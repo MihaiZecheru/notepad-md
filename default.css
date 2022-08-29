@@ -1,0 +1,86 @@
+/* setup page */
+
+* {
+  font-family: "Comfortaa";
+  font-weight: 700;
+}
+
+button:not(.document-button):not(#title-button):not(.btn):not(.btn-close) {
+  cursor: pointer;
+  margin: 10px 0;
+  border-radius: 3rem;
+  border: none;
+  width: 6em;
+  padding: 0.28rem;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+mark {
+  background: #fbf719;
+}
+
+/* footer */
+
+#footer {
+  position: fixed;
+  width: 100vw;
+  height: 5vh;
+  bottom: 0;
+  background: #477bff;
+}
+
+#footer span:nth-child(2) {
+  cursor: pointer;
+}
+
+#user-buttons-container {
+  position: absolute;
+  right: 1em;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.user-button {
+  margin: auto;
+  background: #477bff;
+  color: black;
+}
+
+.user-button:hover {
+  background: black;
+  color: white;
+}
+
+/* general purpose */
+
+.blue {
+  background-color: #477bff;
+}
+
+.justify-content {
+  display: flex;
+  justify-content: center;
+}
+
+.align-items {
+  display: flex;
+  align-items: center;
+}
+
+.disable-highlighting {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.blockquote {
+  border-left: 0.25rem solid #477bff;
+  padding-left: 0.5rem; 
+}

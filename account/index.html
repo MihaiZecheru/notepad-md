@@ -1,0 +1,6 @@
+<script type="module">
+  import { getCookie } from "/modules/cookies.mjs";
+  if (getCookie("nmd-validation"))
+    window.location.href = "/account/me/"
+  else window.location.href = "/account/login/";
+</script>

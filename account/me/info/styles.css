@@ -1,0 +1,45 @@
+h1 {
+  font-size: 2rem;
+}
+
+#delete-account,
+#logout {
+  font-size: 1.25rem;
+  width: 14.5em;
+}
+
+.btn:not(#delete-account):not(#logout):not(.modal-button) {
+  font-size: 1em;
+  width: 12em;
+  margin-left: 1.75em;
+}
+
+.btn:first-child:not(.modal-button) {
+  position: absolute;
+  margin-top: 0;
+}
+
+#change-password {
+  margin-top: .9em;
+}
+
+input.form-control {
+  border-radius: .5em;
+}
+
+input {
+  margin-left: 1vw;
+}
+
+body {
+  display: flex;
+  align-items: flex-start;
+}
+
+body > div.add-margin-top {
+  margin-top: 2.5vh;
+}
+
+button i {
+  margin-right: .5rem;
+}

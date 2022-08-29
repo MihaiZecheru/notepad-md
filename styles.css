@@ -1,0 +1,27 @@
+#header {
+  display: flex;
+  justify-content: center;
+  background: #477bff;
+  padding: 1vh;
+  height: 20vh;
+  align-items: center;
+}
+
+div.card img {
+  display: block;
+  padding: 1vh;
+  width: 80%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.card {
+  width: 15%;
+}
+
+main {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: calc(100vh - 5em - 20vh)
+}
