@@ -27,3 +27,13 @@ main {
   margin-bottom: 1.75%;
   height: 3.6em;
 }
+
+.card-body {
+  overflow-y: hidden;
+}
+
+@supports (overflow-y: overlay) {
+  .card-body:hover {
+    overflow-y: overlay;
+  }
+}
