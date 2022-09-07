@@ -24,11 +24,11 @@ function compileMarkdown(text) {
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
   text = "\n" + text + "\n";
 
-  //                          blockquote
-  let html =  text.replace(/>\ (.*?)<br>/g, "<div class='blockquote'>$1</div><br>")
+  //               newline
+  let html = text.replace(/\n/g, "<br>")
   
-  // newline
-  .replace(/\n/g, "<br>")
+  // blockquote
+  .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div><br>")
 
   // tab
   .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -112,7 +112,7 @@ function compileMarkdown(text) {
     return `<table>${headers}${rows_html}</table>`;
   })
 
-  // center pipes
+  // center
   .replace(/\|(.*?)\|/g, "<center>$1</center>")
 
   if (html.startsWith("<br>"))
@@ -144,6 +144,8 @@ async function saveDocument() {
 
   // check if the new html is different from the previous html
   if (html === previousHTML) return;
+
+  previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
 
   // set the document div to the new html
   doc.innerHTML = html;
