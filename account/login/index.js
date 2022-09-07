@@ -48,7 +48,6 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
     };
 
     // check if email is registered
-    console.log(r)
     if (!r) {
       invalid();
       return;
