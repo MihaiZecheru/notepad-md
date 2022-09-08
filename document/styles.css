@@ -38,6 +38,11 @@ document-title:hover {
   color: #0d6efd;
 }
 
+#download-document-as-html-btn:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .form-group {
   width: 48vw;
   height: 96.5%;
@@ -83,6 +88,11 @@ document-title:hover {
 .document-button:active {
   background: #477bff;
   color: black;
+}
+
+#loading-spinner {
+  float: right;
+  margin-bottom: .25em;
 }
 
 /* move checkboxes closer together */
