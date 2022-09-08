@@ -19,6 +19,11 @@ main {
   border-left: .15em dashed #ccc;
 }
 
+#download-document-as-html-btn:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 document-title {
   color: tomato;
   cursor: pointer;
@@ -36,6 +41,11 @@ document-title:hover {
 #markdown-reference-link:hover {
   text-decoration: underline;
   color: #0d6efd;
+}
+
+#loading-spinner {
+  float: right;
+  margin-bottom: .25em;
 }
 
 .form-group {
