@@ -43,11 +43,16 @@
   <main>
     <div class="form-group disable-highlighting">
       <label for="notepad">Write your document using <a id="markdown-reference-link" href="https://www.markdownguide.org/getting-started/" rel="noopener noreferrer" target="_blank" tabindex="-1">markdown</a></label>
+      <span id="save-status" style="float: right; margin-bottom: .25em; margin-left: .25em; color: #28a745">No New Changes</span>
+      <div id="loading-spinner" class="spinner-border text-primary" style="width: 1.5em; height: 1.5em; visibility: hidden;" role="status"></div>
       <textarea class="form-control" id="notepad" rows="7"></textarea>
     </div>
     <div id="dotted-line"><div></div></div>
     <div class="form-group">
-      <label for="document" class="disable-highlighting"><document-title>Untitled Document</document-title></label>
+      <div class="align-items" style="justify-content: space-between;">
+        <label for="document" class="disable-highlighting"><document-title>Untitled Document</document-title></label>
+        <a id="download-document-as-html-btn" style="color: #28a745;">Download</a>
+      </div>
       <div class="form-control" id="document"></div>
     </div>
   </main>
@@ -68,6 +73,44 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="change">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="new-document-warning" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">New Document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to begin writing a new document?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="new-document-modal-quit-save">Yes, save</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="new-document-modal-quit-nosave" style="width: 9.25em;">Yes, don't save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="login-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Login To Save</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          You have to have an account to save your document, but you can download the document now as a .nmd or .html file.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="register-btn-modal">Register</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="login-btn-modal">Login</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="save-as-html">.html</button>
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="save-as-nmd">.nmd</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
