@@ -20,7 +20,31 @@ function uuid4() {
   });
 }
 
+const isUrl = string => {
+  try { return Boolean(new URL(string)); }
+  catch(e){ return false; }
+}
+
+function get_footnote_ids() {
+  const footnotes = [...new Set(notepad.value.match(/\[\^(\d{1,5})\]/g))];
+  if (!footnotes) return [];
+  return footnotes.map(x => x.match(/\d{1,5}/)[0]);
+}
+
+function get_footnote_count() {
+  const footnotes = notepad.value.match(/\[\^(\d{1,5})\]/g);
+  if (!footnotes) return 0;
+  return Math.ceil(footnotes.length / 2);
+}
+
 function compileMarkdown(text) {
+  // create a unique id for each set of footnotes in the document
+  const footnote_ids = get_footnote_ids();
+  let footnote_uuids = {};
+  for (let i = 0; i < get_footnote_count(); i++) {
+    footnote_uuids[footnote_ids[i]] = uuid4();
+  }
+
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
   text = "\n" + text + "\n";
 
@@ -62,16 +86,16 @@ function compileMarkdown(text) {
   })
 
   // hyperlink
-  .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank'>$1</a>")
+  .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
 
-  // code block
-  .replace(/\`\`\`(.*?)\`\`\`/g, "<pre class='prettyprint'>$1</pre>")
+  // codeblock
+  .replace(/\`\`\`<br>(.*?)<br>\`\`\`/g, "<pre class='prettyprint'>$1</pre>")
+
+  // inline code / pink text
+  .replace(/!\`(.*?)\`/g, "<code>$1</code>")
 
   // highlight
-  .replace(/!\`(.*?)\`/g, "<mark>$1</mark>")
-
-  // inline code
-  .replace(/\`(.*?)\`/g, "<code>$1</code>")
+  .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
   
   // checkbox
   .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
@@ -112,16 +136,62 @@ function compileMarkdown(text) {
     return `<table>${headers}${rows_html}</table>`;
   })
 
-  // center
+  // center pipes
   .replace(/\|(.*?)\|/g, "<center>$1</center>")
+
+  // footnote-bottom
+  .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
+    const footnote_id = c.substring(2, c.indexOf("]"));
+    const footnote_uuid = footnote_uuids[footnote_id];
+    const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
+    return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
+  })
+  // footnote-top
+  .replace(/\[\^(\d{1,5})\]/g, (c) => {
+    const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
+    const footnote_uuid = footnote_uuids[footnote_id];
+    return `<span class="footnote-top" onclick="goto(\"${footnote_uuid}\")">${footnote_id}</span>`;
+  })
+
+  // superscript
+  .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
 
   if (html.startsWith("<br>"))
     html = html.substring(4, html.length);
   
   if (html.endsWith("<br>"))
     return html.substring(0, html.length - 4);
-
   return html;
+}
+
+function showSpinner() {
+  document.getElementById("loading-spinner").style.visibility = "visible";
+}
+
+function hideSpinner() {
+  document.getElementById("loading-spinner").style.visibility = "hidden";
+}
+
+function setSaveStatus(status) {
+  let ele_;
+  switch (status) {
+    case "saved":
+      ele_ = document.getElementById("save-status");
+      ele_.innerText = "No New Changes";
+      ele_.style.color = "#28a745";
+      break;
+    case "saving":
+      ele_ = document.getElementById("save-status")
+      ele_.innerText = "Saving Changes...";
+      ele_.style.color = "#ffc107";
+      break;
+    case "not-saved":
+      ele_ = document.getElementById("save-status");
+      ele_.innerText = "Unsaved Changes";
+      ele_.style.color = "tomato";
+
+      break;
+  }
 }
 
 async function saveDocument() {
@@ -135,6 +205,8 @@ async function saveDocument() {
 
   let text = notepad.value.trim();
   if (text.length === 0 || text === previousText) return;
+  showSpinner();
+  setSaveStatus("saving");
   
   // set the previous text to the current text
   previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
@@ -143,7 +215,11 @@ async function saveDocument() {
   const html = compileMarkdown(text);
 
   // check if the new html is different from the previous html
-  if (html === previousHTML) return;
+  if (html === previousHTML) {
+    hideSpinner();
+    setSaveStatus("saved");
+    return;
+  }
 
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
 
@@ -196,6 +272,9 @@ async function saveDocument() {
     setCookie("nmd-validation", JSON.stringify(cookie));
     setCookie("documents", JSON.stringify(getCookie("documents") ? [ document_uuid ].concat(JSON.parse(getCookie("documents"))) : [ document_uuid ]));
   }
+
+  hideSpinner();
+  setSaveStatus("saved");
 }
 
 function getStartAndEndPositions() {
@@ -215,7 +294,17 @@ document.addEventListener("keypress", (event) => {
   }
 });
 
+async function check_for_changes() {
+  if (previousText !== notepad.value) {
+    setSaveStatus("not-saved");
+    previousText === notepad.value;
+  }
+}
+
 document.getElementById("notepad").addEventListener("keydown", (event) => {
+  check_for_changes();
+  const sel = window.getSelection().toString();
+  
   if (event.key === "Escape") {
     event.preventDefault();
     notepad.blur();
@@ -225,7 +314,11 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   // codebox
   if (event.altKey && event.code === "Backquote") {
     event.preventDefault();
-    insertText("```\n\n```", -4);
+    if (sel.length === 0) {
+      insertText("```\n\n```", -4);
+    } else if (notepad.value.includes(sel)) {
+      insertText(`\`\`\`\n${sel}\n\`\`\``);
+    }
   }
 
   // horizontal rule
@@ -239,7 +332,15 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   if (event.altKey && event.code === "KeyV") {
     if (event.shiftKey) {
       event.preventDefault();
-      insertText("$[]()", -3);
+      if (sel.length === 0) {
+        insertText("$[]()", -3);
+      } else if (notepad.value.includes(sel)) {
+        if (isUrl(sel)) {
+          insertText(`$[](${sel})`, 0 - (3 + sel.length));
+        } else {
+          insertText("$[]()", -3);
+        }
+      }
     } else {
       event.preventDefault();
     }
@@ -263,10 +364,18 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     // unchecked
     if (event.shiftKey) {
       event.preventDefault();
-      insertText("- [x] ");
+      if (sel.length === 0) {
+        insertText("- [x] ");
+      } else if (notepad.value.includes(sel)) {
+        insertText(`- [x] ${sel}`, 0);
+      }
     } else { // checked
       event.preventDefault();
-      insertText("- [] ");
+      if (sel.length === 0) {
+        insertText("- [] ");
+      } else if (notepad.value.includes(sel)) {
+        insertText(`- [] ${sel}`, 0);
+      }
     }
     return;
   }
@@ -274,14 +383,22 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   // strikethrough
   if (event.altKey && event.code === "KeyS") {
     event.preventDefault();
-    insertText("~~~~", -2);
+    if (sel.length === 0) {
+      insertText("~~~~", -2);
+    } else if (notepad.value.includes(sel)) {
+      insertText(`~~${sel}~~`, 0);
+    }
     return;
   }
 
   // highlight
   if (event.altKey && event.code === "KeyH") {
     event.preventDefault();
-    insertText("!``", -1);
+    if (sel.length === 0) {
+      insertText("``", -1);
+    } else if (notepad.value.includes(sel)) {
+      insertText(`\`${sel}\``, 0);
+    }
     return;
   }
 
@@ -299,22 +416,57 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.ctrlKey) {
     switch (event.code) {
+      case "KeyK":
+        event.preventDefault();
+        if (event.shiftKey) {
+          if (notepad.selectionStart === notepad.selectionEnd) {
+            const lines = notepad.value.split("\n");
+            const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+            let start_of_line = 0;
+            for (let i = 0; i < line - 1; i++) {
+              start_of_line += lines[i].length + 1;
+            }
+            const end_of_line = start_of_line + lines[line - 1].length;
+            notepad.value = notepad.value.substring(0, start_of_line - 1) + notepad.value.substring(end_of_line);
+            notepad.selectionStart = notepad.selectionEnd = start_of_line;
+          } else {
+            notepad.value = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
+            notepad.selectionStart = notepad.selectionEnd = notepad.selectionStart;
+          }
+        }
+        break;
+
       // italics
       case "KeyI":
+        if (event.shiftKey) {
+          return;
+        }
         event.preventDefault();
-        insertText("**", -1);
+        if (sel.length === 0) {
+          insertText("**", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`*${sel}*`, 0);
+        }
         break;
 
       // bold
       case "KeyB":
         event.preventDefault();
-        insertText("****", -2);
+        if (sel.length === 0) {
+          insertText("****", -2);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`**${sel}**`, 0);
+        };
         break;
 
       // underline
       case "KeyU":
         event.preventDefault();
-        insertText("____", -2);
+        if (sel.length === 0) {
+          insertText("____", -2);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`__${sel}__`, 0);
+        }
         break;
 
       // save document
@@ -326,44 +478,97 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       // pink text
       case "KeyH":
         event.preventDefault();
-        insertText("``", -1);
+        if (sel.length === 0) {
+          insertText("``", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`\`${sel}\``, 0);
+        }
         break;
 
       // hyperlink
       case "KeyL":
-        // hyperlink
         event.preventDefault();
-        insertText("[]()", -3);
+        if (sel.length === 0) {
+          insertText("[]()", -3);
+        } else if (notepad.value.includes(sel)) {
+          if (isUrl(sel)) {
+            insertText(`[](${sel})`, 0 - (3 + sel.length));
+          } else {
+            insertText("[]()", -3);
+          }
+        }
         break;
 
       // image
       case "KeyM":
         event.preventDefault();
-        insertText("![]()", -3);
+        if (sel.length === 0) {
+          insertText("![]()", -3);
+        } else if (notepad.value.includes(sel)) {
+          if (isUrl(sel)) {
+            insertText(`![](${sel})`, 0 - (3 + sel.length));
+          } else {
+            insertText("![]()", -3);
+          }
+        }
         break;
 
       // iframe embed
       case "KeyE":
         event.preventDefault();
-        insertText("&[]()", -3);
+        if (sel.length === 0) {
+          insertText("&[]()", -3);
+        } else if (notepad.value.includes(sel)) {
+          if (isUrl(sel)) {
+            insertText(`&[](${sel})`, 0 - (3 + sel.length));
+          } else {
+            insertText("&[]()", -3);
+          }
+        }
         break;
 
       // quote
       case "KeyQ":
         event.preventDefault();
-        insertText("> ");
+        if (sel.length === 0) {
+          insertText("> ");
+        } else if (notepad.value.includes(sel)) {
+          insertText(`> ${sel}`, 0);
+        }
         break;
 
       // footnote
       case "Digit6":
         if (event.shiftKey) {
           event.preventDefault();
-          insertText("[^1]\n\n[^1]: ");
+          const location = notepad.selectionStart;
+          const footnote_count = get_footnote_count() + 1;
+          insertText(`[^${footnote_count}]`);
+          notepad.selectionStart = notepad.value.length;
+          notepad.value += `\n[^${footnote_count}]: `;
+          notepad.selectionStart = notepad.selectionEnd = location + `[^${footnote_count}]`.length;
+        }
+        break;
+
+      // subscript
+      case "Comma":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("__", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`_${sel}_`, 0);
+        }
+        break;
+
+      case "Period":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("^^", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`^${sel}^`, 0);
         }
         break;
     }
-
-    // superscript is ^text^ and subscript is _text_
   }
 
   // replace tab with \t
@@ -374,42 +579,94 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 });
 
 document.getElementById("italics").addEventListener("click", () => {
-  insertText("**", -1);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("**", -1);
+  } else if (notepad.value.includes(sel)) {
+    insertText(`*${sel}*`, 0);
+  }
   notepad.focus();
 });
 
 document.getElementById("bold").addEventListener("click", () => {
-  insertText("****", -2);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("****", -2);
+  } else if (notepad.value.includes(sel)) {
+    insertText(`**${sel}**`, 0);
+  }
   notepad.focus();
 });
 
 document.getElementById("underline").addEventListener("click", () => {
-  insertText("____", -2);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("____", -2);
+  } else if (notepad.value.includes(sel)) {
+    insertText(`__${sel}__`, 0);
+  }
   notepad.focus();
 });
 
 document.getElementById("strikethrough").addEventListener("click", () => {
-  insertText("~~~~", -2);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("~~~~", -2);
+  } else if (notepad.value.includes(sel)) {
+    insertText(`~~${sel}~~`, 0);
+  }
   notepad.focus();
 });
 
 document.getElementById("highlight").addEventListener("click", () => {
-  insertText("``", -1);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("``", -1);
+  } else if (notepad.value.includes(sel)) {
+    insertText(`\`${sel}\``, 0);
+  }
   notepad.focus();
 });
 
 document.getElementById("link").addEventListener("click", () => {
-  insertText("[]()", -3);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("[]()", -3);
+  } else if (notepad.value.includes(sel)) {
+    if (isUrl(sel)) {
+      insertText(`[](${sel})`, 0 - (3 + sel.length));
+    } else {
+      insertText("[]()", -3);
+    }
+  }
   notepad.focus();
 });
 
 document.getElementById("image").addEventListener("click", () => {
-  insertText("![]()", -3);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("![]()", -3);
+  } else if (notepad.value.includes(sel)) {
+    if (isUrl(sel)) {
+      insertText(`![](${sel})`, 0 - (3 + sel.length));
+    } else {
+      insertText("![]()", -3);
+    }
+  }
   notepad.focus();
 });
 
 document.getElementById("video").addEventListener("click", () => {
-  insertText("$[]()", -3);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("$[]()", -3);
+  } else if (notepad.value.includes(sel)) {
+    if (isUrl(sel)) {
+      insertText(`$[](${sel})`, 0 - (3 + sel.length));
+    } else {
+      insertText("$[]()", -3);
+    }
+  }
   notepad.focus();
 });
 
@@ -419,12 +676,26 @@ document.getElementById("save").addEventListener("click", () => {
 });
 
 document.getElementById("embed").addEventListener("click", () => {
-  insertText("&[]()", -3);
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("&[]()", -3);
+  } else if (notepad.value.includes(sel)) {
+    if (isUrl(sel)) {
+      insertText(`&[](${sel})`, 0 - (3 + sel.length));
+    } else {
+      insertText("&[]()", -3);
+    }
+  }
   notepad.focus();
 });
 
 document.getElementById("quote").addEventListener("click", () => {
-  insertText("> ");
+  const sel = window.getSelection().toString();
+  if (sel.length === 0) {
+    insertText("> ");
+  } else if (notepad.value.includes(sel)) {
+    insertText(`> ${sel}`, 0);
+  }
   notepad.focus();
 });
 
@@ -439,9 +710,22 @@ document.getElementById("ordered-list").addEventListener("click", () => {
 });
 
 document.getElementById("checkbox").addEventListener("click", (event) => {
-  if (event.ctrlKey) 
-    insertText("- [x] ");
-  else insertText("- [] ");
+  if (event.ctrlKey)  {
+    const sel = window.getSelection().toString();
+    if (sel.length === 0) {
+      insertText("- [x] ");
+    } else if (notepad.value.includes(sel)) {
+      insertText(`- [x] ${sel}`, 0);
+    }
+  }
+  else {
+    const sel = window.getSelection().toString();
+    if (sel.length === 0) {
+      insertText("- [] ");
+    } else if (notepad.value.includes(sel)) {
+      insertText(`- [] ${sel}`, 0);
+    }
+  }
   notepad.focus();
 });
 
@@ -579,3 +863,7 @@ document.getElementById("save-as-nmd").addEventListener("click", () => {
   const _HTML = getHtml();
   download(_HTML, `${title}.nmd`);
 }); 
+
+document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
+  download(getHtml(), `${title}.html`);
+});
