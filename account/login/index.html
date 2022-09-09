@@ -16,7 +16,7 @@
   <script type="module" src="../../modules/update_last_active.mjs"></script>
 </head>
 <body>
-  <img src="https://img.freepik.com/free-vector/login-form-website-register-authorizing-page-sign-up-mobile-tablet-app-application-username-password-account-interface-flat-vector-line-art-illustration-isolated-white-background_198278-9461.jpg?w=1380"
+  <img src="/static/login_page.png"
               class="img-fluid" alt="login img" width="57%">
   <div id="login">
     <form action="/account/me/">
@@ -48,6 +48,23 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="already-logged-in-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Logged In</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          You are already logged in as <span id="logged-in-email"></span>. Do you want to log out?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="already-logged-in-modal-close">Close</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="already-logged-in-modal-logout">Logout</button>
         </div>
       </div>
     </div>
