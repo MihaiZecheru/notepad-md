@@ -904,7 +904,7 @@ const modal_new_title_input = document.querySelector("div.modal-body > form > di
 document.querySelector("document-title").addEventListener("click", () => {
   modal_new_title_input.value = title;
   new bootstrap.Modal(document.getElementById("change-title-modal")).show();  
-  new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.focus());
+  new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
 });
 
 modal_new_title_input.addEventListener("keydown", (event) => {
