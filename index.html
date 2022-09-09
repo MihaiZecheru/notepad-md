@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script type="module">
+    import { getCookie } from "/modules/cookies.mjs";
+    if (getCookie("nmd-validation")) {
+      window.location.href = "/account/me/";
+    }
+  </script>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +18,6 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="default.css">
   <script src="default.js" defer></script>
-  <script type="module">
-    import { getCookie } from "/modules/cookies.mjs";
-    if (getCookie("nmd-validation")) {
-      window.location.href = "/account/me/";
-    }
-  </script>
 </head>
 <body>
   <div id="header">
