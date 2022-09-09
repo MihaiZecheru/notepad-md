@@ -1,5 +1,22 @@
-import { setCookie } from "/modules/cookies.mjs"
+import { getCookie, setCookie, deleteCookie } from "/modules/cookies.mjs"
 import { getDocumentIds } from "/modules/documents.mjs";
+
+if (getCookie("nmd-validation")) {
+  document.getElementById("logged-in-email").innerText = (JSON.parse(getCookie("nmd-validation"))).email;
+  new bootstrap.Modal(document.getElementById("already-logged-in-modal")).show();
+}
+
+document.querySelector("#already-logged-in-modal #already-logged-in-modal-logout").addEventListener("click", () => {
+  deleteCookie("nmd-validation");
+  deleteCookie("documents");
+  window.sessionStorage.removeItem("already-updated");
+  emailBox.select();
+  passwordBox.value = "";
+});
+
+document.querySelector("#already-logged-in-modal #already-logged-in-modal-close").addEventListener("click", () => {
+  window.location.href = "/account/me/";
+});
 
 const emailBox = document.getElementById("email");
 const passwordBox = document.getElementById("password");
