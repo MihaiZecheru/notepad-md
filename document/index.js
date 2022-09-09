@@ -88,7 +88,7 @@ function htmlToMarkdown(html) {
   .replace(/<ol start="(.*?)"><li>(.*?)<\/li><\/ol>/g, "$1. $2\n")
 
   // center
-  .replace(/<center>(.*?)<\/center>/g, "|$1|")
+  .replace(/<center>(.*?)<\/center>/g, "{$1}")
 
   // checkbox
   .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"(" checked" | "")><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div><br>/g, (c) => {
@@ -344,7 +344,7 @@ function compileMarkdown(text) {
   })
 
   // center pipes
-  .replace(/\|(.*?)\|/g, "<center>$1</center>")
+  .replace(/\{(.*?)\}/g, "<center>$1</center>")
 
   // footnote-bottom
   .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
