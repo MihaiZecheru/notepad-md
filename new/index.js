@@ -203,10 +203,12 @@ async function saveDocument() {
     return;
   }
 
-  let text = notepad.value.trim();
+  let text = notepad.value;
   if (text.length === 0 || text === previousText) return;
   showSpinner();
   setSaveStatus("saving");
+
+  text = text.trim();
   
   // set the previous text to the current text
   previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
