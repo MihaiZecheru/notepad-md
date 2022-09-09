@@ -19,9 +19,22 @@ main {
   border-left: .15em dashed #ccc;
 }
 
-#download-document-as-html-btn:hover {
+.dropdown-toggle {
+  background: none;
+  margin: 0!important;
+  color: #28a745;
+  padding: 0!important;
+}
+
+.dropdown-item:hover {
+  color: #28a745;
+  background: none;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.dropdown-menu {
+  padding: 0!important;
 }
 
 document-title {
