@@ -43,7 +43,14 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
   const password = passwordBox.value.trim();
 
   // make sure fields are not blank
-  if (!email || !password) return;
+  if (!email) {
+    emailBox.focus();
+    return;
+  }
+  if (!password) {
+    passwordBox.focus();
+    return;
+  }
 
   // check if email exists
   new Promise((_r) => {
