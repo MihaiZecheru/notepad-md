@@ -137,7 +137,7 @@ function compileMarkdown(text) {
   })
 
   // center pipes
-  .replace(/\|(.*?)\|/g, "<center>$1</center>")
+  .replace(/\{(.*?)\}/g, "<center>$1</center>")
 
   // footnote-bottom
   .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
