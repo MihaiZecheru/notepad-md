@@ -878,3 +878,33 @@ document.getElementById("save-as-nmd").addEventListener("click", () => {
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
   download(getHtml(), `${title}.html`);
 });
+
+const toggle_direct_edit_switch = document.getElementById("toggle-direct-edit");
+toggle_direct_edit_switch.addEventListener("click", () => {
+  if (toggle_direct_edit_switch.checked) {
+    doc.setAttribute("contenteditable", "true");
+    doc.focus();
+  } else {
+    doc.setAttribute("contenteditable", "false");
+  }
+});
+
+document.getElementById("download-document-as-nmd-btn").addEventListener('click', () => {
+  download(getHtml(), `${title}.nmd`);
+});
+
+document.getElementById("copy-html-btn").addEventListener('click', () => {
+  navigator.clipboard.writeText(getHtml());
+});
+
+document.getElementById("copy-md-btn").addEventListener('click', () => {
+  navigator.clipboard.writeText(notepad.value.trim());
+});
+
+document.getElementById("ownload-notepad-as-txt-btn").addEventListener('click', () => {
+  download(notepad.value.trim(), `${title}.txt`);
+});
+
+document.getElementById("export-as-google-doc-btn").addEventListener('click', () => {
+  // todo: add google docs export
+});
