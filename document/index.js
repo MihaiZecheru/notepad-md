@@ -212,15 +212,15 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     "Content-Type": "application/json"
   }
 }).then(r => r.json()).then(_doc => {
-  if (!doc) window.location.href = "/account/me/documents/";
-  previousHTML = _doc.content;
+  if (!_doc) window.location.href = "/account/me/documents/";
+  previousHTML = _doc.content || "";
   doc.innerHTML = previousHTML;
   title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = title;
   title_ele.style.color = "#0d6efd";
   document.title = title;
-  notepad.value = previousText = htmlToMarkdown(_doc.content);
+  notepad.value = previousText = htmlToMarkdown(_doc.content || "");
   notepad.setSelectionRange(0, 0);
 });
 
@@ -402,10 +402,12 @@ function setSaveStatus(status) {
 }
 
 async function saveDocument() {
-  let text = notepad.value.trim();
+  let text = notepad.value;
   if (text.length === 0 || text === previousText) return;
   showSpinner();
   setSaveStatus("saving");
+
+  text = text.trim();
   
   // set the previous text to the current text
   previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
