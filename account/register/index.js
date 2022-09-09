@@ -19,7 +19,14 @@ document.querySelector("button").addEventListener("click", () => {
   const password = passwordBox.value.trim();
 
   // make sure fields are not blank
-  if (!email || !password) return;
+  if (!email) {
+    emailBox.focus();
+    return;
+  } 
+  if (!password) {
+    passwordBox.focus();
+    return;
+  }
 
   // validate email
   const regex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
