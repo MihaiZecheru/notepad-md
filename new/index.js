@@ -415,6 +415,15 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     event.preventDefault();
     new bootstrap.Modal(document.getElementById("new-document-warning")).show();
   }
+
+  // center
+  if (event.altKey && event.code === "KeyE") {
+    if (sel.length === 0) {
+      insertText("{}", -1);
+    } else if (notepad.value.includes(sel)) {
+      insertText(`{${sel}}`, 0);
+    }
+  }
   
   if (event.ctrlKey) {
     switch (event.code) {
