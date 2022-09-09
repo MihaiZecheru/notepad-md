@@ -298,11 +298,11 @@ function compileMarkdown(text) {
   // codeblock
   .replace(/\`\`\`<br>(.*?)<br>\`\`\`/g, "<pre class='prettyprint'>$1</pre>")
 
+  // inline code / pink text
+  .replace(/!\`(.*?)\`/g, "<code>$1</code>")
+  
   // highlight
-  .replace(/!\`(.*?)\`/g, "<mark>$1</mark>")
-
-  // inline code
-  .replace(/\`(.*?)\`/g, "<code>$1</code>")
+  .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
   
   // checkbox
   .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
