@@ -901,7 +901,7 @@ document.getElementById("copy-md-btn").addEventListener('click', () => {
   navigator.clipboard.writeText(notepad.value.trim());
 });
 
-document.getElementById("ownload-notepad-as-txt-btn").addEventListener('click', () => {
+document.getElementById("download-notepad-as-txt-btn").addEventListener('click', () => {
   download(notepad.value.trim(), `${title}.txt`);
 });
 
