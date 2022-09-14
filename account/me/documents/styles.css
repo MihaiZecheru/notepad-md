@@ -20,6 +20,8 @@ main {
   height: 25vh;
   margin: 2.5vh auto 0 auto;
   margin-top: 2.5vh;
+  transition: .5s ease;
+
 }
 
 .document-title-btn {
