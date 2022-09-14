@@ -25,3 +25,7 @@ div.card img {
 .card {
   width: 15%;
 }
+
+.card a.btn {
+  width: 100%;
+}
