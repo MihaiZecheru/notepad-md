@@ -9,6 +9,23 @@ if (!getCookie("nmd-validation")) {
   window.location.href = "/account/login/";
 }
 
+const parameters = new URLSearchParams(window.location.search);
+const mode = parameters.get('mode');
+if (mode === "view") {
+  new Promise((r_) => {
+    setTimeout(r_, 250);
+  }).then(() => {
+    document.querySelector(".dropleft > span").click();
+    document.getElementById("notepad").blur();
+  });
+} else if (mode === "edit") {
+  new Promise((r_) => {
+    setTimeout(r_, 250);
+  }).then(() => {
+    document.querySelector("main div > span").click();
+  });
+}
+
 const isUrl = string => {
   try { return Boolean(new URL(string)); }
   catch(e){ return false; }
@@ -30,8 +47,8 @@ function htmlToMarkdown(html) {
   html = `<br>${html}<br>`;
   
   // blockquote
-  let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1\n")
-  
+  let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
+
   // tab
   .replace(/(&nbsp;){8}/g, "\t")
 
@@ -76,7 +93,7 @@ function htmlToMarkdown(html) {
   .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank'>(.*?)<\/a>/g, "[$2]($1)") // backwards compatibility
 
   // image
-  .replace(/<img src="(.*?)" alt="(.*?)">/g, "![$2]($1)")
+  .replace(/<img src="(.*?)" alt="(.*?)" id="(.*?)" style="width: 100%;"><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "![$2]($1)")
 
   // video and embed
   .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "&[$4]($2)")
@@ -85,7 +102,7 @@ function htmlToMarkdown(html) {
   .replace(/<ul><li>(.*?)<\/li><\/ul>/g, "\n- $1")
 
   // ordered list
-  .replace(/<ol start="(.*?)"><li>(.*?)<\/li><\/ol>/g, "$1. $2\n")
+  .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
 
   // center
   .replace(/<center>(.*?)<\/center>/g, "{$1}")
@@ -106,7 +123,7 @@ function htmlToMarkdown(html) {
     const columns = table.match(/<th>(.*?)<\/th>/g).length;
     
     table = table
-      .replace(/<th>\|(.*?)\|/g, "| $1")
+      .replace(/<th>\{(.*?)\}/g, "| $1")
       .replace(/(<\/th>\|)|(<\/th>)/g, " |")
       .replace(/<(\/)?tr>/g, "")
       .replace(/<(\/)?table>/g, "");
@@ -174,6 +191,8 @@ function htmlToMarkdown(html) {
   // newline
   .replace(/<br>/g, "\n")
 
+  // .replace(//g, "\n")
+
   if (text.substring(0, 1) === "\n") {
     text = text.substring(1);
   }
@@ -202,6 +221,8 @@ let previousText = "";
 // get the document title
 let title = "Untitled Document";
 
+let NOTEPAD_DISABLED = false;
+
 // get the document content
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
   method: "GET",
@@ -213,6 +234,15 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   }
 }).then(r => r.json()).then(_doc => {
   if (!_doc) window.location.href = "/account/me/documents/";
+  if (_doc.owner.replace(/,/g, ".") !== JSON.parse(getCookie("nmd-validation")).email) {
+    notepad.style.opacity = '0.5';
+    notepad.style.cursor = 'not-allowed';
+    notepad.classList.add("disable-highlighting");
+    notepad.setAttribute("disabled", "true");
+    NOTEPAD_DISABLED = true;
+    document.querySelector("main div > span").setAttribute("title", "Notepad Fullscreen | Disabled");
+    notepad.setAttribute("title", "You do not have permission to edit this document");
+  }
   previousHTML = _doc.content || "";
   doc.innerHTML = previousHTML;
   title = _doc.title;
@@ -259,7 +289,9 @@ function compileMarkdown(text) {
   let html = text.replace(/\n/g, "<br>")
   
   // blockquote
-  .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div><br>")
+  .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
+
+  // .replace(//g, "\n")
 
   // tab
   .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -313,7 +345,7 @@ function compileMarkdown(text) {
   })
 
   // horizontal rule
-  .replace(/<br>---/g, "<hr>")
+  .replace(/<br>---/g, "<br><hr>")
 
   // unordered list
   .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
@@ -403,7 +435,7 @@ function setSaveStatus(status) {
 
 async function saveDocument() {
   let text = notepad.value;
-  if (text.length === 0 || text === previousText) return;
+  if (text === previousText) return;
   showSpinner();
   setSaveStatus("saving");
 
@@ -462,7 +494,7 @@ document.addEventListener("keypress", (event) => {
 });
 
 async function check_for_changes() {
-  if (previousText !== notepad.value) {
+  if (previousText.trim() !== notepad.value.trim()) {
     setSaveStatus("not-saved");
     previousText === notepad.value;
   }
@@ -909,7 +941,7 @@ const modal_new_title_input = document.querySelector("div.modal-body > form > di
 
 document.querySelector("document-title").addEventListener("click", () => {
   modal_new_title_input.value = title;
-  new bootstrap.Modal(document.getElementById("change-title-modal")).show();  
+  new bootstrap.Modal(document.getElementById("change-title-modal")).show();
   new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
 });
 
@@ -985,17 +1017,29 @@ function getHtml() {
 }
 
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
-  download(getHtml(), `${title}.html`);
-});
-
-const toggle_direct_edit_switch = document.getElementById("toggle-direct-edit");
-toggle_direct_edit_switch.addEventListener("click", () => {
-  if (toggle_direct_edit_switch.checked) {
-    doc.setAttribute("contenteditable", "true");
-    doc.focus();
-  } else {
-    doc.setAttribute("contenteditable", "false");
-  }
+  download(`<!DOCTYPE>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://notes.mzecheru.com/static/notepad.png">
+    <title>Untitled Document</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://notes.mzecheru.com/document/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
+    </script><link rel="stylesheet" href="../default.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/prettify.css">
+  </head>
+  <body>
+    ${getHtml()}
+    <a class="btn btn-primary" href="https://notes.mzecheru.com/document/?id=${document_uuid}" style="position: fixed; right: .5vw; bottom: 1vh;">View in Notepad MD</a>
+  </body>
+  </html>`, `${title}.html`);
 });
 
 document.getElementById("download-document-as-nmd-btn").addEventListener('click', () => {
@@ -1016,4 +1060,92 @@ document.getElementById("download-notepad-as-txt-btn").addEventListener('click',
 
 document.getElementById("export-as-google-doc-btn").addEventListener('click', () => {
   // todo: add google docs export
+});
+
+let notepad_fullscreen = false;
+document.querySelector("main div > span").addEventListener('click', () => {
+  if (NOTEPAD_DISABLED) return;
+  if (!notepad_fullscreen) {
+    notepad.style.position = "fixed";
+    notepad.style.width = "98.75vw";
+    notepad.style.height = "120vh";
+    notepad.style.zIndex = "1000";
+    document.querySelector("main div > span").innerText = "fullscreen_exit";
+    document.getElementById("footer").style.visibility= "hidden";
+    document.getElementById("dotted-line").style.visibility= "hidden";
+    notepad_fullscreen = true;
+    document.getElementById("notepad").focus();
+  } else {
+    notepad.style.position = "relative";
+    notepad.style.width = "100%";
+    notepad.style.height = "calc(100% - 5vh)";
+    notepad.style.zIndex = "0";
+    document.querySelector("main div > span").innerText = "fullscreen";
+    document.getElementById("footer").style.visibility= "visible";
+    document.getElementById("dotted-line").style.visibility= "visible";
+    notepad_fullscreen = false;
+    document.getElementById("notepad").focus();
+  }
+});
+
+let doc_fullscreen = false;
+let doc_fullscreen_previous_styles = {};
+document.querySelector(".dropleft > span").addEventListener('click', () => {
+  if (!doc_fullscreen) {
+    doc.style.position = "absolute";
+    doc.style.top = "0";
+    doc.style.left = "0";
+    doc.style.width = "100vw";
+    doc.style.height = "120vh";
+    const fullscreen_box = document.querySelector(".dropleft > span");
+    doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
+    fullscreen_box.innerText = "fullscreen_exit";
+    fullscreen_box.style.position = "fixed";
+    fullscreen_box.style.top = "1vh";
+    fullscreen_box.style.right = "1vh";
+    fullscreen_box.style.float = "right";
+    fullscreen_box.style.zIndex = "1000";
+    doc_fullscreen = true;
+    doc.focus();
+  } else {
+    doc.style.position = "relative";
+    doc.style.top = "";
+    doc.style.width = "100%";
+    doc.style.height = "calc(100% - 3.13vh)";
+    doc.style.zIndex = "0";
+    const fullscreen_box = document.querySelector(".dropleft > span");
+    fullscreen_box.innerText = "fullscreen";
+    fullscreen_box.style = doc_fullscreen_previous_styles;
+    doc_fullscreen = false;
+    doc.focus();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.altKey && e.code === "Digit1") {
+    if (NOTEPAD_DISABLED) return;
+    if (doc_fullscreen) {
+      // exit fullscreen
+      document.querySelector(".dropleft > span").click();
+    }
+    document.querySelector("main div > span").click();
+  }
+  
+  if (e.altKey && e.code === "Digit2") {
+    if (notepad_fullscreen) {
+      // notepad is fullscreen, so we need to exit it first
+      document.querySelector("main div > span").click();
+    };
+    document.querySelector(".dropleft > span").click();
+  }
+});
+
+window.onbeforeunload = () => {
+  if (notepad.value.trim() !== "" && document.getElementById("save-status").innerText !== "No New Changes") {
+    return "Are you sure you want to leave? Your changes will not be saved.";
+  }
+}
+
+document.getElementById("copy-share-link-btn").addEventListener('click', () => {
+  navigator.clipboard.writeText(`https://notes.mzecheru.com/document/?id=${document_uuid}&mode=view`);
 });
