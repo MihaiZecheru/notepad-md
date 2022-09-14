@@ -63,14 +63,15 @@ document-title:hover {
 
 .form-group > textarea {
   resize: none;
-  height: calc(100% - 5vh);
+  height: calc(100% - 3.5vh);
   overflow-y: scroll;
 }
 
 /* since #document isn't a textarea, the above style can't apply to it */
 #document {
-  height: calc(100% - 5vh);
+  height: calc(100% - 3.13vh);
   overflow-y: scroll;
+  padding: .375rem .75rem;
 }
 
 #header {
@@ -141,3 +142,20 @@ tr:nth-child(even) td:not(td:last-child) {
   width: 100%;
   text-align: right;
 } 
+
+ul, ol {
+  margin-bottom: 0;
+}
+
+div.blockquote {
+  margin-bottom: 0;
+}
+
+.fullscreen {
+  color: black;
+}
+
+.fullscreen:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
