@@ -43,14 +43,29 @@
       </div>
     </div>
     <div class="card">
-      <a href="/new/">
+      <a class="new-doc">
         <img src="/static/new_document.png" class="card-img-top" alt="new_document.png">
       </a>
     
       <div class="card-body">
         <h5 class="card-title">New Document</h5>
         <p class="card-text">Create a new document or upload a text/markdown file to be saved to your Documents page.</p>
-        <a href="/new/" class="btn btn-primary">Create new document</a>
+        <a class="btn btn-primary new-doc">Create new document</a>
+        <script>
+          function uuid4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+              var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+          }
+          
+          document.querySelectorAll(".new-doc").forEach((ele) => {
+            ele.addEventListener("click", () => {
+            window.sessionStorage.setItem("new-doc-validation", uuid4());
+            window.location.href = "/new/";
+          });
+          });
+        </script>
       </div>
     </div>
   </main>
