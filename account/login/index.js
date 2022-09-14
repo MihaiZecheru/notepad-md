@@ -82,7 +82,7 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       // login
       const d = new Date(); const today = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
       getDocumentIds(email).then((documentIds) => {
-        setCookie("nmd-validation", JSON.stringify({ email, password, created_on: today, last_active: today, document_count: documentIds.length }), 1);
+        setCookie("nmd-validation", JSON.stringify({ email, password, created_on: r.created_on, last_active: today, document_count: documentIds.length }), 1);
         setCookie("documents", JSON.stringify(documentIds));
         if (_b === "new")
           document.querySelector("form").action = "../../new/";
