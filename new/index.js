@@ -32,7 +32,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     "Content-Type": "application/json"
   },
-  body: JSON.stringify({ title: "Untitled Document", content: "", last_visit: getDate(), owner: email.replace(/\./g, ",") })
+  body: JSON.stringify({ title: "Untitled Document", content: "", last_visit: getDate(), owner: email })
 }).then(() => {
   window.sessionStorage.removeItem("new-doc-validation");
   if (!JSON.parse(getCookie("documents")).includes(document_uuid)) {
