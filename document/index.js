@@ -469,7 +469,7 @@ async function saveDocument() {
       "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ title, content: html, last_visit: getDate() })
+    body: JSON.stringify({ title, content: html, last_visit: getDate(), owner: JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",") })
   });
 
   hideSpinner();
