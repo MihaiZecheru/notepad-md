@@ -41,7 +41,7 @@ async function createCard(doc) {
   ["card", "shadow", "mb-5", "bg-body", "rounded"].forEach(cls => ele.classList.add(cls));
   ele.innerHTML = 
   `<div class="card-body" id="${doc.id}">
-  <span class="card-title"><a href="/document/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc.title.length > max_title_length ? doc.title.substring(0, max_title_length) + "..." : doc.title}</a></span>
+  <span class="card-title"><a href="/document/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc?.title?.length > max_title_length ? doc?.title?.substring(0, max_title_length) + "..." : doc?.title ? doc.title : "NO TITLE"}</a></span>
   <p class="card-text">${parseText(doc.content)}</p>
   </div>
 
