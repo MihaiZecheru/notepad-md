@@ -648,6 +648,18 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
             notepad.value = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
             notepad.selectionStart = notepad.selectionEnd = notepad.selectionStart;
           }
+        } else {
+          // hyperlink
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("[]()", -3);
+          } else if (notepad.value.includes(sel)) {
+            if (isUrl(sel)) {
+              insertText(`[](${sel})`, 0 - (3 + sel.length));
+            } else {
+              insertText("[]()", -3);
+            }
+          }
         }
         break;
 
@@ -697,20 +709,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           insertText("``", -1);
         } else if (notepad.value.includes(sel)) {
           insertText(`\`${sel}\``, 0);
-        }
-        break;
-
-      // hyperlink
-      case "KeyL":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("[]()", -3);
-        } else if (notepad.value.includes(sel)) {
-          if (isUrl(sel)) {
-            insertText(`[](${sel})`, 0 - (3 + sel.length));
-          } else {
-            insertText("[]()", -3);
-          }
         }
         break;
 
