@@ -510,6 +510,12 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
+  // title
+  if (event.altKey && event.shiftKey && event.code === "KeyT") {
+    document.querySelector("document-title").click();
+    return;
+  }
+
   // codebox
   if (event.altKey && event.code === "Backquote") {
     event.preventDefault();
@@ -753,22 +759,22 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
-      // subscript
-      case "Comma":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("__", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`_${sel}_`, 0);
-        }
-        break;
-
+      // superscript
       case "Period":
         event.preventDefault();
         if (sel.length === 0) {
           insertText("^^", -1);
         } else if (notepad.value.includes(sel)) {
           insertText(`^${sel}^`, 0);
+        }
+        break;
+
+      case "BracketLeft":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("{}", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`{${sel}}`, 0);
         }
         break;
     }
@@ -1062,6 +1068,8 @@ document.getElementById("export-as-google-doc-btn").addEventListener('click', ()
   // todo: add google docs export
 });
 
+/* notepad fullscreen - Alt+1 */
+
 let notepad_fullscreen = false;
 document.querySelector("main div > span").addEventListener('click', () => {
   if (NOTEPAD_DISABLED) return;
@@ -1070,9 +1078,11 @@ document.querySelector("main div > span").addEventListener('click', () => {
     notepad.style.width = "98.75vw";
     notepad.style.height = "120vh";
     notepad.style.zIndex = "1000";
+
     document.querySelector("main div > span").innerText = "fullscreen_exit";
     document.getElementById("footer").style.visibility= "hidden";
     document.getElementById("dotted-line").style.visibility= "hidden";
+    
     notepad_fullscreen = true;
     document.getElementById("notepad").focus();
   } else {
@@ -1080,13 +1090,17 @@ document.querySelector("main div > span").addEventListener('click', () => {
     notepad.style.width = "100%";
     notepad.style.height = "calc(100% - 5vh)";
     notepad.style.zIndex = "0";
+    
     document.querySelector("main div > span").innerText = "fullscreen";
     document.getElementById("footer").style.visibility= "visible";
     document.getElementById("dotted-line").style.visibility= "visible";
+    
     notepad_fullscreen = false;
     document.getElementById("notepad").focus();
   }
 });
+
+/* doc fullscreen - Alt+2 */
 
 let doc_fullscreen = false;
 let doc_fullscreen_previous_styles = {};
@@ -1097,6 +1111,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.left = "0";
     doc.style.width = "100vw";
     doc.style.height = "120vh";
+    
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
     fullscreen_box.innerText = "fullscreen_exit";
@@ -1105,6 +1120,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style.right = "1vh";
     fullscreen_box.style.float = "right";
     fullscreen_box.style.zIndex = "1000";
+    
     doc_fullscreen = true;
     doc.focus();
   } else {
@@ -1113,16 +1129,20 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.width = "100%";
     doc.style.height = "calc(100% - 3.13vh)";
     doc.style.zIndex = "0";
+    
     const fullscreen_box = document.querySelector(".dropleft > span");
     fullscreen_box.innerText = "fullscreen";
     fullscreen_box.style = doc_fullscreen_previous_styles;
+    
     doc_fullscreen = false;
     doc.focus();
   }
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.altKey && e.code === "Digit1") {
+  if (!e.altKey) return;
+
+  if (e.code === "Digit1") {
     if (NOTEPAD_DISABLED) return;
     if (doc_fullscreen) {
       // exit fullscreen
@@ -1131,12 +1151,18 @@ document.addEventListener('keydown', (e) => {
     document.querySelector("main div > span").click();
   }
   
-  if (e.altKey && e.code === "Digit2") {
+  if (e.code === "Digit2") {
     if (notepad_fullscreen) {
       // notepad is fullscreen, so we need to exit it first
       document.querySelector("main div > span").click();
     };
     document.querySelector(".dropleft > span").click();
+  }
+
+  if (e.shiftKey && e.code === "T") {
+    console.log('asd')
+    document.querySelector("document-title").click();
+    return;
   }
 });
 
