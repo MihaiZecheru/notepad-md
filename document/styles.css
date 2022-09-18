@@ -162,3 +162,8 @@ div.blockquote {
   transform: scale(1.1);
   cursor: pointer;
 }
+
+.footnote-top {
+  cursor: pointer;
+  color: #0d6efd;
+}

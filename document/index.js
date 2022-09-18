@@ -183,7 +183,7 @@ function htmlToMarkdown(html) {
     return `[^${footnote_id}]: ${footnote_content}<br>`;
   })
   // footnote-top
-  .replace(/<span class="footnote-top" onclick="goto\(\"(.*?)\"\)">(.*?)<\/span>/g, "[^$2]")
+  .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^(.*?)\^<\/span>/g, "[^$2]")
 
   // horizontal rule
   .replace(/<hr>/g, "\n---")
@@ -244,7 +244,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     notepad.setAttribute("title", "You do not have permission to edit this document");
   }
   previousHTML = _doc.content || "";
-  doc.innerHTML = previousHTML;
+  doc.innerHTML = `<div id="footers-alert-placeholder"></div>${previousHTML}`;
   title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = title;
@@ -388,8 +388,8 @@ function compileMarkdown(text) {
   // footnote-top
   .replace(/\[\^(\d{1,5})\]/g, (c) => {
     const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
-    const footnote_uuid = footnote_uuids[footnote_id];
-    return `<span class="footnote-top" onclick="goto(\"${footnote_uuid}\")">${footnote_id}</span>`;
+    const footnote_uuid = footnote_uuids[footnote_id].trim();
+    return `<span class="footnote-top" onclick="show_footnote('${footnote_uuid}')"><sup>[${footnote_id}]</sup></span>`;
   })
 
   // superscript
@@ -455,7 +455,7 @@ async function saveDocument() {
   }
 
   // set the document div to the new html
-  doc.innerHTML = html;
+  doc.innerHTML = `<div id="footers-alert-placeholder"></div>${html}`;
 
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
@@ -506,7 +506,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.key === "Escape") {
     event.preventDefault();
-    if (notepad_fullscreen) {
+    if (notepad.dataset.fullscreen === "true" ? true : false) {
       document.querySelector("span.fullscreen").click();
       notepad.focus();
     } else {
@@ -1064,9 +1064,10 @@ document.getElementById("export-as-google-doc-btn").addEventListener('click', ()
 
 /* notepad fullscreen - Alt+1 */
 
-let notepad_fullscreen = false;
 document.querySelector("main div > span").addEventListener('click', () => {
   if (NOTEPAD_DISABLED) return;
+  const notepad_fullscreen = notepad.dataset.fullscreen === "true" ? true : false;
+  console.log(notepad_fullscreen)
   if (!notepad_fullscreen) {
     notepad.style.position = "fixed";
     notepad.style.width = "98.75vw";
@@ -1077,7 +1078,7 @@ document.querySelector("main div > span").addEventListener('click', () => {
     document.getElementById("footer").style.visibility= "hidden";
     document.getElementById("dotted-line").style.visibility= "hidden";
     
-    notepad_fullscreen = true;
+    notepad.dataset.fullscreen = true;
     document.getElementById("notepad").focus();
   } else {
     notepad.style.position = "relative";
@@ -1089,23 +1090,23 @@ document.querySelector("main div > span").addEventListener('click', () => {
     document.getElementById("footer").style.visibility= "visible";
     document.getElementById("dotted-line").style.visibility= "visible";
     
-    notepad_fullscreen = false;
+    notepad.dataset.fullscreen = false;
     document.getElementById("notepad").focus();
   }
 });
 
 /* doc fullscreen - Alt+2 */
 
-let doc_fullscreen = false;
 let doc_fullscreen_previous_styles = {};
 document.querySelector(".dropleft > span").addEventListener('click', () => {
+  const doc_fullscreen = doc.dataset.fullscreen === "true" ? true : false;
   if (!doc_fullscreen) {
     doc.style.position = "absolute";
     doc.style.top = "0";
     doc.style.left = "0";
     doc.style.width = "100vw";
     doc.style.height = "120vh";
-    
+
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
     fullscreen_box.innerText = "fullscreen_exit";
@@ -1114,8 +1115,10 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style.right = "1vh";
     fullscreen_box.style.float = "right";
     fullscreen_box.style.zIndex = "1000";
-    
-    doc_fullscreen = true;
+
+    // delete alert if it exists
+    document.getElementById("footers-alert-placeholder").innerHTML = "";
+    doc.dataset.fullscreen = true;
     notepad.blur();
   } else {
     doc.style.position = "relative";
@@ -1128,7 +1131,9 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.innerText = "fullscreen";
     fullscreen_box.style = doc_fullscreen_previous_styles;
     
-    doc_fullscreen = false;
+    // delete alert if it exists
+    document.getElementById("footers-alert-placeholder").innerHTML = "";
+    doc.dataset.fullscreen = false;
     notepad.focus();
   }
 });
@@ -1138,7 +1143,7 @@ document.addEventListener('keydown', (e) => {
 
   if (e.code === "Digit1") {
     if (NOTEPAD_DISABLED) return;
-    if (doc_fullscreen) {
+    if (doc.dataset.fullscreen === "true" ? true : false) {
       // exit fullscreen
       document.querySelector(".dropleft > span").click();
     }
@@ -1146,7 +1151,7 @@ document.addEventListener('keydown', (e) => {
   }
   
   if (e.code === "Digit2") {
-    if (notepad_fullscreen) {
+    if (notepad.dataset.fullscreen === "true" ? true : false) {
       // notepad is fullscreen, so we need to exit it first
       document.querySelector("main div > span").click();
     };
@@ -1158,7 +1163,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (e.code === "Escape" && doc_fullscreen) {
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
     return;
@@ -1166,7 +1171,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 doc.addEventListener*('keydown', (e) => {
-  if (e.code === "Escape" && doc_fullscreen) {
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
     return;
@@ -1174,7 +1179,7 @@ doc.addEventListener*('keydown', (e) => {
 });
 
 document.body.addEventListener('keydown', (e) => {
-  if (e.code === "Escape" && doc_fullscreen) {
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
     return;
