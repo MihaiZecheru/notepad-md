@@ -111,7 +111,7 @@ document-title:hover {
 
 /* move checkboxes closer together */
 .nmd-checkbox {
-  margin-bottom: -1em!important;
+  margin-bottom: -1rem!important;
 }
 
 table {
