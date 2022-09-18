@@ -16,13 +16,6 @@ else {
 let documents_ = [];
 const main = document.querySelector("main");
 
-function uuid4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
-
 const modal_new_title_input = document.querySelector("#new-title");
 let DOC_BEING_RENAMED;
 let DOC_BEING_DELETED;
