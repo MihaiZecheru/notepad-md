@@ -5,13 +5,6 @@ import { max_title_length } from "../../../modules/max_lengths.mjs";
 
 let email, password;
 
-// take input and capitalize first letter of each word
-function title(sentence) {
-  return sentence.replace(/\w\S*/g, function(txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-}
-
 if (!getCookie("nmd-validation")) window.location.href = "/account/login/";
 else {
   const cookie = JSON.parse(getCookie("nmd-validation"));
