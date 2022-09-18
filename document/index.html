@@ -44,12 +44,23 @@
     </div>
   </div>
   <main>
+    <script>
+      function SyncScroll(div) {
+        const notepad_ = document.getElementById("notepad");
+        const doc_ = document.getElementById("document");
+        if (div === notepad_) {
+          doc_.scrollTop = notepad_.scrollTop;
+        } else {
+          notepad_.scrollTop = doc_.scrollTop;
+        }
+      }
+    </script>
     <div class="form-group disable-highlighting">
       <label style="position: relative; left: 0%;" for="notepad">Write your document using <a id="markdown-reference-link" href="/help/#markdown" rel="noopener noreferrer" target="_blank" tabindex="-1" title="Markdown Help">markdown</a></label>
       <span class="material-symbols-outlined fullscreen disable-highlighting" style="position: absolute; margin-left: .5vw" title="Notepad Fullscreen | Alt+1">fullscreen</span>
       <span id="save-status" style="float: right; margin: 0!important; color: #28a745">No New Changes</span>
       <div id="loading-spinner" class="spinner-border text-primary" style="width: 1.5em; height: 1.5em; visibility: hidden;" role="status"></div>
-      <textarea class="form-control" id="notepad" rows="7"></textarea>
+      <textarea class="form-control" id="notepad" rows="7" onscroll="SyncScroll(this)"></textarea>
     </div>
     <div id="dotted-line"><div></div></div> <!-- don't remove the nested div -->
     <div class="form-group">
@@ -73,7 +84,7 @@
           </div>
         </div>
       </div>
-      <div class="form-control" id="document"></div>
+      <div class="form-control" id="document" onscroll="SyncScroll(this)"></div>
     </div>
   </main>
   <div class="modal fade" id="change-title-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
