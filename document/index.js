@@ -506,6 +506,10 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.key === "Escape") {
     event.preventDefault();
+    if (document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+      document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+      return;
+    }
     if (notepad.dataset.fullscreen === "true" ? true : false) {
       document.querySelector("span.fullscreen").click();
       notepad.focus();
@@ -1163,6 +1167,11 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    return;
+  }
+
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
@@ -1176,12 +1185,22 @@ doc.addEventListener*('keydown', (e) => {
     notepad.focus();
     return;
   }
+
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    return;
+  }
 });
 
 document.body.addEventListener('keydown', (e) => {
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
+    return;
+  }
+
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     return;
   }
 });
