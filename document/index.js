@@ -613,6 +613,21 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
     return;
   }
+
+  // iframe embed
+  if (event.altKey && event.code === "KeyE") {
+    event.preventDefault();
+    if (sel.length === 0) {
+      insertText("&[]()", -3);
+    } else if (notepad.value.includes(sel)) {
+      if (isUrl(sel)) {
+        insertText(`&[](${sel})`, 0 - (3 + sel.length));
+      } else {
+        insertText("&[]()", -3);
+      }
+    }
+    return;
+  }
   
   if (event.ctrlKey) {
     switch (event.code) {
@@ -709,20 +724,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
             insertText(`![](${sel})`, 0 - (3 + sel.length));
           } else {
             insertText("![]()", -3);
-          }
-        }
-        break;
-
-      // iframe embed
-      case "KeyE":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("&[]()", -3);
-        } else if (notepad.value.includes(sel)) {
-          if (isUrl(sel)) {
-            insertText(`&[](${sel})`, 0 - (3 + sel.length));
-          } else {
-            insertText("&[]()", -3);
           }
         }
         break;
