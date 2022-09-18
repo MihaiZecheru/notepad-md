@@ -1150,7 +1150,6 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (e.shiftKey && e.code === "T") {
-    console.log('asd')
     document.querySelector("document-title").click();
     return;
   }
