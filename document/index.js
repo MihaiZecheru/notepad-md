@@ -122,7 +122,7 @@ function htmlToMarkdown(html) {
   .replace(/<table>(.*?)<\/table>/g, (table) => {
     const columns = table.match(/<th>(.*?)<\/th>/g).length;
     
-    table = table
+    table = '\n' + table
       .replace(/<th>\{(.*?)\}/g, "| $1")
       .replace(/(<\/th>\|)|(<\/th>)/g, " |")
       .replace(/<(\/)?tr>/g, "")
