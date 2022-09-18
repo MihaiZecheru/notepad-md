@@ -613,15 +613,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
     return;
   }
-
-  // center
-  if (event.altKey && event.code === "KeyE") {
-    if (sel.length === 0) {
-      insertText("{}", -1);
-    } else if (notepad.value.includes(sel)) {
-      insertText(`{${sel}}`, 0);
-    }
-  }
   
   if (event.ctrlKey) {
     switch (event.code) {
