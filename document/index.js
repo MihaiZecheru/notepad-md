@@ -183,7 +183,7 @@ function htmlToMarkdown(html) {
     return `[^${footnote_id}]: ${footnote_content}<br>`;
   })
   // footnote-top
-  .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^(.*?)\^<\/span>/g, "[^$2]")
+  .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
 
   // horizontal rule
   .replace(/<hr>/g, "\n---")
@@ -244,7 +244,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     notepad.setAttribute("title", "You do not have permission to edit this document");
   }
   previousHTML = _doc.content || "";
-  doc.innerHTML = `<div id="footers-alert-placeholder"></div>${previousHTML}`;
+  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
   title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = title;
@@ -455,7 +455,7 @@ async function saveDocument() {
   }
 
   // set the document div to the new html
-  doc.innerHTML = `<div id="footers-alert-placeholder"></div>${html}`;
+  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${html}`;
 
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
@@ -1117,7 +1117,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style.zIndex = "1000";
 
     // delete alert if it exists
-    document.getElementById("footers-alert-placeholder").innerHTML = "";
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     doc.dataset.fullscreen = true;
     notepad.blur();
   } else {
@@ -1132,7 +1132,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style = doc_fullscreen_previous_styles;
     
     // delete alert if it exists
-    document.getElementById("footers-alert-placeholder").innerHTML = "";
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     doc.dataset.fullscreen = false;
     notepad.focus();
   }
