@@ -74,19 +74,19 @@ function htmlToMarkdown(html) {
   .replace(/<pre class='prettyprint'>(.*?)<\/pre>/g, "```\n$1\n```")
 
   // heading 1
-  .replace(/<h1>(.*?)<\/h1>/g, "# $1\n")
+  .replace(/<h1>(.*?)<\/h1>/g, "# $1")
 
   // heading 2
-  .replace(/<h2>(.*?)<\/h2>/g, "## $1\n")
+  .replace(/<h2>(.*?)<\/h2>/g, "## $1")
 
   // heading 3
-  .replace(/<h3>(.*?)<\/h3>/g, "### $1\n")
+  .replace(/<h3>(.*?)<\/h3>/g, "### $1")
 
   // heading 4
-  .replace(/<h4>(.*?)<\/h4>/g, "#### $1\n")
+  .replace(/<h4>(.*?)<\/h4>/g, "#### $1")
 
   // heading 5
-  .replace(/<h5>(.*?)<\/h5>/g, "##### $1\n")
+  .replace(/<h5>(.*?)<\/h5>/g, "##### $1")
 
   // hyperlink
   .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank' tabindex='-1'>(.*?)<\/a>/g, "[$2]($1)")
