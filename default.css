@@ -79,8 +79,3 @@ mark {
   -ms-user-select: none;
   user-select: none;
 }
-
-.blockquote {
-  border-left: 0.25rem solid #477bff;
-  padding-left: 0.5rem; 
-}
