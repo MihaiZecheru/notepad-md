@@ -104,6 +104,9 @@ function htmlToMarkdown(html) {
   // ordered list
   .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
 
+  // right-align
+  .replace(/<div style="text-align: right;">(.*?)<\/div>/g, "{{$1}}")
+  
   // center
   .replace(/<center>(.*?)<\/center>/g, "{$1}")
 
@@ -375,6 +378,9 @@ function compileMarkdown(text) {
     return `<table>${headers}${rows_html}</table>`;
   })
 
+  // right-align pipes
+  .replace(/\{\{(.*?)\}\}/g, "<div style='text-align: right;'>$1</div>")
+  
   // center pipes
   .replace(/\{(.*?)\}/g, "<center>$1</center>")
 
@@ -770,6 +776,15 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           insertText("{}", -1);
         } else if (notepad.value.includes(sel)) {
           insertText(`{${sel}}`, 0);
+        }
+        break;
+
+      case "BracketRight":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("{{}}", -2);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`{{${sel}}}`, 0);
         }
         break;
     }
