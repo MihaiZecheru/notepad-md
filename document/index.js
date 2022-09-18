@@ -353,16 +353,16 @@ function compileMarkdown(text) {
   // ordered list
   .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
     const number = c.match(/\d{1,3}/g)[0];
-    const content = c.substring(6);
+    const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2)
     return `<ol start="${number}"><li>${content}</li></ol>`;
   })
 
   // headers
-  .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5>")
-  .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4>")
-  .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3>")
-  .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2>")
-  .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1>")
+  .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><br>")
+  .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><br>")
+  .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><br>")
+  .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><br>")
+  .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><br>")
 
   // table
   .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
