@@ -506,7 +506,12 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.key === "Escape") {
     event.preventDefault();
-    notepad.blur();
+    if (notepad_fullscreen) {
+      document.querySelector("span.fullscreen").click();
+      notepad.focus();
+    } else {
+      notepad.blur();
+    }
     return;
   }
 
@@ -702,7 +707,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         saveDocument();
         break;
 
-      // pink text
+      // highlight
       case "KeyH":
         event.preventDefault();
         if (sel.length === 0) {
@@ -1112,7 +1117,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style.zIndex = "1000";
     
     doc_fullscreen = true;
-    doc.focus();
+    notepad.blur();
   } else {
     doc.style.position = "relative";
     doc.style.top = "";
@@ -1125,7 +1130,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style = doc_fullscreen_previous_styles;
     
     doc_fullscreen = false;
-    doc.focus();
+    notepad.focus();
   }
 });
 
@@ -1151,6 +1156,28 @@ document.addEventListener('keydown', (e) => {
 
   if (e.shiftKey && e.code === "T") {
     document.querySelector("document-title").click();
+    return;
+  }
+
+  if (e.code === "Escape" && doc_fullscreen) {
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
+    return;
+  }
+});
+
+doc.addEventListener*('keydown', (e) => {
+  if (e.code === "Escape" && doc_fullscreen) {
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
+    return;
+  }
+});
+
+document.body.addEventListener('keydown', (e) => {
+  if (e.code === "Escape" && doc_fullscreen) {
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
     return;
   }
 });
