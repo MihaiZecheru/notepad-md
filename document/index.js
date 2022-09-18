@@ -70,9 +70,6 @@ function htmlToMarkdown(html) {
   // inline code / pink text
   .replace(/<code>(.*?)<\/code>/g, "!`$1`")
 
-  // codeblock
-  .replace(/<pre class='prettyprint'>(.*?)<\/pre>/g, "```\n$1\n```")
-
   // heading 1
   .replace(/<h1>(.*?)<\/h1>/g, "# $1")
 
@@ -330,9 +327,6 @@ function compileMarkdown(text) {
   // hyperlink
   .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
 
-  // codeblock
-  .replace(/\`\`\`<br>(.*?)<br>\`\`\`/g, "<pre class='prettyprint'>$1</pre>")
-
   // inline code / pink text
   .replace(/!\`(.*?)\`/g, "<code>$1</code>")
   
@@ -525,16 +519,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   if (event.altKey && event.shiftKey && event.code === "KeyT") {
     document.querySelector("document-title").click();
     return;
-  }
-
-  // codebox
-  if (event.altKey && event.code === "Backquote") {
-    event.preventDefault();
-    if (sel.length === 0) {
-      insertText("```\n\n```", -4);
-    } else if (notepad.value.includes(sel)) {
-      insertText(`\`\`\`\n${sel}\n\`\`\``);
-    }
   }
 
   // horizontal rule
