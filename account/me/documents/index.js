@@ -2,7 +2,6 @@
 
 import { setCookie, getCookie } from "/modules/cookies.mjs";
 import { max_title_length } from "../../../modules/max_lengths.mjs";
-import getDate from "/modules/date.mjs";
 
 let email, password;
 
@@ -18,7 +17,7 @@ else {
   const cookie = JSON.parse(getCookie("nmd-validation"));
   email = cookie.email.replace(/,/g, ".");
   password = cookie.password;
-  document.querySelector("div#header h1").innerText = title(email + "'s documents");
+  document.querySelector("div#header h1").innerText = "Documents: " + email;
 }
 
 let documents_ = [];
