@@ -1,0 +1,46 @@
+.document-button {
+  border: none;
+  background: white;
+  font-family: 'Merriweather', serif;
+  height: 1.75em;
+  text-align: center;
+  font-size: 1em;
+  margin: 1px;
+  background: #477bff;
+}
+
+.document-button:hover {
+  background: #477bff;
+  color: white;
+}
+
+.document-button:active {
+  background: #477bff;
+  color: black;
+}
+
+div.blockquote {
+  margin-bottom: 0;
+  border-left: 0.25rem solid #477bff;
+  padding-left: 0.5rem; 
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+tr:nth-child(even) td:not(td:last-child) {
+  border-right: 1px solid whitesmoke;
+}
