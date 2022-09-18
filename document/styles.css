@@ -61,6 +61,7 @@ document-title:hover {
   height: 96.5%;
 }
 
+/* notepad */
 .form-group > textarea {
   resize: none;
   height: calc(100% - 3.5vh);
