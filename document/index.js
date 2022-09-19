@@ -186,7 +186,7 @@ function htmlToMarkdown(html) {
   .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
 
   // horizontal rule
-  .replace(/<hr>/g, "\n---")
+  .replace(/<hr>/g, "---")
 
   // newline
   .replace(/<br>/g, "\n")
