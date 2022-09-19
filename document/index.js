@@ -1180,27 +1180,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 doc.addEventListener*('keydown', (e) => {
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    return;
+  }
+  
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     document.querySelectorAll("span.fullscreen")[1].click();
     notepad.focus();
-    return;
-  }
-
-  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     return;
   }
 });
 
 document.body.addEventListener('keydown', (e) => {
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     return;
   }
 
-  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
     return;
   }
 });
