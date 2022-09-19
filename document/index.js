@@ -528,7 +528,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   // horizontal rule
   if (event.altKey && event.code === "KeyR") {
     event.preventDefault();
-    insertText("---\n");
+    insertText("---");
     return;
   }
 
