@@ -59,7 +59,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
         body: JSON.stringify(cookie.document_count)
       }).then(() => {
         setCookie("nmd-validation", JSON.stringify(cookie));
-        setCookie("documents", JSON.stringify(getCookie("documents") ? [ document_uuid ].concat(JSON.parse(getCookie("documents"))) : [ document_uuid ]));
+        setCookie("documents", JSON.stringify(getCookie("documents") ? JSON.parse(getCookie("documents")).concat([ document_uuid ]) : [ document_uuid ]));
         window.location.href = `/document/?id=${document_uuid}`;
       });
     });
