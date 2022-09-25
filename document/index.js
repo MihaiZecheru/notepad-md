@@ -252,6 +252,12 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
         checkbox.addEventListener("change", (event) => {
           updateCheckbox(email, event.target.id, event.target.checked);
         });
+        // enter event listener
+        checkbox.addEventListener("keydown", (event) => {
+          if (event.code === "Enter") {
+            checkbox.click();
+          }
+        });
       });
     }
   })();
