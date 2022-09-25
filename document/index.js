@@ -234,7 +234,8 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   }
 }).then(r => r.json()).then(_doc => {
   if (!_doc) window.location.href = "/account/me/documents/";
-  if (_doc.owner.replace(/,/g, ".") !== JSON.parse(getCookie("nmd-validation")).email) {
+  const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
+  if (_doc.owner !== email) {
     notepad.style.opacity = '0.5';
     notepad.style.cursor = 'not-allowed';
     notepad.classList.add("disable-highlighting");
@@ -245,6 +246,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   }
   previousHTML = _doc.content || "";
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
+  // fill in checkboxes
+  (async () => {
+    let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
+    if (checkboxes.length) {
+      const checkbox_data = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`).then(r => r.json());
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = checkbox_data[checkbox.id];
+        checkbox.addEventListener("change", (event) => {
+          updateCheckbox(email, event.target.id, event.target.checked);
+        });
+      });
+    }
+  })();
+
   title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = title;
@@ -454,6 +469,20 @@ function setSaveStatus(status) {
   }
 }
 
+async function updateCheckbox(email, element_id, status) {
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${element_id}.json`, {
+    method: "PUT",
+    // headers: {
+    //   "Access-Control-Allow-Origin":  "http, https",
+    //   "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
+    //   "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    //   "Content-Type": "application/json"
+    // },
+    body: JSON.stringify(status ? 1 : 0)
+  });
+  console.log(status)
+}
+
 async function saveDocument() {
   let text = notepad.value;
   if (text === previousText) return;
@@ -481,6 +510,43 @@ async function saveDocument() {
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
 
+  const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
+
+  // check for checkboxes
+  (async () => {
+    let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
+    if (checkboxes.length) {
+      // delete previous checkbox data
+      fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, {
+        method: "DELETE",
+        headers: {
+          "Access-Control-Allow-Origin":  "http, https",
+          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
+          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+          "Content-Type": "application/json"
+        }
+      });
+    
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
+          updateCheckbox(email, event.target.id, event.target.checked);
+        });
+
+        // upload checkbox data
+        fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${checkbox.id}.json`, {
+          method: "PUT",
+          headers: {
+            "Access-Control-Allow-Origin":  "http, https",
+            "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
+            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(checkbox.checked ? 1 : 0)
+        });
+      });
+    }
+  })();
+
   // upload the document to the server
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: "PUT",
@@ -490,7 +556,7 @@ async function saveDocument() {
       "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ title, content: html, last_visit: getDate(), owner: JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",") })
+    body: JSON.stringify({ title, content: html, last_visit: getDate(), owner: email })
   });
 
   hideSpinner();
