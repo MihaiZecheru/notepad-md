@@ -26,12 +26,6 @@ const document_uuid = uuid4();
 // upload new empty document
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
   method: "PUT",
-  headers: {
-    "Access-Control-Allow-Origin":  "http, https",
-    "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    "Content-Type": "application/json"
-  },
   body: JSON.stringify({ title: "Untitled Document", content: "", last_visit: getDate(), owner: email })
 }).then(() => {
   // add document to user document list
@@ -39,12 +33,6 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   if (!JSON.parse(getCookie("documents")).includes(document_uuid)) {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email}.json`, {
       method: "POST",
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify(document_uuid)
     }).then(() => {
       // user document count
@@ -52,12 +40,6 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email}/document_count.json`, {
         method: "PUT",
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify(cookie.document_count)
       }).then(() => {
           setCookie("nmd-validation", JSON.stringify(cookie));

@@ -56,13 +56,7 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
   new Promise((_r) => {
     showLoading(document.getElementById("submit-btn"));
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ',')}.json`, {
-      method: 'GET',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json"
-      }
+      method: 'GET'
     }).then((r) => _r(r.json()));
   }).then((r) => {
     const invalid = () => {

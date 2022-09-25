@@ -92,13 +92,8 @@ async function getDocumentsAsync() {
   // get documents
   for (let i = 0; i < document_uuids.length; i++) {
     createCard(await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuids[i]}.json`, {
-      method: "GET",
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json" 
-    }}).then(r => r.json()).then((d) => { return { id: document_uuids[i], ...d } }));
+      method: "GET"
+    }).then(r => r.json()).then((d) => { return { id: document_uuids[i], ...d } }));
   }
 }
 
@@ -164,12 +159,6 @@ document.querySelector("#change").addEventListener("click", () => {
   // upload the new title to the server
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${DOC_BEING_RENAMED.id}/title.json`, {
     method: "PUT",
-    headers: {
-      "Access-Control-Allow-Origin":  "http, https",
-      "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      "Content-Type": "application/json"
-    },
     body: JSON.stringify(new_title)
   }).then(() => {
     sessionStorage.removeItem("documents"); // force reload
@@ -181,43 +170,20 @@ document.querySelector("#change").addEventListener("click", () => {
 document.querySelector("#delete-modal").addEventListener("click", () => {
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${DOC_BEING_DELETED.id}.json`, {
     method: "DELETE",
-    headers: {
-      "Access-Control-Allow-Origin":  "http, https",
-      "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      "Content-Type": "application/json" 
-  }}).then(() => {
+  }).then(() => {
     const cookie = JSON.parse(getCookie("nmd-validation"));
     setCookie("nmd-validation", JSON.stringify(cookie));
     
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${DOC_BEING_DELETED.owner}.json`, {
       method: "GET",
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json"
-      }
     }).then(r => r.json()).then((doc_list) => {
       const doc_to_delete = Object.entries(doc_list).find((entry) => entry[1] === DOC_BEING_DELETED.id)[0];
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${DOC_BEING_DELETED.owner}/${doc_to_delete}.json`, {
         method: "DELETE",
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-          "Content-Type": "application/json"
-        }
       }).then(() => {
         cookie.document_count--;
         fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${DOC_BEING_DELETED.owner}/document_count.json`, {
           method: "PUT",
-          headers: {
-            "Access-Control-Allow-Origin":  "http, https",
-            "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-            "Content-Type": "application/json"
-          },
           body: JSON.stringify(cookie.document_count)
         }).then(() => {
           setCookie("nmd-validation", JSON.stringify(cookie));

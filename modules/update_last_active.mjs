@@ -8,11 +8,6 @@ if (!window.sessionStorage.getItem("already-updated") && cookie) {
   const today = getDate();
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email}/last_active.json`, {
     method: 'PUT',
-    headers: {
-      "Access-Control-Allow-Origin": "http, https",
-      "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    },
     body: JSON.stringify(today)
   });
 }

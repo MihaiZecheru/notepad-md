@@ -226,12 +226,6 @@ let NOTEPAD_DISABLED = false;
 // get the document content
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
   method: "GET",
-  headers: {
-    "Access-Control-Allow-Origin":  "http, https",
-    "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    "Content-Type": "application/json"
-  }
 }).then(r => r.json()).then(_doc => {
   if (!_doc) window.location.href = "/account/me/documents/";
   const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
@@ -250,7 +244,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   (async () => {
     let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
     if (checkboxes.length) {
-      const checkbox_data = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`).then(r => r.json());
+      const checkbox_data = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, { method: 'GET' }).then(r => r.json());
       checkboxes.forEach((checkbox) => {
         checkbox.checked = checkbox_data[checkbox.id];
         checkbox.addEventListener("change", (event) => {
@@ -273,12 +267,6 @@ notepad.focus();
 
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
   method: "PUT",
-  headers: {
-    "Access-Control-Allow-Origin":  "http, https",
-    "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    "Content-Type": "application/json"
-  },
   body: JSON.stringify(getDate())
 });
 
@@ -472,12 +460,6 @@ function setSaveStatus(status) {
 async function updateCheckbox(email, element_id, status) {
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${element_id}.json`, {
     method: "PUT",
-    // headers: {
-    //   "Access-Control-Allow-Origin":  "http, https",
-    //   "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-    //   "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    //   "Content-Type": "application/json"
-    // },
     body: JSON.stringify(status ? 1 : 0)
   });
   console.log(status)
@@ -519,12 +501,6 @@ async function saveDocument() {
       // delete previous checkbox data
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, {
         method: "DELETE",
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-          "Content-Type": "application/json"
-        }
       });
     
       checkboxes.forEach((checkbox) => {
@@ -535,12 +511,6 @@ async function saveDocument() {
         // upload checkbox data
         fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${checkbox.id}.json`, {
           method: "PUT",
-          headers: {
-            "Access-Control-Allow-Origin":  "http, https",
-            "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-            "Content-Type": "application/json"
-          },
           body: JSON.stringify(checkbox.checked ? 1 : 0)
         });
       });
@@ -550,12 +520,6 @@ async function saveDocument() {
   // upload the document to the server
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: "PUT",
-    headers: {
-      "Access-Control-Allow-Origin":  "http, https",
-      "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      "Content-Type": "application/json"
-    },
     body: JSON.stringify({ title, content: html, last_visit: getDate(), owner: email })
   });
 
@@ -1070,23 +1034,11 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
   // upload the new title to the server
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/title.json`, {
     method: "PUT",
-    headers: {
-      "Access-Control-Allow-Origin":  "http, https",
-      "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-      "Content-Type": "application/json"
-    },
     body: JSON.stringify(title)
   }).then(() => {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
       method: "PUT",
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json"
-      },
-    body: JSON.stringify(getDate())
+      body: JSON.stringify(getDate())
     }).then(() => {
       document_title.innerText = title;
     });

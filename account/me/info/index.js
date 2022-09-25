@@ -86,11 +86,6 @@ document.getElementById("yes-change-email").addEventListener("click", () => {
   new Promise((_r) => {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ',')}.json`, {
       method: 'GET',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      }
     }).then((r) => _r(r.json()));
   }).then((r) => {
     // if r has a value, the account already exists
@@ -109,11 +104,6 @@ document.getElementById("yes-change-email").addEventListener("click", () => {
       showLoadingEmail(document.getElementById("submit-btn"));
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ",")}.json`, {
         method: 'PUT',
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-        },
         body: JSON.stringify(cookie)
       }).then(_r());
     }).then((new_email) => {
@@ -125,11 +115,6 @@ document.getElementById("yes-change-email").addEventListener("click", () => {
       new Promise((_r) => {
         fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${old_email.replace(/\./g, ",")}.json`, {
         method: 'DELETE',
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-        }
       }).then((r) => r.json()).then((r) => _r(new_email));
       }).then((new_email) => {
         // copy the new email to clipboard
@@ -160,11 +145,6 @@ document.getElementById("yes-change-password").addEventListener("click", () => {
     showLoadingPassword(document.getElementById("submit-btn"));
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ",")}/password.json`, {
       method: 'PUT',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      },
       body: JSON.stringify(password)
     }).then(r => r.json()).then(_r(password));
   }).then((password) => {
@@ -218,41 +198,21 @@ document.getElementById("yes-delete-account").addEventListener("click", () => {
     // delete /users/email
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ",")}.json`, {
       method: 'DELETE',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      }
   }).then((r) => r.json()).then(() => _r());
   }).then(() => {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email.replace(/\./g, ",")}.json`, {
       method: 'GET',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-      }
     }).then((r) => r.json()).then(async (d) => {
       const users_documents = d ? Object.values(d) : [];
       await users_documents.forEach(async (id) => {
         await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${id}.json`, {
           method: 'DELETE',
-          headers: {
-            "Access-Control-Allow-Origin":  "http, https",
-            "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-          }
         });
       });
    
       // delete /documents_id_list/email
       await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email.replace(/\./g, ",")}.json`, {
         method: 'DELETE',
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-        }
       }).then((r) => r.json()).then(() => {
         document.body.innerHTML = "";
         // sign out

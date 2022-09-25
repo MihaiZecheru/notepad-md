@@ -45,12 +45,6 @@ document.querySelector("button").addEventListener("click", () => {
   new Promise((_r) => {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ',')}.json`, {
       method: 'GET',
-      headers: {
-        "Access-Control-Allow-Origin":  "http, https",
-        "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        "Content-Type": "application/json"
-      }
     }).then((r) => _r(r.json()));
   }).then((r) => {
     // if r has a value, the account already exists
@@ -71,12 +65,6 @@ document.querySelector("button").addEventListener("click", () => {
       showLoading(document.getElementById("submit-btn"));
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email.replace(/\./g, ",")}.json`, {
         method: 'PUT',
-        headers: {
-          "Access-Control-Allow-Origin":  "http, https",
-          "Access-Control-Allow-Methods": "PUT, GET, POST, DELETE, OPTONS",
-          "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({ password, created_on: today, last_active: today, document_count: 0 })
       }).then(() => _r(today));
     }).then((today) => {
