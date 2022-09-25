@@ -34,6 +34,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   },
   body: JSON.stringify({ title: "Untitled Document", content: "", last_visit: getDate(), owner: email })
 }).then(() => {
+  // add document to user document list
   window.sessionStorage.removeItem("new-doc-validation");
   if (!JSON.parse(getCookie("documents")).includes(document_uuid)) {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email}.json`, {
@@ -46,6 +47,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
       },
       body: JSON.stringify(document_uuid)
     }).then(() => {
+      // user document count
       cookie.document_count++;
     
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${email}/document_count.json`, {
@@ -58,10 +60,10 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
         },
         body: JSON.stringify(cookie.document_count)
       }).then(() => {
-        setCookie("nmd-validation", JSON.stringify(cookie));
-        setCookie("documents", JSON.stringify(getCookie("documents") ? JSON.parse(getCookie("documents")).concat([ document_uuid ]) : [ document_uuid ]));
-        window.location.href = `/document/?id=${document_uuid}`;
+          setCookie("nmd-validation", JSON.stringify(cookie));
+          setCookie("documents", JSON.stringify(getCookie("documents") ? JSON.parse(getCookie("documents")).concat([ document_uuid ]) : [ document_uuid ]));
+          window.location.href = `/document/?id=${document_uuid}`;
       });
     });
-  }
+  };
 });
