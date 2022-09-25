@@ -23,7 +23,7 @@ const passwordBox = document.getElementById("password");
 let passwordVisible = false;
 
 const parameters = new URLSearchParams(window.location.search);
-const _b = parameters.get('b');
+const _r = parameters.get('redirect');
 
 function showLoading(ele) {
   ele.disabled = true;
@@ -78,7 +78,7 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       getDocumentIds(email).then((documentIds) => {
         setCookie("nmd-validation", JSON.stringify({ email, password, created_on: r.created_on, last_active: today, document_count: documentIds.length }), 1);
         setCookie("documents", JSON.stringify(documentIds));
-        if (_b === "new")
+        if (_r === "new")
           document.querySelector("form").action = "../../new/";
         document.querySelector("form").submit();
       });
