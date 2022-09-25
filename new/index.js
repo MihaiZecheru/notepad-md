@@ -4,12 +4,16 @@ import { getCookie, setCookie } from "../modules/cookies.mjs";
 import getDate from "../modules/date.mjs";
 
 if (!getCookie("nmd-validation")) {
-  window.location.href = "/account/login/";
+  window.location.href = "/account/login/?redirect=new_document";
 }
 
 if (!window.sessionStorage.getItem("new-doc-validation")) {
   document.querySelector("h2").innerText = "Session Expired";
-  window.location.href = "/account/me/";
+  new Promise((_r) => {
+    setTimeout(() => {
+      window.location.href = "/account/me/";
+    }, 787);
+  })
 }
 
 function uuid4() {

@@ -6,7 +6,6 @@ const passwordBox = document.getElementById("password");
 let passwordVisible = false;
 
 const parameters = new URLSearchParams(window.location.search);
-const _r = parameters.get('redirect');
 
 function showLoading(ele) {
   ele.disabled = true;
@@ -71,8 +70,6 @@ document.querySelector("button").addEventListener("click", () => {
       window.sessionStorage.setItem("already-updated", "1");
       setCookie("nmd-validation", JSON.stringify({ email, password, created_on: today, last_active: today, document_count: 0 }));
       setCookie("documents", JSON.stringify([]));
-      if (_r === "new")
-        document.querySelector("form").action = "new";
       document.querySelector("form").submit();
     });
   });
@@ -101,7 +98,7 @@ document.getElementById("gen-pw-btn").addEventListener("click", () => {
 });
 
 document.getElementById("login-modal-btn").addEventListener("click", () => {
-  window.location.href = "/account/login/" + (_r === "new" ? "?redirect=new" : "");
+  window.location.href = "/account/me/";
 });
 
 document.getElementById("exampleCheck1").addEventListener("click", () => {

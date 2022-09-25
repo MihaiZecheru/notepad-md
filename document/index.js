@@ -4,12 +4,18 @@ import { getCookie } from "../modules/cookies.mjs";
 import { max_title_length } from "../modules/max_lengths.mjs";
 import getDate from "../modules/date.mjs";
 
+const parameters = new URLSearchParams(window.location.search);
+
 // make sure user has an account
 if (!getCookie("nmd-validation")) {
-  window.location.href = "/account/login/";
+  const _document_uuid = parameters.get("id");
+  if (!_document_uuid) {
+    window.location.href = "/account/login/?redirect=new_document";
+  } else {
+    window.location.href = "/account/login/?redirect=document&id=" + _document_uuid;
+  }
 }
 
-const parameters = new URLSearchParams(window.location.search);
 const mode = parameters.get('mode');
 if (mode === "view") {
   new Promise((r_) => {
@@ -207,13 +213,9 @@ function htmlToMarkdown(html) {
 const notepad = document.getElementById("notepad");
 const doc = document.getElementById("document");
 
-const params = new Proxy(new URLSearchParams(window.location.search), {
-  get: (searchParams, prop) => searchParams.get(prop),
-});
-
 // get the document uuid
-const document_uuid = params.id;
-if (!document_uuid) window.location.href = "/account/me/documents/";
+const document_uuid = parameters.get('id');
+if (!document_uuid) window.location.href = "/account/me/documents/?error=missing_id&id=" + document_uuid;
 
 let previousHTML = "";
 let previousText = "";
@@ -227,7 +229,7 @@ let NOTEPAD_DISABLED = false;
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
   method: "GET",
 }).then(r => r.json()).then(_doc => {
-  if (!_doc) window.location.href = "/account/me/documents/";
+  if (!_doc) window.location.href = "/account/me/documents/?error=invalid_id";
   const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
   if (_doc.owner !== email) {
     notepad.style.opacity = '0.5';

@@ -23,7 +23,7 @@ const passwordBox = document.getElementById("password");
 let passwordVisible = false;
 
 const parameters = new URLSearchParams(window.location.search);
-const _r = parameters.get('redirect');
+const _redirect = parameters.get('redirect');
 
 function showLoading(ele) {
   ele.disabled = true;
@@ -71,6 +71,13 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       return;
     }
 
+    function uuid4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
     // check if password matches
     if (password === r.password) {
       // login
@@ -78,8 +85,36 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       getDocumentIds(email).then((documentIds) => {
         setCookie("nmd-validation", JSON.stringify({ email, password, created_on: r.created_on, last_active: today, document_count: documentIds.length }), 1);
         setCookie("documents", JSON.stringify(documentIds));
-        if (_r === "new")
-          document.querySelector("form").action = "../../new/";
+        switch (_redirect) {
+
+          case "documents":
+            document.querySelector("form").action = "/account/me/documents";
+            break;
+
+          case "me":
+            document.querySelector("form").action = "/account/me/";
+            break;
+
+          case "new_document":
+            window.sessionStorage.setItem("new-doc-validation", uuid4());
+            document.querySelector("form").action = "/new/";
+            break;
+
+          case "document":
+            console.log(parameters.get('id'))
+            // 5 second delay
+            new Promise((r) => setTimeout(r, 5000)).then(() => {
+            if (!parameters.get('id')) {
+              window.sessionStorage.setItem("new-doc-validation", uuid4());
+              document.querySelector("form").action = "/new/";
+            } else {
+              document.querySelector("form").action = `/document/?id=${parameters.get('id')}/`;
+            }});
+            break;
+
+          
+
+        }
         document.querySelector("form").submit();
       });
     } else invalid();

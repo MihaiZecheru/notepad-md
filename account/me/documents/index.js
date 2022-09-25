@@ -5,7 +5,7 @@ import { max_title_length } from "../../../modules/max_lengths.mjs";
 
 let email, password;
 
-if (!getCookie("nmd-validation")) window.location.href = "/account/login/";
+if (!getCookie("nmd-validation")) window.location.href = "/account/login/?redirect=documents";
 else {
   const cookie = JSON.parse(getCookie("nmd-validation"));
   email = cookie.email.replace(/,/g, ".");
