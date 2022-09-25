@@ -45,7 +45,7 @@ function get_footnote_count() {
 
 function htmlToMarkdown(html) {
   html = `<br>${html}<br>`;
-  // console.log(html)
+  
   // blockquote
   let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
 
@@ -288,10 +288,17 @@ function compileMarkdown(text) {
   //               newline
   let html = text.replace(/\n/g, "<br>")
   
+  // escape characters
+  .replace(/\\#/g, "<HASHTAG>")
+  .replace(/\\\*/g, "<ASTERISK>")
+  .replace(/\\_/g, "<UNDERSCORE>")
+  .replace(/\\~/g, "<TILDE>")
+  .replace(/\\`/g, "<BACKTICK>")
+  .replace(/\\\^/g, "<CARRET>")
+  .replace(/\\\\/g, "<BACKSLASH>")
+
   // blockquote
   .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
-
-  // .replace(//g, "\n")
 
   // tab
   .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -335,7 +342,6 @@ function compileMarkdown(text) {
   
   // checkbox
   .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
-    console.log(c)
     const uuid = uuid4();
     const is_filled = c.match(/\[x\]/g) !== null;
     const content = c.match(/\ (.*?)<br>/g)[0];
@@ -377,10 +383,10 @@ function compileMarkdown(text) {
     return `<table>${headers}${rows_html}</table>`;
   })
 
-  // right-align pipes
+  // right-align brackets
   .replace(/\{\{(.*?)\}\}/g, "<div style='text-align: right;'>$1</div>")
   
-  // center pipes
+  // center brackets
   .replace(/\{(.*?)\}/g, "<center>$1</center>")
 
   // footnote-bottom
@@ -390,6 +396,7 @@ function compileMarkdown(text) {
     const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
     return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
   })
+
   // footnote-top
   .replace(/\[\^(\d{1,5})\]/g, (c) => {
     const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
@@ -400,7 +407,15 @@ function compileMarkdown(text) {
   // superscript
   .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
 
-  console.log(html);
+  // escape characters
+  .replace(/<HASHTAG>/g, "#")
+  .replace(/<ASTERISK>/g, "*")
+  .replace(/<UNDERSCORE>/g, "_")
+  .replace(/<TILDE>/g, "~")
+  .replace(/<BACKTICK>/g, "`")
+  .replace(/<CARRET>/g, "^")
+  .replace(/<BACKSLASH>/g, "\\")
+
   if (html.startsWith("<br>"))
     html = html.substring(4, html.length);
   
@@ -1077,7 +1092,7 @@ document.getElementById("export-as-google-doc-btn").addEventListener('click', ()
 document.querySelector("main div > span").addEventListener('click', () => {
   if (NOTEPAD_DISABLED) return;
   const notepad_fullscreen = notepad.dataset.fullscreen === "true" ? true : false;
-  console.log(notepad_fullscreen)
+  
   if (!notepad_fullscreen) {
     notepad.style.position = "fixed";
     notepad.style.width = "98.75vw";
