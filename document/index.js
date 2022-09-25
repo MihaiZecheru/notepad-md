@@ -45,7 +45,7 @@ function get_footnote_count() {
 
 function htmlToMarkdown(html) {
   html = `<br>${html}<br>`;
-  
+  // console.log(html)
   // blockquote
   let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
 
@@ -108,13 +108,13 @@ function htmlToMarkdown(html) {
   .replace(/<center>(.*?)<\/center>/g, "{$1}")
 
   // checkbox
-  .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"(" checked" | "")><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div><br>/g, (c) => {
-    const _text = c.substring(c.indexOf("document-content-label\">") + 24, c.indexOf("</label>")) + "\n";
-    
+  .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div>/g, (c) => {
+    const _text = c.substring(c.indexOf("document-content-label\">") + 24, c.indexOf("</label>"));
+
     if (c.includes("checked")) {
-      return "- [x] " + _text + "\n";
+      return "- [x] " + _text;
     } else {
-      return "- [ ] " + _text + "\n";
+      return "- [] " + _text;
     }
   })
 
@@ -335,10 +335,15 @@ function compileMarkdown(text) {
   
   // checkbox
   .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
+    console.log(c)
     const uuid = uuid4();
     const is_filled = c.match(/\[x\]/g) !== null;
     const content = c.match(/\ (.*?)<br>/g)[0];
-    return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input" ${is_filled ? "checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 4)}</label></div><br>`;
+    if (content.includes("|<br>")) {
+      return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 5).trim()}</label></div>\|<br>`
+    } else {
+      return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 4).trim()}</label></div><br>`;
+    }
   })
 
   // horizontal rule
@@ -395,6 +400,7 @@ function compileMarkdown(text) {
   // superscript
   .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
 
+  console.log(html);
   if (html.startsWith("<br>"))
     html = html.substring(4, html.length);
   

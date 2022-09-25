@@ -115,6 +115,10 @@ document-title:hover {
   margin-bottom: -1rem!important;
 }
 
+.nmd-checkbox > label {
+  text-align: left;
+}
+
 table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
