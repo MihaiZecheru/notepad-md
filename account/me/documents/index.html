@@ -60,6 +60,23 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="new-or-deleted-document-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Changes Detected</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            While signed in to another account, you've created or deleted a document. Sync changes now?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="new-or-deleted-document-btn">Sync</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">On Next Reload</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="card shadow mb-5 bg-body rounded">
       <div class="card-body">
         <span class="card-title">

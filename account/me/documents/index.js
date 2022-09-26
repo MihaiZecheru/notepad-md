@@ -125,17 +125,43 @@ window.onbeforeunload = () => {
   sessionStorage.setItem("last_reload", Date.now());
 }
 
+async function checkForNewOrDeletedDocuments() {
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email.replace(/\./g, ",")}.json`, {
+    method: 'GET'
+  }).then(r => r.json()).then((d) => { 
+    const document_uuids = Object.values(d);
+    if (document_uuids.length !== JSON.parse(getCookie("documents")).length) {
+      setCookie("documents", JSON.stringify(document_uuids));
+      new bootstrap.Modal(document.getElementById("new-or-deleted-document-modal")).show();
+    }
+  });
+}
+
+document.getElementById("new-or-deleted-document-btn").addEventListener("click", () => {
+  window.location.reload();
+});
+
 if (sessionStorage.hasOwnProperty("documents")) {
   const _documents = JSON.parse(sessionStorage.getItem("documents"))
   let documents = {};
   for (let i = 0; i < _documents.length; i++) {
     documents[_documents[i].id] = _documents[i];
   }
-  JSON.parse(getCookie('documents')).reverse().forEach((id) => { createCard(documents[id]) });
+  checkForNewOrDeletedDocuments();
+  JSON.parse(getCookie('documents')).reverse().forEach((id, i) => { 
+    if (i === 0) {
+      // get new data on the previously used document
+      fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${id}.json`, {
+        method: "GET"
+      }).then(r => r.json()).then(createCard);
+    }; 
+    createCard(documents[id]);
+  });
   sessionStorage.removeItem("documents");
   removeSkeletonCards();
 } else {
-  getDocumentsAsync().then(() => {;
+  checkForNewOrDeletedDocuments();
+  getDocumentsAsync().then(() => {
     removeSkeletonCards();
   });
 }
