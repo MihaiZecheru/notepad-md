@@ -1,6 +1,6 @@
 'use strict';
 
-import { getCookie } from "../modules/cookies.mjs";
+import { getCookie, setCookie } from "../modules/cookies.mjs";
 import { max_title_length } from "../modules/max_lengths.mjs";
 import getDate from "../modules/date.mjs";
 
@@ -34,7 +34,7 @@ if (mode === "view") {
 
 const isUrl = string => {
   try { return Boolean(new URL(string)); }
-  catch(e){ return false; }
+  catch(e) { return false; }
 }
 
 function get_footnote_ids() {
@@ -54,6 +54,9 @@ function htmlToMarkdown(html) {
   
   // blockquote
   let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
+
+  // right-align
+  .replace(/<div style='text-align: right;'>(.*?)<\/div>/g, "{{$1}}")
 
   // tab
   .replace(/(&nbsp;){8}/g, "\t")
@@ -1261,3 +1264,12 @@ window.onbeforeunload = () => {
 document.getElementById("copy-share-link-btn").addEventListener('click', () => {
   navigator.clipboard.writeText(`https://notes.mzecheru.com/document/?id=${document_uuid}&mode=view`);
 });
+
+
+// update order of documents
+if (JSON.parse(getCookie("documents")).includes(document_uuid)) {
+  const documents = JSON.parse(getCookie("documents"));
+  documents.splice(documents.indexOf(document_uuid), 1);
+  documents.push(document_uuid);
+  setCookie("documents", JSON.stringify(documents), 365);
+}

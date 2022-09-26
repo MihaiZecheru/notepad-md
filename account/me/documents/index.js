@@ -126,7 +126,12 @@ window.onbeforeunload = () => {
 }
 
 if (sessionStorage.hasOwnProperty("documents")) {
-  JSON.parse(sessionStorage.getItem("documents")).forEach(createCard);
+  const _documents = JSON.parse(sessionStorage.getItem("documents"))
+  let documents = {};
+  for (let i = 0; i < _documents.length; i++) {
+    documents[_documents[i].id] = _documents[i];
+  }
+  JSON.parse(getCookie('documents')).reverse().forEach((id) => { createCard(documents[id]) });
   sessionStorage.removeItem("documents");
   removeSkeletonCards();
 } else {
