@@ -197,6 +197,8 @@ document.querySelector("#delete-modal").addEventListener("click", () => {
           setCookie("documents", JSON.stringify(documents));
           documents_ = documents_.filter(doc_ => doc_.id !== DOC_BEING_DELETED.id);
           document.getElementById(DOC_BEING_DELETED.id).parentElement.remove();
+          // update document count on the make new document card
+          document.querySelector("#document-count").innerText = cookie.document_count;
         });
       });
     });
