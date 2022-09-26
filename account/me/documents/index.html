@@ -18,7 +18,19 @@
 </head>
 <body>
   <div id="header">
+    <!-- <button class="btn">New Document</button> -->
     <h1 style="font-weight: 700;">Notepad MD Documents</h1>
+    <!-- <style>
+      #header > button {
+        position: fixed;
+        top: calc((5em / 2) - (1rem + .375rem));
+        left: 1em;
+        /* background-color: #212529;
+        border-color: #212529; */
+        color: #212529;
+        z-index: 5;
+      }
+    </style> -->
   </div>
   <main>
     <div class="modal fade" id="change-title-modal" tabindex="-1" aria-labelledby="change-title-modal-label" aria-hidden="true">
@@ -60,24 +72,35 @@
         </div>
       </div>
     </div>
-    <div class="card shadow mb-5 bg-body rounded user-select-none skeleton-card" aria-hidden="true">
+    <div class="card shadow mb-5 bg-body rounded">
       <div class="card-body">
-        <span class="card-title"><a href="#" tabindex="-1" class="btn btn-primary disabled placeholder document-title-btn"></a></span>
-        <span class="card-title placeholder-glow">
-          <span class="placeholder col-6"></span>
+        <span class="card-title">
+          <a class="btn btn-secondary new-doc document-title-btn">New Document</a>
         </span>
-        <p class="card-text placeholder-glow">
-          <span class="placeholder col-7"></span>
-          <span class="placeholder col-4"></span>
-          <span class="placeholder col-4"></span>
-          <span class="placeholder col-6"></span>
-          <span class="placeholder col-8"></span>
-        </p>
+        <p class="card-text">Create a new document or upload a text/markdown file to be saved to your Documents page.</p>
       </div>
-      <div class="card-footer">
-        <small class="text-muted">‎</small>
+      
+      <div class="card-footer user-select-none">
+        <small class="text-muted">Document count: <span id="document-count"></span></small>
       </div>
     </div>
+    <script type="module">
+      import { getCookie } from "/modules/cookies.mjs";
+      document.getElementById("document-count").innerText = JSON.parse(getCookie("nmd-validation")).document_count;
+      function uuid4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
+      
+      document.querySelectorAll(".new-doc").forEach((ele) => {
+        ele.addEventListener("click", () => {
+        window.sessionStorage.setItem("new-doc-validation", uuid4());
+        window.location.href = "/new/";
+      });
+      });
+    </script>
     <div class="card shadow mb-5 bg-body rounded user-select-none skeleton-card" aria-hidden="true">
       <div class="card-body">
         <span class="card-title"><a href="#" tabindex="-1" class="btn btn-primary disabled placeholder document-title-btn"></a></span>
