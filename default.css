@@ -79,3 +79,7 @@ mark {
   -ms-user-select: none;
   user-select: none;
 }
+
+::selection {
+  background: #86b7fe;
+}
