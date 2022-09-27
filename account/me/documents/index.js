@@ -85,16 +85,103 @@ async function createCard(doc) {
   }
   documents_.push(doc);
 
+  const preview = () => {
+    document.getElementById("preview-document-modal-title").innerText = doc.title;
+    document.getElementById("preview-document-modal-content").innerHTML = `
+    <style>
+      /* move checkboxes closer together */
+      .nmd-checkbox {
+        margin-bottom: -1rem!important;
+      }
+      
+      .nmd-checkbox > label {
+        text-align: left;
+      }
+      
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+      
+      tr:nth-child(even) td:not(td:last-child) {
+        border-right: 1px solid whitesmoke;
+      }
+      
+      .table-right-align {
+        text-align: right;
+      }
+      
+      .document-content-label {
+        width: 100%;
+        text-align: right;
+      } 
+      
+      ul, ol {
+        margin-bottom: 0;
+      }
+      
+      div.blockquote {
+        margin-bottom: 0;
+        border-left: 0.25rem solid #477bff;
+        padding-left: 0.5rem; 
+      }
+      
+      .footnote-top {
+        cursor: pointer;
+        color: #0d6efd;
+      }
+      
+      h1, h2, h3, h4, h5 {
+        margin-bottom: 0;
+      }
+      
+      hr {
+        margin: 0;
+      }
+    </style>` + doc.content;
+
+    document.getElementById("open-edit-modal-btn").onclick = () => {
+      window.location.href = `/document/?id=${doc.id}&mode=edit`;
+    };
+    document.getElementById("open-view-modal-btn").onclick = () => {
+      window.location.href = `/document/?id=${doc.id}&mode=view`;
+    };
+    new bootstrap.Modal("#preview-document-modal").show();
+  }
+
+  ele.addEventListener("click", (event) => {
+    if (event.ctrlKey) {
+      if (event.target.tagName === "A") {
+        return;
+      }
+      preview();
+    }
+  })
+
   ele.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     new BootstrapMenu(`#${doc.id}`, {
       actions: [{
-        name: "Edit",
+        name: "Preview",
+        onClick: preview
+      }, {
+        name: "Open (Edit)",
         onClick: () => {
           window.location.href = `/document/?id=${doc.id}&mode=edit`;
         }
       }, {
-        name: "View",
+        name: "Open (View)",
         onClick: () => {
           window.location.href = `/document/?id=${doc.id}&mode=view`;
         }
