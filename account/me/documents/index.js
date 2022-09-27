@@ -13,6 +13,24 @@ else {
   document.querySelector("div#header h1").innerText = "Documents: " + email;
 }
 
+// check for errors on /document/ page
+const urlParams = new URLSearchParams(window.location.search);
+const missing_id = urlParams.get("error") === "missing_id" && urlParams.get("id") === "null";
+const invalid_id = urlParams.get("error") === "invalid_id";
+if (missing_id) {
+  new bootstrap.Modal(document.getElementById("missing-id-error-modal")).show();
+} else if (invalid_id) {
+  new bootstrap.Modal(document.getElementById("invalid-id-error-modal")).show();
+}
+
+document.getElementById("okay1").addEventListener("click", () => {
+  window.history.replaceState({}, document.title, "/account/me/documents/");
+});
+
+document.getElementById("okay2").addEventListener("click", () => {
+  window.history.replaceState({}, document.title, "/account/me/documents/");
+});
+
 let documents_ = [];
 const main = document.querySelector("main");
 
