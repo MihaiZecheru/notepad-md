@@ -93,6 +93,10 @@ async function createCard(doc) {
       .nmd-checkbox {
         margin-bottom: -1rem!important;
       }
+
+      .nmd-checkbox > input {
+        cursor: not-allowed; /* checkboxes will not work during preview mode */
+      }
       
       .nmd-checkbox > label {
         text-align: left;
@@ -150,6 +154,13 @@ async function createCard(doc) {
         margin: 0;
       }
     </style>` + doc.content;
+
+    document.querySelectorAll(".nmd-checkbox > input").forEach((checkbox) => {
+      checkbox.addEventListener("click", (e) => {
+        e.preventDefault();
+        checkbox.blur();
+      });
+    });
 
     document.getElementById("open-edit-modal-btn").onclick = () => {
       window.location.href = `/document/?id=${doc.id}&mode=edit`;
