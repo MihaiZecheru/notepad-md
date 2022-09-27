@@ -237,6 +237,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   if (_doc.owner !== email) {
     notepad.style.opacity = '0.5';
     notepad.style.cursor = 'not-allowed';
+    notepad.style.userSelect = "none";
     notepad.classList.add("disable-highlighting");
     notepad.setAttribute("disabled", "true");
     NOTEPAD_DISABLED = true;
