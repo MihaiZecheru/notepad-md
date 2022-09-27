@@ -126,7 +126,9 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
               window.sessionStorage.setItem("new-doc-validation", uuid4());
               document.querySelector("form").action = "/new/";
             } else {
-              document.querySelector("form").action = `/document/?id=${parameters.get('id')}/`;
+              // document.querySelector("form").action = `/document/?id=${parameters.get('id')}`;
+              window.location.href = `/document/?id=${parameters.get('id')}`;
+              return;
             }
             break;
         }
