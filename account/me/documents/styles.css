@@ -5,6 +5,7 @@
   padding: 1vh;
   height: 5em;
   align-items: center;
+  width: 100%;
 }
 
 main {
@@ -21,7 +22,18 @@ main {
   margin: 2.5vh auto 0 auto;
   margin-top: 2.5vh;
   transition: .5s ease;
+}
 
+#header input {
+  border-radius: 2em;
+}
+
+#header div {
+  position: absolute;
+  vertical-align: middle;
+  width: 15em;
+  right: .5em;
+  float: right;
 }
 
 .document-title-btn {

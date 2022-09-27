@@ -13,6 +13,30 @@ else {
   document.querySelector("div#header h1").innerText = "Documents: " + email;
 }
 
+document.body.addEventListener("keypress", (event) => {
+  console.log((event.ctrlKey && event.shiftKey && event.code === "KeyK") || (event.ctrlKey && event.code === "KeyF"), (event.ctrlKey && event.shiftKey && event.code === "KeyK"), (event.ctrlKey && event.code === "KeyF"))
+  if ((event.ctrlKey && event.shiftKey && event.code === "KeyK") || (event.ctrlKey && event.code === "KeyF")) {
+    event.preventDefault();
+    document.getElementById("searchbox").focus();
+  }
+});
+
+document.getElementById("searchbox").addEventListener("input", (e) => {
+  const search = e.target.value.toLowerCase();
+  if (search.length > 0) {
+    document.querySelectorAll("div.card").forEach((card) => {
+      const title = card.querySelector("span.card-title").innerText.toLowerCase();
+      const content = card.querySelector("p.card-text").innerText.toLowerCase();
+      if (title.includes(search) || content.includes(search)) card.style.display = "flex";
+      else card.style.display = "none";
+    });
+  } else {
+    document.querySelectorAll("div.card").forEach((card) => {
+      card.style.display = "flex";
+    });
+  }
+});
+
 // check for errors on /document/ page
 const urlParams = new URLSearchParams(window.location.search);
 const missing_id = urlParams.get("error") === "missing_id" && urlParams.get("id") === "null";
