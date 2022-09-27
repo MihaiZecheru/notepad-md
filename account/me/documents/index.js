@@ -93,7 +93,9 @@ async function getDocumentsAsync() {
   for (let i = 0; i < document_uuids.length; i++) {
     createCard(await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuids[i]}.json`, {
       method: "GET"
-    }).then(r => r.json()).then((d) => { return { id: document_uuids[i], ...d } }));
+    }).then(r => r.json()).then((d) => {
+      return { id: document_uuids[i], ...d } 
+    }));
   }
 }
 
@@ -148,17 +150,18 @@ if (sessionStorage.hasOwnProperty("documents")) {
     documents[_documents[i].id] = _documents[i];
   }
   checkForNewOrDeletedDocuments();
-  JSON.parse(getCookie('documents')).reverse().forEach((id, i) => { 
-    if (i === 0) {
-      // get new data on the previously used document
-      fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${id}.json`, {
-        method: "GET"
-      }).then(r => r.json()).then(createCard);
-    }; 
-    createCard(documents[id]);
+  const docs = JSON.parse(getCookie('documents')).reverse();
+  // get new data on the previously used document
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${docs[0]}.json`, {
+    method: "GET"
+  }).then(r => r.json()).then(d => { createCard({ id: docs[0], ...d }) }).then(() => {
+    docs.forEach((id, i) => {
+      if (i === 0) return;
+      createCard(documents[id]);
+    });
+    sessionStorage.removeItem("documents");
+    removeSkeletonCards();
   });
-  sessionStorage.removeItem("documents");
-  removeSkeletonCards();
 } else {
   checkForNewOrDeletedDocuments();
   getDocumentsAsync().then(() => {
