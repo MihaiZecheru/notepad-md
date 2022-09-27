@@ -240,6 +240,12 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     notepad.style.userSelect = "none";
     notepad.classList.add("disable-highlighting");
     notepad.setAttribute("disabled", "true");
+    notepad.setAttribute("unselectable", "on");
+    // prevent selecting
+    notepad.addEventListener('select', (event) => {
+      event.preventDefault();
+      notepad.selectionStart = notepad.selectionEnd;
+    }, false);
     NOTEPAD_DISABLED = true;
     document.querySelector("main div > span").setAttribute("title", "Notepad Fullscreen | Disabled");
     notepad.setAttribute("title", "You do not have permission to edit this document");
