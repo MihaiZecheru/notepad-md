@@ -13,11 +13,12 @@ else {
   document.querySelector("div#header h1").innerText = "Documents: " + email;
 }
 
-document.body.addEventListener("keypress", (event) => {
-  console.log((event.ctrlKey && event.shiftKey && event.code === "KeyK") || (event.ctrlKey && event.code === "KeyF"), (event.ctrlKey && event.shiftKey && event.code === "KeyK"), (event.ctrlKey && event.code === "KeyF"))
+document.body.addEventListener("keydown", (event) => {
   if ((event.ctrlKey && event.shiftKey && event.code === "KeyK") || (event.ctrlKey && event.code === "KeyF")) {
     event.preventDefault();
     document.getElementById("searchbox").focus();
+  } else if (event.code === "Escape") {
+    document.getElementById("searchbox").blur();
   }
 });
 
