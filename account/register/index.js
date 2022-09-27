@@ -106,3 +106,9 @@ document.getElementById("exampleCheck1").addEventListener("click", () => {
   else passwordBox.type = "text";
   passwordVisible = !passwordVisible;
 });
+
+document.getElementById("exampleCheck1").addEventListener("keypress", (event) => {
+  if (event.code === "Enter") {
+    document.getElementById("exampleCheck1").click();
+  }
+});
