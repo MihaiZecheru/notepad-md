@@ -12,6 +12,24 @@ document.querySelector("#already-logged-in-modal #already-logged-in-modal-logout
   window.sessionStorage.removeItem("already-updated");
   emailBox.select();
   passwordBox.value = "";
+  // change the footer back
+  const left_button = document.getElementById("login-btn-footer") || document.getElementById("documents-btn-footer");
+  left_button.innerText = "Login";
+  left_button.id = "login-btn-footer";
+  left_button.addEventListener("click", () => {
+    window.location.href = "/account/login/";
+  });
+  const right_button = document.getElementById("register-btn-footer") || document.getElementById("switch-account-btn-footer");
+  right_button.innerText = "Register";
+  right_button.id = "register-btn-footer";
+  right_button.addEventListener("click", () => {
+    window.location.href = "/account/register/";
+  });
+  document.querySelectorAll("#footer span")[1].addEventListener("click", () => {
+    window.location.href = "/";
+  });
+  
+  document.getElementById("notepad-redirect").href = "/";
 });
 
 document.querySelector("#already-logged-in-modal #already-logged-in-modal-close").addEventListener("click", () => {
@@ -83,10 +101,13 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
       // login
       const d = new Date(); const today = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
       getDocumentIds(email).then((documentIds) => {
-        setCookie("nmd-validation", JSON.stringify({ email, password, created_on: r.created_on, last_active: today, document_count: documentIds.length }), 1);
+        setCookie("nmd-validation", JSON.stringify({ email, password, created_on: r.created_on, last_active: today, document_count: documentIds.length }));
         setCookie("documents", JSON.stringify(documentIds));
+        const accounts = JSON.parse(getCookie("nmd-accounts")) || [];
+        if (!accounts.includes(email)) {
+          setCookie("nmd-accounts", JSON.stringify([...accounts, email ]));
+        }
         switch (_redirect) {
-
           case "documents":
             document.querySelector("form").action = "/account/me/documents";
             break;
@@ -111,9 +132,6 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
               document.querySelector("form").action = `/document/?id=${parameters.get('id')}/`;
             }});
             break;
-
-          
-
         }
         document.querySelector("form").submit();
       });
