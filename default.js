@@ -113,15 +113,30 @@ right_button.addEventListener("click", () => {
             ${select_options}
           </select>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" style="padding-left: 0; padding-right: 0; display: flex; justify-content: space-evenly;">
           <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="switch-accounts-btn">Switch Account</button>
           <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="add-account-btn">Add Account</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="switch-accounts-modal-logout-btn">Logout</button>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>`;
     document.body.appendChild(ele);
+    document.getElementById("switch-accounts-modal-logout-btn").addEventListener("click", () => {
+      deleteCookie("nmd-validation");
+      deleteCookie("documents");
+      window.sessionStorage.removeItem("already-updated");
+      window.location.href = "/account/login/";
+    });
+    document.querySelector("select").addEventListener("keypress", (event) => {
+      if (event.key === "Enter") {
+        document.getElementById("switch-accounts-btn").click();
+      }
+    });
     document.getElementById("switch-accounts-btn").addEventListener('click', async () => {
+      const option = document.querySelector("#switch-accounts-modal select").value;
+      if (option === email) return;
+
       document.querySelectorAll("button").forEach((ele) => {
         ele.setAttribute("disabled", "true");
         ele.style.pointerEvents = "none";
@@ -136,9 +151,6 @@ right_button.addEventListener("click", () => {
       document.body.style.cursor = "wait";
       document.body.style.userSelect = "none";
       document.body.style.opacity = "0.5";
-      
-      const option = document.querySelector("#switch-accounts-modal select").value;
-      if (option === email) return;
       
       // get password
       const { password, created_on } = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/users/${option.replace(/\./g, ",")}.json`, {
@@ -155,6 +167,7 @@ right_button.addEventListener("click", () => {
         })
         setCookie("nmd-validation", JSON.stringify({ email: option, password, created_on, last_active: today, document_count: documentIds.length }));
         setCookie("documents", JSON.stringify(documentIds));
+        document.body.style.cursor = "default";
         window.location.reload();
       });
       document.body.removeChild(ele);

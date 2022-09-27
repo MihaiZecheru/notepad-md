@@ -122,15 +122,12 @@ document.getElementById("submit-btn").addEventListener("click", (event) => {
             break;
 
           case "document":
-            console.log(parameters.get('id'))
-            // 5 second delay
-            new Promise((r) => setTimeout(r, 5000)).then(() => {
             if (!parameters.get('id')) {
               window.sessionStorage.setItem("new-doc-validation", uuid4());
               document.querySelector("form").action = "/new/";
             } else {
               document.querySelector("form").action = `/document/?id=${parameters.get('id')}/`;
-            }});
+            }
             break;
         }
         document.querySelector("form").submit();
