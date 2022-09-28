@@ -1138,7 +1138,7 @@ document.querySelector("main div > span").addEventListener('click', () => {
   if (!notepad_fullscreen) {
     notepad.style.position = "fixed";
     notepad.style.width = "98.75vw";
-    notepad.style.height = "120vh";
+    notepad.style.height = "calc(95vh - 2.8em)";
     notepad.style.zIndex = "1000";
 
     document.querySelector("main div > span").innerText = "fullscreen_exit";
@@ -1172,7 +1172,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.top = "0";
     doc.style.left = "0";
     doc.style.width = "100vw";
-    doc.style.height = "120vh";
+    doc.style.height = "95vh";
 
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
