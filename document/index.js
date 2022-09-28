@@ -105,9 +105,11 @@ function htmlToMarkdown(html) {
   .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "&[$4]($2)")
 
   // unordered list
+  .replace(/<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>(.*?)<\/li><\/ul><\/li><\/ul>/g, "\t- $1")
   .replace(/<ul><li>(.*?)<\/li><\/ul>/g, "\n- $1")
 
   // ordered list
+  .replace(/<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="(.*?)"><li>(.*?)<\/li><\/ol><\/li><\/ul>/g, "\t$1 $2")
   .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
 
   // right-align
@@ -306,9 +308,12 @@ function compileMarkdown(text) {
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
   text = "\n" + text + "\n";
 
-  //               newline
-  let html = text.replace(/\n/g, "<br>")
+  //               tab
+  let html = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
   
+  // newline
+  .replace(/\n/g, "<br>")
+
   // escape characters
   .replace(/\\#/g, "<HASHTAG>")
   .replace(/\\\*/g, "<ASTERISK>")
@@ -320,9 +325,6 @@ function compileMarkdown(text) {
 
   // blockquote
   .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
-
-  // tab
-  .replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
 
   // bold
   .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
@@ -377,15 +379,24 @@ function compileMarkdown(text) {
   .replace(/<br>---/g, "<br><hr>")
 
   // unordered list
+  .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
+    const content = c.substring(6 + 42 + 2);
+    return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
+  })
   .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
     const content = c.substring(6);
     return `<ul><li>${content}</li></ul>`;
   })
   
   // ordered list
+  .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+    const number = c.match(/\d{1,3}\./g)[0];
+    const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
+    return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+  })
   .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
     const number = c.match(/\d{1,3}/g)[0];
-    const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2)
+    const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
     return `<ol start="${number}"><li>${content}</li></ol>`;
   })
 
@@ -1146,7 +1157,7 @@ document.querySelector("main div > span").addEventListener('click', () => {
     document.getElementById("dotted-line").style.visibility= "hidden";
     
     notepad.dataset.fullscreen = true;
-    document.getElementById("notepad").focus();
+    notepad.focus();
   } else {
     notepad.style.position = "relative";
     notepad.style.width = "100%";
@@ -1158,7 +1169,7 @@ document.querySelector("main div > span").addEventListener('click', () => {
     document.getElementById("dotted-line").style.visibility= "visible";
     
     notepad.dataset.fullscreen = false;
-    document.getElementById("notepad").focus();
+    notepad.focus();
   }
 });
 
@@ -1187,6 +1198,9 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     doc.dataset.fullscreen = true;
     notepad.blur();
+    doc.tabIndex = 100;
+    doc.focus();
+    doc.tabIndex = -1;
   } else {
     doc.style.position = "relative";
     doc.style.top = "";
@@ -1201,6 +1215,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     // delete alert if it exists
     document.getElementById("footnotes-alert-placeholder").innerHTML = "";
     doc.dataset.fullscreen = false;
+    doc.blur();
     notepad.focus();
   }
 });
