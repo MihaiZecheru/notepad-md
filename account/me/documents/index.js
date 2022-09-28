@@ -16,11 +16,15 @@ else {
 document.body.addEventListener("keydown", (event) => {
   if ((event.ctrlKey && event.shiftKey && event.code === "KeyK") || (event.ctrlKey && event.code === "KeyF")) {
     event.preventDefault();
-    document.getElementById("searchbox").focus();
+    document.getElementById("searchbox").select();
   } else if (event.code === "Escape") {
     document.getElementById("searchbox").blur();
   }
 });
+
+document.getElementById("searchbox").addEventListener("click", () => {
+  document.getElementById("searchbox").select();
+})
 
 document.getElementById("searchbox").addEventListener("input", (e) => {
   const search = e.target.value.toLowerCase();
