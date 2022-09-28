@@ -4,7 +4,7 @@
 
 * {
   font-family: "Comfortaa";
-  font-weight: 700;
+  font-weight: 600;
 }
 
 button:not(.document-button):not(#title-button):not(.btn):not(.btn-close) {
