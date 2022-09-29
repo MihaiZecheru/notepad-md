@@ -1,6 +1,6 @@
 function show_footnote(ele_id) {
   const txt = document.getElementById(ele_id).innerText;
-  const doc_ = document.getElementById("document");
+  const doc_ = document.getElementById("document") || document.body;
   const docScrollbarWidth = doc_.offsetWidth - doc_.clientWidth;
   document.getElementById("footnotes-alert-placeholder").innerHTML = `
   <div class="alert alert-primary d-flex align-items-center mt-2 mb-2 alert-dismissible" style="position: fixed; z-index: 5000; width: ${doc_.dataset.fullscreen === "true" ?
