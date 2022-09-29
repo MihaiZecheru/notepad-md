@@ -32,6 +32,8 @@ if (mode === "view") {
   });
 }
 
+let BOLD_COLOR = "#FF69B4";
+
 const isUrl = string => {
   try { return Boolean(new URL(string)); }
   catch(e) { return false; }
@@ -274,6 +276,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   })();
 
+  // set color of bold items
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/${JSON.parse(getCookie('nmd-validation')).email.replace(/\./g, ",")}/bold_color.json`, { 
+    method: 'GET'
+  }).then(res => res.json()).then(d => {
+    const _e_ = document.createElement("style");
+    _e_.innerHTML = d.startsWith('#') ? `b { color: ${d}; }` : `b { color: rgb(${d}); }`;
+    document.body.appendChild(_e_);
+  }).catch(() => {
+    // set the default color
+    const _e_ = document.createElement("style");
+    _e_.innerHTML = "b { color: #FF69B4; }";
+    document.body.appendChild(_e_);
+  });
+
   title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = title;
@@ -281,6 +297,23 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   document.title = title;
   notepad.value = previousText = htmlToMarkdown(_doc.content || "");
   notepad.setSelectionRange(0, 0);
+
+  // add bold contextmenu event listeners
+  document.querySelectorAll("#document b").forEach(b => {
+    b.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      b.id = uuid4();
+      new BootstrapMenu(`#${b.id}`, {
+        actions: [{
+          name: "Change Color",
+          onClick: () => {
+            new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
+            // document.getElementById("color-picker").value = BOLD_COLOR;
+          }
+        }]
+      });
+    });
+  });
 });
 
 notepad.focus();
@@ -493,7 +526,6 @@ async function updateCheckbox(email, element_id, status) {
     method: "PUT",
     body: JSON.stringify(status ? 1 : 0)
   });
-  console.log(status)
 }
 
 async function saveDocument() {
@@ -1388,3 +1420,24 @@ if (JSON.parse(getCookie("documents")).includes(document_uuid)) {
   documents.push(document_uuid);
   setCookie("documents", JSON.stringify(documents), 365);
 }
+
+document.getElementById("change-bold-text-color-confirm-button").addEventListener('click', () => {
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/${JSON.parse(getCookie('nmd-validation')).email.replace(/\./g, ",")}/bold_color.json`, { 
+    method: "PUT",
+    body: JSON.stringify(BOLD_COLOR)
+  }).then(res => res.json());
+  document.querySelectorAll("#document b").forEach(_b => {
+    _b.style.color = BOLD_COLOR.startsWith('#') ? BOLD_COLOR : `rgb(${BOLD_COLOR})`;
+  });
+});
+
+document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele => {
+  _ele.addEventListener('click', () => {
+    const rgb = _ele.style.boxShadow.substring(4, _ele.style.boxShadow.length - 24);
+    BOLD_COLOR = rgb;
+    document.querySelectorAll(".circle-picker span > div > span > div").forEach(__ele => {
+      __ele.style.border = "none";
+    });
+    _ele.style.border = ".2em solid #000";
+  });
+});

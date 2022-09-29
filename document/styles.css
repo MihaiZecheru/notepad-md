@@ -187,5 +187,9 @@ hr {
 
 b {
   font-weight: 900;
-  color: #FF69B4;
+  /* color: #FF69B4; /* default bold color */
+}
+
+.circle-picker span > div:hover {
+  transform: scale(1.2);
 }
