@@ -1230,15 +1230,18 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.left = "0";
     doc.style.width = "100vw";
     doc.style.height = "95vh";
-
+    
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
     fullscreen_box.innerText = "fullscreen_exit";
     fullscreen_box.style.position = "fixed";
     fullscreen_box.style.top = "1vh";
-    fullscreen_box.style.right = "1vh";
+    fullscreen_box.style.right = "1.25vw";
     fullscreen_box.style.float = "right";
     fullscreen_box.style.zIndex = "1000";
+    
+    // prevent text from going all the way to the right edge; prevents overlap with the fullsreen_box
+    doc.style.paddingRight = `calc(${doc.offsetWidth - doc.clientWidth}px + 1.25vw + ${fullscreen_box.clientWidth}px)`;
 
     // delete alert if it exists
     document.getElementById("footnotes-alert-placeholder").innerHTML = "";
