@@ -184,3 +184,8 @@ hr {
 #document {
   font-weight: 900;
 }
+
+b {
+  font-weight: 900;
+  color: #FF69B4;
+}

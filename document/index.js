@@ -61,7 +61,7 @@ function htmlToMarkdown(html) {
   // tab
   .replace(/(&nbsp;){8}/g, "\t")
 
-  // bold
+  // pink color (pink bold)
   .replace(/<b>(.*?)<\/b>/g, "**$1**")
 
   // italic
@@ -75,9 +75,6 @@ function htmlToMarkdown(html) {
 
   // highlight
   .replace(/<mark>(.*?)<\/mark>/g, "`$1`")
-
-  // inline code / pink text
-  .replace(/<code>(.*?)<\/code>/g, "!`$1`")
 
   // heading 1
   .replace(/<h1>(.*?)<\/h1>/g, "# $1")
@@ -329,7 +326,7 @@ function compileMarkdown(text) {
   // blockquote
   .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
 
-  // bold
+  // pink color (pink bold)
   .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
 
   // italics  
@@ -359,9 +356,6 @@ function compileMarkdown(text) {
 
   // hyperlink
   .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
-
-  // inline code / pink text
-  .replace(/!\`(.*?)\`/g, "<code>$1</code>")
   
   // highlight
   .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
@@ -769,7 +763,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
-      // bold
+      // pink color (pink bold)
       case "KeyB":
         event.preventDefault();
         if (sel.length === 0) {
