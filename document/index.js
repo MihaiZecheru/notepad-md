@@ -111,6 +111,9 @@ function htmlToMarkdown(html) {
   // ordered list
   .replace(/<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="(.*?)"><li>(.*?)<\/li><\/ol><\/li><\/ul>/g, "\t$1 $2")
   .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
+  
+  // replacement br
+  .replace(/<rbr>/g, "\n")
 
   // right-align
   .replace(/<div style="text-align: right;">(.*?)<\/div>/g, "{{$1}}")
@@ -387,6 +390,7 @@ function compileMarkdown(text) {
     const content = c.substring(6);
     return `<ul><li>${content}</li></ul>`;
   })
+  .replace(/<\/ul><br>/g, "</ul><rbr>")
   
   // ordered list
   .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
@@ -399,6 +403,7 @@ function compileMarkdown(text) {
     const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
     return `<ol start="${number}"><li>${content}</li></ol>`;
   })
+  .replace(/<\/ol><br>/g, "</ol><rbr>")
 
   // headers
   .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><br>")
@@ -448,11 +453,14 @@ function compileMarkdown(text) {
   .replace(/<CARRET>/g, "^")
   .replace(/<BACKSLASH>/g, "\\")
 
-  if (html.startsWith("<br>"))
+  if (html.startsWith("<br>")) {
     html = html.substring(4, html.length);
+  }
   
-  if (html.endsWith("<br>"))
+  if (html.endsWith("<br>")) {
     return html.substring(0, html.length - 4);
+  }
+
   return html;
 }
 
@@ -1112,11 +1120,22 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     </script><link rel="stylesheet" href="../default.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/prettify.css">
-    <script src="https://notes.mzecheru.com/document/show_footer.js"></script>
+    <script src="https://notes.mzecheru.com/modules/show_footer.js"></script>
   </head>
   <body>
+    <div id="footnotes-alert-placeholder"></div>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </symbol>
+    </svg>
     ${getHtml()}
     <a class="btn btn-primary" href="https://notes.mzecheru.com/document/?id=${document_uuid}" style="position: fixed; right: .5vw; bottom: 1vh;">View in Notepad MD</a>
+    <style>
+      body {
+        margin-left: 1em;
+      }
+    </style>
   </body>
   </html>`, `${title}.html`);
 });
