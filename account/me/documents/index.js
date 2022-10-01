@@ -500,7 +500,7 @@ document.querySelector("#change").addEventListener("click", () => {
   });
 });
 
-document.querySelector("#delete-modal").addEventListener("click", () => {
+document.getElementById("delete-doc-btn").addEventListener("click", () => {
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${DOC_BEING_DELETED.id}.json`, {
     method: "DELETE",
   }).then(() => {
