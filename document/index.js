@@ -107,7 +107,7 @@ function htmlToMarkdown(html) {
   .replace(/<img src="(.*?)" alt="(.*?)" id="(.*?)" style="width: 100%;"><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "![$2]($1)")
 
   // video and embed
-  .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "&[$4]($2)")
+  .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" height="(.*?)%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe>/g, "&[$3]($2)")
 
   // unordered list
   .replace(/<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>(.*?)<\/li><\/ul><\/li><\/ul>/g, "\t- $1")
@@ -390,7 +390,8 @@ function compileMarkdown(text) {
     const uuid = uuid4();
     const content = c.match(/\[(.*?)\]/g)[0];
     const url = c.match(/\((.*?)\)/g)[0];
-    return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`
+    const height = content.substring(1, content.length - 1);
+    return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`
   })
 
   // hyperlink
@@ -522,7 +523,6 @@ function setSaveStatus(status) {
       ele_ = document.getElementById("save-status");
       ele_.innerText = "Unsaved Changes";
       ele_.style.color = "tomato";
-
       break;
   }
 }
@@ -600,6 +600,8 @@ function getStartAndEndPositions() {
   return { start: notepad.selectionStart, end: notepad.selectionEnd };
 }
 
+let before_insert_text = null;
+
 function insertText(text, cursor_movement = 0) {
   const { start, end } = getStartAndEndPositions();
   notepad.value = notepad.value.substring(0, start) + text + notepad.value.substring(end);
@@ -650,19 +652,15 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
       // video
       case "KeyV":
-        if (event.shiftKey) {
-          event.preventDefault();
-          if (sel.length === 0) {
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("$[]()", -3);
+        } else if (notepad.value.includes(sel)) {
+          if (isUrl(sel)) {
+            insertText(`$[](${sel})`, 0 - (3 + sel.length));
+          } else {
             insertText("$[]()", -3);
-          } else if (notepad.value.includes(sel)) {
-            if (isUrl(sel)) {
-              insertText(`$[](${sel})`, 0 - (3 + sel.length));
-            } else {
-              insertText("$[]()", -3);
-            }
           }
-        } else {
-          event.preventDefault();
         }
         break;
 
@@ -744,7 +742,33 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       // ctrl + shift + right_arrow = select word
       case "ArrowRight":
         event.preventDefault();
-        const endOfWord = Math.min(notepad.value.indexOf(" ", notepad.selectionEnd + 1), notepad.value.indexOf("\n", notepad.selectionEnd + 1));
+        const endOfWord = Math.min(
+          1 + notepad.value.indexOf(" ", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("\n", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf(".", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf(",", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("!", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("?", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("@", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("#", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("$", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("%", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("*", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("(", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf(")", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("{", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("}", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("[", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("]", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("`", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("~", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("__", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("^^", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("+", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("=", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("|", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf("\"", notepad.selectionEnd + 1) || 999999999,
+        ) - 1;
         if (event.shiftKey) {
           notepad.selectionEnd = endOfWord;
         } else {
