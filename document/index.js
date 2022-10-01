@@ -750,6 +750,16 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.ctrlKey) {
     switch (event.code) {
+      case "ArrowRight":
+        event.preventDefault();
+        const endOfWord = Math.min(notepad.value.indexOf(" ", notepad.selectionEnd + 1), notepad.value.indexOf("\n", notepad.selectionEnd + 1));
+        if (event.shiftKey) {
+          notepad.selectionEnd = endOfWord;
+        } else {
+          notepad.selectionStart = notepad.selectionEnd = endOfWord;
+        }
+        break;
+
       case "KeyK":
         event.preventDefault();
         if (event.shiftKey) {
