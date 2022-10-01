@@ -46,9 +46,15 @@ function get_footnote_ids() {
 }
 
 function get_footnote_count() {
+  const footnotes_ = {};
   const footnotes = notepad.value.match(/\[\^(\d{1,5})\]/g);
+  footnotes.forEach((footnote, i) => {
+    footnotes_[footnote] = (footnotes_[footnote] || 0) + 1;
+    if (footnotes_[footnote] > 2) footnotes_[footnote] = 2;
+  })
+  const sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
   if (!footnotes) return 0;
-  return Math.ceil(footnotes.length / 2);
+  return Math.ceil(sumValues(footnotes_) / 2);
 }
 
 function htmlToMarkdown(html) {
