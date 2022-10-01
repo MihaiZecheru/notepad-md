@@ -1465,3 +1465,15 @@ function printDiv(divName) {
 document.getElementById("print-document-btn").addEventListener('click', () => {
   printDiv("document");
 });
+
+document.getElementById('file-upload-modal-confirm-btn').addEventListener('click', () => {
+  for (var i = 0, f; f = files[i]; i++) {
+    const reader = new FileReader();
+    reader.readAsText(f);
+    
+    reader.onload = () => {
+      document.getElementById('notepad').value = reader.result;
+      saveDocument();
+    }
+  }
+});
