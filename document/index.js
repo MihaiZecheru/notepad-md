@@ -1182,10 +1182,6 @@ document.getElementById("download-notepad-as-txt-btn").addEventListener('click',
   download(notepad.value.trim(), `${title}.txt`);
 });
 
-document.getElementById("export-as-google-doc-btn").addEventListener('click', () => {
-  // todo: add google docs export
-});
-
 /* notepad fullscreen - Alt+1 */
 
 document.querySelector("main div > span").addEventListener('click', () => {
