@@ -148,7 +148,7 @@ tr:nth-child(even) td:not(td:last-child) {
   text-align: right;
 } 
 
-ul, ol {
+ul:not(.list-group), ol {
   margin-bottom: 0;
   padding-left: 2.5rem!important;
 }
