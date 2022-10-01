@@ -48,7 +48,7 @@ function get_footnote_ids() {
 function get_footnote_count() {
   const footnotes_ = {};
   const footnotes = notepad.value.match(/\[\^(\d{1,5})\]/g);
-  footnotes.forEach((footnote, i) => {
+  footnotes?.forEach((footnote, i) => {
     footnotes_[footnote] = (footnotes_[footnote] || 0) + 1;
     if (footnotes_[footnote] > 2) footnotes_[footnote] = 2;
   })
