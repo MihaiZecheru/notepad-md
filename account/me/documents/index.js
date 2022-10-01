@@ -173,7 +173,7 @@ async function createCard(doc) {
           name: 'Document Summary',
           onClick: () => {
             document.getElementById("preview-document-modal-close-btn").click();
-            const text = document.getElementById("preview-document-modal-content").innerText;
+            const text = document.getElementById("preview-document-modal-content").innerText.substring(1296); // 1296 is the text from the style tag
             const character_count = text.replace(/\n/g, " ").length;
         
             const wordOccurrence = string => {
@@ -191,10 +191,11 @@ async function createCard(doc) {
                 if (a < b) return -1;
               }
         
-              return { total_words: words.length, indiv_words_count: Object.entries(map).filter(entry => entry[1] > 1).sort((a, b) => compareNumeric(b[1], a[1])) };
+              return { total_words: words.length, indiv_words_count: Object.entries(map).sort((a, b) => compareNumeric(b[1], a[1])) };
             }
         
             const { total_words, indiv_words_count } = wordOccurrence(text);
+            let expand_level = 1;
         
             const sentences = text.split(".").map(sentence => sentence.replace(/\n/, " ")).filter(sentence => sentence.length >= 7);
             const sentence_count = sentences.length;
@@ -206,10 +207,28 @@ async function createCard(doc) {
               <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
               <p class="text-center"><u>Most Common Words</u></p>
               <ul class="list-group">
-                ${indiv_words_count.map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
-                <li class="list-group-item">Words that occur only once are not included</li>
+                ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+                <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
               </ul>
             `;
+
+            function expand() {
+              expand_level++;
+              document.getElementById("word-count-modal-body").innerHTML = `
+              <p class="text-center">Total Characters: . . . . . . . . . . . &nbsp;${character_count}</p>
+              <p class="text-center">Total Words: . . . . . . . . . . . . . . . . ${total_words}</p>
+              <p class="text-center">Total Sentences: . . . . . . . . . . . ${sentence_count}</p>
+              <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
+              <p class="text-center"><u>Most Common Words</u></p>
+              <ul class="list-group">
+              ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+              <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
+              </ul>
+              `;
+              document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
+            }
+          
+          document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
             document.getElementById("word-count-modal-body").addEventListener("contextmenu", (e) => {
               e.preventDefault();
               new BootstrapMenu('#word-count-modal-body', {
@@ -251,6 +270,80 @@ async function createCard(doc) {
       actions: [{
         name: "Preview",
         onClick: preview
+      }, {
+        name: 'Summary',
+        onClick: () => {
+          document.getElementById("preview-document-modal-close-btn").click();
+          const text = doc.content;
+          const character_count = text.replace(/\n/g, " ").length;
+      
+          const wordOccurrence = string => {
+            let map = {};
+            const words = string.replace(/\n/g, " ").replace(/\./, " ").replace(/,/, " ").split(" ").map(word => word.replace(/\./g, " ").replace(/,/g, " ").toLowerCase().trim()).filter(word => word !== "" && isNaN(word));
+      
+            for (let i = 0; i < words.length; i++) {
+              const item = words[i];
+              map[item] = (map[item] + 1) || 1;
+            }
+        
+            function compareNumeric(a, b) {
+              if (a > b) return 1;
+              if (a == b) return 0;
+              if (a < b) return -1;
+            }
+      
+            return { total_words: words.length, indiv_words_count: Object.entries(map).sort((a, b) => compareNumeric(b[1], a[1])) };
+          }
+      
+          const { total_words, indiv_words_count } = wordOccurrence(text);
+          let expand_level = 1;
+      
+          const sentences = text.split(".").map(sentence => sentence.replace(/\n/, " ")).filter(sentence => sentence.length >= 7);
+          const sentence_count = sentences.length;
+          const avg_words_per_sentence = (total_words / sentences.length).toFixed(2);
+          document.getElementById("word-count-modal-body").innerHTML = `
+            <p class="text-center">Total Characters: . . . . . . . . . . . &nbsp;${character_count}</p>
+            <p class="text-center">Total Words: . . . . . . . . . . . . . . . . ${total_words}</p>
+            <p class="text-center">Total Sentences: . . . . . . . . . . . ${sentence_count}</p>
+            <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
+            <p class="text-center"><u>Most Common Words</u></p>
+            <ul class="list-group">
+              ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+              <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
+            </ul>
+          `;
+
+          function expand() {
+            expand_level++;
+            document.getElementById("word-count-modal-body").innerHTML = `
+            <p class="text-center">Total Characters: . . . . . . . . . . . &nbsp;${character_count}</p>
+            <p class="text-center">Total Words: . . . . . . . . . . . . . . . . ${total_words}</p>
+            <p class="text-center">Total Sentences: . . . . . . . . . . . ${sentence_count}</p>
+            <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
+            <p class="text-center"><u>Most Common Words</u></p>
+            <ul class="list-group">
+            ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+            <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
+            </ul>
+            `;
+            document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
+          }
+        
+        document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
+          document.getElementById("word-count-modal-body").addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            new BootstrapMenu('#word-count-modal-body', {
+              actions: [{
+                name: 'Back to Preview',
+                onClick: () => {
+                  document.getElementById("word-count-modal-close-btn").click();
+                  preview();
+                }
+              }]
+            });
+          });
+          new bootstrap.Modal(document.getElementById("word-count-modal")).show();
+        }
       }, {
         name: "Open (Edit)",
         onClick: () => {

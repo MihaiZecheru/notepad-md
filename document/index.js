@@ -624,6 +624,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   check_for_changes();
   const sel = window.getSelection().toString();
   
+  // close alert if present, exit fullscreen if in fullscreen, or unfocus notepad otherwise
   if (event.key === "Escape") {
     event.preventDefault();
     if (document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
@@ -638,118 +639,109 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     }
     return;
   }
-
-  // horizontal rule
-  if (event.altKey && event.code === "KeyR") {
-    event.preventDefault();
-    insertText("---");
-    return;
-  }
-
-  // video
-  if (event.altKey && event.code === "KeyV") {
-    if (event.shiftKey) {
-      event.preventDefault();
-      if (sel.length === 0) {
-        insertText("$[]()", -3);
-      } else if (notepad.value.includes(sel)) {
-        if (isUrl(sel)) {
-          insertText(`$[](${sel})`, 0 - (3 + sel.length));
-        } else {
-          insertText("$[]()", -3);
-        }
-      }
-    } else {
-      event.preventDefault();
-    }
-    return;
-  }
-
-  // lists
-  if (event.altKey && event.code === "KeyL") {
-    if (event.shiftKey) {
-      event.preventDefault();
-      insertText("1. \n2. \n3. ", -8);
-    } else {
-      event.preventDefault();
-      insertText("- \n- \n- ", -6);
-    }
-    return;
-  }
-
-  // checkbox
-  if (event.altKey && event.code === "KeyC") {
-    // unchecked
-    if (event.shiftKey) {
-      event.preventDefault();
-      if (sel.length === 0) {
-        insertText("- [x] ");
-      } else if (notepad.value.includes(sel)) {
-        insertText(`- [x] ${sel}`, 0);
-      }
-    } else { // checked
-      event.preventDefault();
-      if (sel.length === 0) {
-        insertText("- [] ");
-      } else if (notepad.value.includes(sel)) {
-        insertText(`- [] ${sel}`, 0);
-      }
-    }
-    return;
-  }
-
-  // strikethrough
-  if (event.altKey && event.code === "KeyS") {
-    event.preventDefault();
-    if (sel.length === 0) {
-      insertText("~~~~", -2);
-    } else if (notepad.value.includes(sel)) {
-      insertText(`~~${sel}~~`, 0);
-    }
-    return;
-  }
-
-  // highlight
-  if (event.altKey && event.code === "KeyH") {
-    event.preventDefault();
-    if (sel.length === 0) {
-      insertText("``", -1);
-    } else if (notepad.value.includes(sel)) {
-      insertText(`\`${sel}\``, 0);
-    }
-    return;
-  }
-
-  // table
-  if (event.altKey && event.code === "KeyT") {
-    event.preventDefault();
-    insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
-    return;
-  }
-
-  // iframe embed
-  if (event.altKey && event.code === "KeyE") {
-    event.preventDefault();
-    if (sel.length === 0) {
-      insertText("&[]()", -3);
-    } else if (notepad.value.includes(sel)) {
-      if (isUrl(sel)) {
-        insertText(`&[](${sel})`, 0 - (3 + sel.length));
-      } else {
-        insertText("&[]()", -3);
-      }
-    }
-    return;
-  }
-
-  if (event.ctrlKey && event.shiftKey && event.code === "KeyP") {
-    event.preventDefault();
-    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
-    return;
-  }
   
+  if (event.altKey) {
+    switch (event.code) {
+      // horizontal rule
+      case "KeyR":
+        event.preventDefault();
+        insertText("---");
+        break;
+
+      // video
+      case "KeyV":
+        if (event.shiftKey) {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("$[]()", -3);
+          } else if (notepad.value.includes(sel)) {
+            if (isUrl(sel)) {
+              insertText(`$[](${sel})`, 0 - (3 + sel.length));
+            } else {
+              insertText("$[]()", -3);
+            }
+          }
+        } else {
+          event.preventDefault();
+        }
+        break;
+
+      // lists
+      case "KeyL":
+        if (event.shiftKey) {
+          event.preventDefault();
+          insertText("1. \n2. \n3. ", -8);
+        } else {
+          event.preventDefault();
+          insertText("- \n- \n- ", -6);
+        }
+        break;
+      
+      // checkbox
+      case "KeyC":
+        // unchecked
+        if (event.shiftKey) {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("- [x] ");
+          } else if (notepad.value.includes(sel)) {
+            insertText(`- [x] ${sel}`, 0);
+          }
+        } else { // checked
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("- [] ");
+          } else if (notepad.value.includes(sel)) {
+            insertText(`- [] ${sel}`, 0);
+          }
+        }
+        break;
+
+      // strikethrough
+      case "KeyS":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("~~~~", -2);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`~~${sel}~~`, 0);
+        }
+        break;
+
+      // highlight
+      case "KeyH":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("``", -1);
+        } else if (notepad.value.includes(sel)) {
+          insertText(`\`${sel}\``, 0);
+        }
+        break;
+      
+      // table
+      case "KeyT":
+        event.preventDefault();
+        insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
+        break;
+      
+      // iframe embed
+      case "KeyE":
+        event.preventDefault();
+        if (sel.length === 0) {
+          insertText("&[]()", -3);
+        } else if (notepad.value.includes(sel)) {
+          if (isUrl(sel)) {
+            insertText(`&[](${sel})`, 0 - (3 + sel.length));
+          } else {
+            insertText("&[]()", -3);
+          }
+        }
+        break; 
+    }
+  }
+
   if (event.ctrlKey) {
     switch (event.code) {
+      // ctrl + shift + right_arrow = select word
       case "ArrowRight":
         event.preventDefault();
         const endOfWord = Math.min(notepad.value.indexOf(" ", notepad.selectionEnd + 1), notepad.value.indexOf("\n", notepad.selectionEnd + 1));
@@ -760,6 +752,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
+      // delete line
       case "KeyK":
         event.preventDefault();
         if (event.shiftKey) {
@@ -789,6 +782,14 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
               insertText("[]()", -3);
             }
           }
+        }
+        break;
+
+      // word count, alternative shortcut (original is alt + shift + p)
+      case "KeyP":
+        if (event.shiftKey) {
+          event.preventDefault();
+          new bootstrap.Modal(document.getElementById("word-count-modal")).show();
         }
         break;
 
@@ -888,6 +889,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
+      // center align
       case "BracketLeft":
         event.preventDefault();
         if (sel.length === 0) {
@@ -897,6 +899,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
+      // right align
       case "BracketRight":
         event.preventDefault();
         if (sel.length === 0) {
@@ -1275,54 +1278,6 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
   }
 });
 
-document.addEventListener('keydown', (e) => {
-  if (!e.altKey) return;
-
-  if (e.code === "Digit1") {
-    e.preventDefault();
-    if (NOTEPAD_DISABLED) return;
-    if (doc.dataset.fullscreen === "true" ? true : false) {
-      // exit fullscreen
-      document.querySelector(".dropleft > span").click();
-    }
-    document.querySelector("main div > span").click();
-  }
-  
-  if (e.code === "Digit2") {
-    e.preventDefault();
-    if (notepad.dataset.fullscreen === "true" ? true : false) {
-      // notepad is fullscreen, so we need to exit it first
-      document.querySelector("main div > span").click();
-    };
-    document.querySelector(".dropleft > span").click();
-  }
-
-  if (e.shiftKey && e.code === "T") {
-    e.preventDefault();
-    document.querySelector("document-title").click();
-    return;
-  }
-
-  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-    e.preventDefault();
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-    return;
-  }
-
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
-  if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
-    e.preventDefault();
-    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
-    return;
-  }
-});
-
 doc.addEventListener*('keydown', (e) => {
   if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
     e.preventDefault();
@@ -1355,12 +1310,6 @@ document.body.addEventListener('keydown', (e) => {
   if (e.altKey && e.shiftKey && e.code === "KeyT") {
     document.querySelector("document-title").click();
     return;
-  }
-
-  // print
-  if (e.ctrlKey && e.code === "KeyP") {
-    e.preventDefault();
-    printDiv("document");
   }
 
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
@@ -1396,10 +1345,11 @@ document.body.addEventListener('keydown', (e) => {
         if (a < b) return -1;
       }
 
-      return { total_words: words.length, indiv_words_count: Object.entries(map).filter(entry => entry[1] > 1).sort((a, b) => compareNumeric(b[1], a[1])) };
+      return { total_words: words.length, indiv_words_count: Object.entries(map).sort((a, b) => compareNumeric(b[1], a[1])) };
     }
 
     const { total_words, indiv_words_count } = wordOccurrence(text);
+    let expand_level = 1;
 
     const sentences = text.split(".").map(sentence => sentence.replace(/\n/, " ")).filter(sentence => sentence.length >= 7);
     const sentence_count = sentences.length;
@@ -1411,12 +1361,37 @@ document.body.addEventListener('keydown', (e) => {
       <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
       <p class="text-center"><u>Most Common Words</u></p>
       <ul class="list-group">
-        ${indiv_words_count.map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
-        <li class="list-group-item">Words that occur only once are not included</li>
+        ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+        <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
       </ul>
     `;
+
+    function expand() {
+      expand_level++;
+      document.getElementById("word-count-modal-body").innerHTML = `
+      <p class="text-center">Total Characters: . . . . . . . . . . . &nbsp;${character_count}</p>
+      <p class="text-center">Total Words: . . . . . . . . . . . . . . . . ${total_words}</p>
+      <p class="text-center">Total Sentences: . . . . . . . . . . . ${sentence_count}</p>
+      <p class="text-center">Average Words Per Sentence: ${avg_words_per_sentence}</p>
+      <p class="text-center"><u>Most Common Words</u></p>
+      <ul class="list-group">
+      ${indiv_words_count.slice(0, expand_level * 50).map((word, index) => `<li class="list-group-item">${index + 1}. ${word[0]} (${word[1]})</li>`).join("")}
+      <li class="list-group-item" id="word-count-modal-more-btn"><center>. . .</center></li>
+      </ul>
+      `;
+      document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
+    }
+    
+    document.getElementById("word-count-modal-more-btn").addEventListener('click', expand);
+
     new bootstrap.Modal(document.getElementById("word-count-modal")).show();
     return;
+  }
+
+  // print
+  if (e.ctrlKey && e.code === "KeyP") {
+    e.preventDefault();
+    printDiv("document");
   }
 });
 

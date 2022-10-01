@@ -65,6 +65,17 @@ mark {
   color: white;
 }
 
+/* for document summary modal */
+
+#word-count-modal-more-btn {
+  cursor: pointer;
+  transition: .5s;
+}
+
+#word-count-modal-more-btn:hover {
+  background: #477bff;
+}
+
 /* general purpose */
 
 .blue {
