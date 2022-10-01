@@ -633,12 +633,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
-  // title
-  if (event.altKey && event.shiftKey && event.code === "KeyT") {
-    document.querySelector("document-title").click();
-    return;
-  }
-
   // horizontal rule
   if (event.altKey && event.code === "KeyR") {
     event.preventDefault();
@@ -1345,6 +1339,18 @@ document.body.addEventListener('keydown', (e) => {
     return;
   }
 
+  // title
+  if (e.altKey && e.shiftKey && e.code === "KeyT") {
+    document.querySelector("document-title").click();
+    return;
+  }
+
+  // print
+  if (e.ctrlKey && e.code === "KeyP") {
+    e.preventDefault();
+    printDiv("document");
+  }
+
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     e.preventDefault();
     document.querySelectorAll("span.fullscreen")[1].click();
@@ -1443,4 +1449,17 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
     });
     _ele.style.border = ".2em solid #000";
   });
+});
+
+function printDiv(divName) {
+  // delete alert if it's open
+  document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+  var printContents = document.getElementById(divName).innerHTML;
+  document.body.innerHTML = printContents;
+  window.print();
+  window.location.reload();
+}
+
+document.getElementById("print-document-btn").addEventListener('click', () => {
+  printDiv("document");
 });
