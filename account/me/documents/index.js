@@ -75,15 +75,16 @@ let DOC_BEING_RENAMED;
 let DOC_BEING_DELETED;
 
 async function createCard(doc) {
-  if (!doc?.description) {
-    if (!doc?.content) doc.content = "";
-  }
+  console.log(doc.description)
+  const content = doc.description || doc.content || "";
+  const should_parse_text = doc.description ? false : true;
+
   let ele = document.createElement("div");
   ["card", "shadow", "mb-5", "bg-body", "rounded"].forEach(cls => ele.classList.add(cls));
   ele.innerHTML = 
   `<div class="card-body" id="${doc.id}">
   <span class="card-title"><a href="/document/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc?.title?.length > max_title_length ? doc?.title?.substring(0, max_title_length) + "..." : doc?.title ? doc.title : "DELETED DOCUMENT"}</a></span>
-  <p class="card-text">${parseText(doc.content)}</p>
+  <p class="card-text">${should_parse_text ? parseText(content) : content}</p>
   </div>
 
   <div class="card-footer user-select-none">
