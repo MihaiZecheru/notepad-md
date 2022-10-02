@@ -240,6 +240,9 @@ function htmlToMarkdown(html) {
   // footnote-top
   .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
 
+  // fix bottom footnotes
+  .replace(/\[<\/sup>(.*?)\]/g, "[^$1]")
+
   // horizontal rule
   .replace(/<hr>/g, "---")
 
@@ -291,6 +294,7 @@ let documentData = {
 async function saveSettings() {
   showSpinner();
   setSaveStatus('saving');
+  documentData.content = compileMarkdown(notepad.innerHTML);
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: 'PUT',
     body: JSON.stringify(documentData)
@@ -582,7 +586,8 @@ function compileMarkdown(text) {
   // footnote-top
   .replace(/\[\^(\d{1,5})\]/g, (c) => {
     const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
-    const footnote_uuid = footnote_uuids[footnote_id].trim();
+    const footnote_uuid = footnote_uuids[footnote_id]?.trim();
+    if (!footnote_uuid) return c;
     return `<span class="footnote-top" onclick="show_footnote('${footnote_uuid}')"><sup>[${footnote_id}]</sup></span>`;
   })
 
@@ -1910,6 +1915,10 @@ document.getElementById("settings").addEventListener('click', () => {
   new bootstrap.Modal(document.getElementById("settings-modal")).show();
 });
 
+document.getElementById("settings-modal").addEventListener("hidden.bs.modal", () => {
+  saveDocument();
+  window.location.reload();
+});
 
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
   documentData.title = document.getElementById("settings-modal-document-title").value;
