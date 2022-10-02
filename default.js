@@ -184,7 +184,7 @@ right_button.addEventListener("click", () => {
   }
 });
 
-document.querySelectorAll("#footer span")[1].addEventListener("click", () => {
+document.querySelectorAll("#footer span:not(.material-symbols-outlined)")[1].addEventListener("click", () => {
   window.location.href = center_image_and_text_redirect;
 });
 
