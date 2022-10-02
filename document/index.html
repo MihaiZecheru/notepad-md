@@ -253,13 +253,14 @@
             </div>
             <select class="form-select" id="settings-modal-document-font">
               <option value="comfortaa">Comfortaa</option>
+              <option value="calibri">Calibri</option>
               <option value="roboto">Roboto</option>
+              <option value="times new roman">Times New Roman</option>
               <option value="montserrat">Montserrat</option>
               <option value="source-code-pro">Source Code Pro</option>
               <option value="dina">Dina</option>
               <option value="input">Input</option>
               <option value="fira-code">Fira Code</option>
-              <option value="hack">Hack</option>
               <option value="jetbrains-mono">JetBrains Mono</option>
               <option value="monoid">Monoid</option>
             </select>
@@ -267,9 +268,9 @@
           <div class="mb-3">
             <div style="display: flex; align-items: center;">
               <label for="settings-modal-document-font-size" class="help-button-label col-form-label disable-highlighting">Font Size</label>
-              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Font Size" data-bs-content="The document's font size in pixels, which can be between 1 and 50. The default is 16"><span class="material-symbols-outlined">help</span></button>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Font Size" data-bs-content="The document's font size in pixels, which can be between 5 and 50. The default is 16"><span class="material-symbols-outlined">help</span></button>
             </div>
-            <input type="range" class="form-range" id="settings-modal-document-font-size" min="1" max="50" step="1">
+            <input type="range" class="form-range" id="settings-modal-document-font-size" min="5" max="50" step="1">
               <span id="settings-modal-document-font-size-label" class="btn btn-secondary" style="cursor: default!important;"></span>
             <script>
               const settingsModalDocumentFontSize = document.getElementById("settings-modal-document-font-size");
