@@ -289,11 +289,12 @@ let documentData = {
 };
 
 async function saveSettings() {
+  showSpinner();
   setSaveStatus('saving');
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: 'PUT',
     body: JSON.stringify(documentData)
-  }).then(() => { setSaveStatus('saved') });
+  }).then(() => { hideSpinner(); setSaveStatus('saved'); });
 }
 
 let NOTEPAD_DISABLED = false;
@@ -550,11 +551,11 @@ function compileMarkdown(text) {
   .replace(/<\/ol><br>/g, "</ol><rbr>")
 
   // headers
-  .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><br>")
-  .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><br>")
-  .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><br>")
-  .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><br>")
-  .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><br>")
+  .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
+  .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
+  .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><rbr>")
+  .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><rbr>")
+  .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><rbr>")
 
   // table
   .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
@@ -661,13 +662,14 @@ async function updateCheckbox(email, element_id, status) {
 }
 
 async function saveDocument() {
+  showSpinner();
   let text = notepad.value;
   if (text === previousText) {
+    hideSpinner();
     setSaveStatus("saved");
     return;
   }
 
-  showSpinner();
   setSaveStatus("saving");
 
   text = text.trimEnd();
@@ -752,7 +754,7 @@ function insertText(text, cursor_movement = 0) {
   location_before_last_insert.unshift({ start, end });
   notepad.focus();
 
-  document.execCommand('selectAll',false);
+  document.execCommand('selectAll', false);
   var el = document.createElement('p');
   el.innerText = notepad.value.substring(0, start) + text + notepad.value.substring(end);
   document.execCommand('insertHTML', false, el.innerHTML);
@@ -939,6 +941,8 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       case "KeyK":
         event.preventDefault();
         if (event.shiftKey) {
+          const { start, end } = getStartAndEndPositions();
+          location_before_last_insert.unshift({ start, end });
           if (notepad.selectionStart === notepad.selectionEnd) {
             const lines = notepad.value.split("\n");
             const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
@@ -947,10 +951,16 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
               start_of_line += lines[i].length + 1;
             }
             const end_of_line = start_of_line + lines[line - 1].length;
-            notepad.value = notepad.value.substring(0, start_of_line - 1) + notepad.value.substring(end_of_line);
+            document.execCommand('selectAll', false);
+            var el = document.createElement('p');
+            el.innerText = notepad.value.substring(0, start_of_line - 1) + notepad.value.substring(end_of_line);
+            document.execCommand('insertHTML', false, el.innerHTML);
             notepad.selectionStart = notepad.selectionEnd = start_of_line;
           } else {
-            notepad.value = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
+            document.execCommand('selectAll', false);
+            var el = document.createElement('p');
+            el.innerText = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
+            document.execCommand('insertHTML', false, el.innerHTML);
             notepad.selectionStart = notepad.selectionEnd = notepad.selectionStart;
           }
         } else {
@@ -1303,13 +1313,19 @@ modal_new_title_input.addEventListener("keydown", (event) => {
 });
 
 document.querySelector("div.modal-footer #change").addEventListener("click", () => {
+  showSpinner();
+  setSaveStatus('saving');
   const new_title = modal_new_title_input.value.trim();
-  if (new_title === documentData.title) return;
+  if (new_title === documentData.title) {
+    setSaveStatus('saved');
+    hideSpinner();
+    return;
+  }
 
   const document_title = document.querySelector("document-title");
 
   if (!new_title || new_title === "Untitled Document") {
-    documentData.title = "Untitled Document";
+    documentData.title = "Unt itled Document";
     document_title.style.color = "tomato";
   } else {
     documentData.title = new_title;
@@ -1328,6 +1344,8 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
       body: JSON.stringify(getDate())
     }).then(() => {
       document_title.innerText = documentData.title;
+      setSaveStatus('saved');
+      hideSpinner();
     });
   });
 });
@@ -1818,6 +1836,8 @@ tagInput.addEventListener('keyup', (e) => {
 });
 
 form.addEventListener('submit', handleFormSubmit);
+const settingsModalDocumentDescriptionCharacterCounter = document.getElementById("settings-modal-document-description-character-counter");
+const description_box_character_limit = 500;
 
 document.getElementById("settings").addEventListener('click', () => {
   saveDocument();
@@ -1829,6 +1849,7 @@ document.getElementById("settings").addEventListener('click', () => {
 
   const description_ele = document.getElementById("settings-modal-document-description");
   description_ele.value = documentData.description || "";
+  settingsModalDocumentDescriptionCharacterCounter.innerText = description_box_character_limit - description_ele.value.length;
   eles.push(description_ele);
   
   const visibility_ele = document.getElementById("settings-modal-document-visibility");
@@ -1873,7 +1894,6 @@ document.getElementById("settings").addEventListener('click', () => {
   });
 
   eles.forEach(ele => {
-    console.log(ele)
     ele?.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.code === "KeyS") {
         e.preventDefault();
@@ -1884,6 +1904,7 @@ document.getElementById("settings").addEventListener('click', () => {
 
   new bootstrap.Modal(document.getElementById("settings-modal")).show();
 });
+
 
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
   documentData.title = document.getElementById("settings-modal-document-title").value;
@@ -1900,6 +1921,17 @@ document.getElementById("settings-modal-save-btn").addEventListener('click', () 
   saveSettings().then(() => {
     window.location.reload();
   });
+});
+
+
+document.getElementById("settings-modal-document-description").addEventListener('input', (e) => {
+  const remainingChars = description_box_character_limit - e.target.value.length;
+  if (remainingChars < 0) {
+    e.target.value = e.target.value.substring(0, description_box_character_limit);
+    settingsModalDocumentDescriptionCharacterCounter.innerText = 0;
+    return;
+  }
+  settingsModalDocumentDescriptionCharacterCounter.innerText = remainingChars;
 });
 
 // initialize popovers

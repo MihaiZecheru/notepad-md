@@ -176,14 +176,17 @@
               <label for="settings-modal-document-title" class="help-button-label col-form-label disable-highlighting">Title</label>
               <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Title" data-bs-content="The document's title. Give your document a memorable name."><span class="material-symbols-outlined">help</span></button>
             </div>
-            <input type="text" class="form-control" id="settings-modal-document-title">
+            <input type="text" class="form-control" id="settings-modal-document-title" onclick="this.select();">
           </div>
           <div class="mb-3">
             <div style="display: flex; align-items: center;">
               <label for="document-description" class="help-button-label col-form-label disable-highlighting">Description</label>
               <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Description" data-bs-content="The document's description. What's your document about? Write a short summary!"><span class="material-symbols-outlined">help</span></button>
             </div>
-            <textarea class="form-control" style="resize: none;" id="settings-modal-document-description" rows="3"></textarea>
+            <div id="settings-modal-document-description-container">
+              <textarea class="form-control" style="resize: none;" id="settings-modal-document-description" rows="3"></textarea>
+              <span id="settings-modal-document-description-character-counter"></span>
+            </div>
           </div>
           <div class="mb-3">
             <div style="display: flex; align-items: center;">

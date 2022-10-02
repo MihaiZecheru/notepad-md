@@ -108,6 +108,7 @@ document-title:hover {
 #loading-spinner {
   float: right;
   margin-bottom: .25em;
+  margin-right: .25em!important;
 }
 
 /* move checkboxes closer together */
@@ -305,4 +306,21 @@ b {
 
 .help-button:hover {
   transform: scale(1.1);
+}
+
+#settings-modal-document-description-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+}
+
+#settings-modal-document-description {
+  height: 100%;
+  width: 100%;
+}
+
+#settings-modal-document-description-character-counter {
+  position: absolute;
+  bottom: 0;
+  right: .50em;
 }
