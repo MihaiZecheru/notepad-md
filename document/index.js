@@ -757,7 +757,9 @@ function insertText(text, cursor_movement = 0) {
   document.execCommand('selectAll', false);
   var el = document.createElement('p');
   el.innerText = notepad.value.substring(0, start) + text + notepad.value.substring(end);
+  const previousScrollLocation = notepad.scrollTop;
   document.execCommand('insertHTML', false, el.innerHTML);
+  notepad.scrollTop = previousScrollLocation;
   
   notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
 }
@@ -799,7 +801,8 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   // replace tab with \t
   if (event.key === "Tab") {
     event.preventDefault();
-    insertText("\t")
+    setSaveStatus("not-saved");
+    insertText("\t");
   }
   
   if (event.altKey) {
@@ -954,14 +957,16 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
             document.execCommand('selectAll', false);
             var el = document.createElement('p');
             el.innerText = notepad.value.substring(0, start_of_line - 1) + notepad.value.substring(end_of_line);
+            const previousScrollLocation = notepad.scrollTop;
             document.execCommand('insertHTML', false, el.innerHTML);
+            notepad.scrollTop = previousScrollLocation;
             notepad.selectionStart = notepad.selectionEnd = start_of_line;
           } else {
             document.execCommand('selectAll', false);
             var el = document.createElement('p');
             el.innerText = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
             document.execCommand('insertHTML', false, el.innerHTML);
-            notepad.selectionStart = notepad.selectionEnd = notepad.selectionStart;
+            notepad.selectionStart = notepad.selectionEnd = start;
           }
         } else {
           // hyperlink
