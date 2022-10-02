@@ -652,6 +652,12 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     }
     return;
   }
+
+  // replace tab with \t
+  if (event.key === "Tab") {
+    event.preventDefault();
+    insertText("\t")
+  }
   
   if (event.altKey) {
     switch (event.code) {
@@ -820,6 +826,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
 
+      // copy line is there is no currently selected text
       case "KeyC":
         if (notepad.selectionStart === notepad.selectionEnd) {
           const lines = notepad.value.split("\n");
@@ -971,12 +978,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
         break;
     }
-  }
-
-  // replace tab with \t
-  if (event.key === "Tab") {
-    event.preventDefault();
-    insertText("\t")
   }
 });
 
