@@ -536,7 +536,11 @@ async function updateCheckbox(email, element_id, status) {
 
 async function saveDocument() {
   let text = notepad.value;
-  if (text === previousText) return;
+  if (text === previousText) {
+    setSaveStatus("saved");
+    return;
+  }
+  
   showSpinner();
   setSaveStatus("saving");
 
@@ -600,11 +604,18 @@ function getStartAndEndPositions() {
   return { start: notepad.selectionStart, end: notepad.selectionEnd };
 }
 
-let before_insert_text = null;
+let location_before_last_insert = [ { start: 0, end: 0 } ];
 
 function insertText(text, cursor_movement = 0) {
   const { start, end } = getStartAndEndPositions();
-  notepad.value = notepad.value.substring(0, start) + text + notepad.value.substring(end);
+  location_before_last_insert.unshift({ start, end });
+  notepad.focus();
+
+  document.execCommand('selectAll',false);
+  var el = document.createElement('p');
+  el.innerText = notepad.value.substring(0, start) + text + notepad.value.substring(end);
+  document.execCommand('insertHTML', false, el.innerHTML);
+  
   notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
 }
 
@@ -815,6 +826,18 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           event.preventDefault();
           new bootstrap.Modal(document.getElementById("word-count-modal")).show();
         }
+        break;
+
+      case "KeyZ":
+        new Promise((_r) => {
+          setTimeout(_r, 1);
+        }).then(() => {
+          if (notepad.selectionStart === 0 && notepad.selectionEnd === notepad.value.length) {
+            notepad.selectionStart = location_before_last_insert[0].start;
+            notepad.selectionEnd = location_before_last_insert[0].end;
+            location_before_last_insert.shift();
+          }
+        });
         break;
 
       // italics
