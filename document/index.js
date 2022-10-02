@@ -540,7 +540,7 @@ async function saveDocument() {
     setSaveStatus("saved");
     return;
   }
-  
+
   showSpinner();
   setSaveStatus("saving");
 
@@ -817,6 +817,21 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
               insertText("[]()", -3);
             }
           }
+        }
+        break;
+
+      case "KeyC":
+        if (notepad.selectionStart === notepad.selectionEnd) {
+          const lines = notepad.value.split("\n");
+          const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+
+          let start_of_line = 0;
+          for (let i = 0; i < line - 1; i++) {
+            start_of_line += lines[i].length + 1;
+          }
+          const end_of_line = start_of_line + lines[line - 1].length;
+          navigator.clipboard.writeText(notepad.value.substring(start_of_line - 1, end_of_line));
+          notepad.selectionStart = notepad.selectionEnd = end_of_line;
         }
         break;
 
