@@ -34,14 +34,6 @@ if (mode === "view") {
 
 let BOLD_COLOR = "#FF69B4";
 
-async function saveSettings() {
-  setSaveStatus('saving');
-  await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
-    method: 'PUT',
-    body: JSON.stringify(documentData)
-  }).then(() => { setSaveStatus('saved') });
-}
-
 const isUrl = string => {
   try { return Boolean(new URL(string)); }
   catch(e) { return false; }
@@ -68,14 +60,50 @@ function get_footnote_count() {
 function htmlToMarkdown(html) {
   html = `<br>${html}<br>`;
   
+  // tab
+  switch (documentData.indentSize) {
+    case 2:
+      html = html.replace(/(&nbsp;){2}/g, "\t");
+      break;
+
+    case 3:
+      html = html.replace(/(&nbsp;){3}/g, "\t");
+      break;
+
+    case 4:
+      html = html.replace(/(&nbsp;){4}/g, "\t");
+      break;
+
+    case 5:
+      html = html.replace(/(&nbsp;){5}/g, "\t");
+      break;
+
+    case 6:
+      html = html.replace(/(&nbsp;){6}/g, "\t");
+      break;
+
+    case 7:
+      html = html.replace(/(&nbsp;){7}/g, "\t");
+      break;
+
+    case 8:
+      html = html.replace(/(&nbsp;){8}/g, "\t");
+      break;
+
+    case 9:
+      html = html.replace(/(&nbsp;){9}/g, "\t");
+      break;
+
+    case 10:
+      html = html.replace(/(&nbsp;){10}/g, "\t");
+      break;
+  }
+
   // blockquote
   let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
 
   // right-align
   .replace(/<div style='text-align: right;'>(.*?)<\/div>/g, "{{$1}}")
-
-  // tab
-  .replace(/(&nbsp;){8}/g, "\t")
 
   // pink color (pink bold)
   .replace(/<b>(.*?)<\/b>/g, "**$1**")
@@ -260,6 +288,14 @@ let documentData = {
   authors: [ email.replace(/,/g, ".") ]
 };
 
+async function saveSettings() {
+  setSaveStatus('saving');
+  await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
+    method: 'PUT',
+    body: JSON.stringify(documentData)
+  }).then(() => { setSaveStatus('saved') });
+}
+
 let NOTEPAD_DISABLED = false;
 
 // get the document content
@@ -292,8 +328,14 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     notepad.setAttribute("title", "You do not have permission to edit this document");
   }
 
+  doc.style.fontSize = documentData.fontSize + 'px';
+  notepad.style.fontSize = documentData.fontSize + 'px';
+
+  notepad.style.tabSize = documentData.indentSize;
+
   previousHTML = _doc.content || "";
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
+
   // fill in checkboxes
   (async () => {
     let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
@@ -379,11 +421,47 @@ function compileMarkdown(text) {
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
   text = "\n" + text + "\n";
 
-  //               tab
-  let html = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
-  
-  // newline
-  .replace(/\n/g, "<br>")
+  // tab
+  switch (documentData.indentSize) {
+    case 2:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;");
+      break;
+
+    case 3:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 4:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+    
+    case 5:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 6:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 7:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 8:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 9:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+
+    case 10:
+      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+      break;
+  }
+
+  //              newline
+  let html = text.replace(/\n/g, "<br>")
 
   // escape characters
   .replace(/\\#/g, "<HASHTAG>")
@@ -519,6 +597,22 @@ function compileMarkdown(text) {
   .replace(/<CARRET>/g, "^")
   .replace(/<BACKSLASH>/g, "\\")
 
+  // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
+  .replace(/<i><\/i>/g, "")
+  .replace(/<b><\/b>/g, "")
+  .replace(/<u><\/u>/g, "")
+  .replace(/<s><\/s>/g, "")
+  .replace(/<sup><\/sup>/g, "")
+  .replace(/<center><\/center>/g, "")
+  .replace(/<div style="text-align: right;"><\/div>/g, "")
+  .replace(/<h1><\/h1>/g, "")
+  .replace(/<h2><\/h2>/g, "")
+  .replace(/<h3><\/h3>/g, "")
+  .replace(/<h4><\/h4>/g, "")
+  .replace(/<h5><\/h5>/g, "")
+  .replace(/<mark><\/mark>/g, "")
+  .replace(/<div class='blockquote'><\/div>/g, "")
+
   if (html.startsWith("<br>")) {
     html = html.substring(4, html.length);
   }
@@ -576,7 +670,7 @@ async function saveDocument() {
   showSpinner();
   setSaveStatus("saving");
 
-  text = text.trim();
+  text = text.trimEnd();
   
   // set the previous text to the current text
   previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
@@ -1249,7 +1343,7 @@ function download(text, filename) {
 }
 
 function getHtml() {
-  return compileMarkdown(notepad.value.trim());
+  return compileMarkdown(notepad.value.trimEnd());
 }
 
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
