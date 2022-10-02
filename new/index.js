@@ -14,7 +14,6 @@ function uuid4() {
   });
 }
 
-
 if (!window.sessionStorage.getItem("new-doc-validation")) {
   document.querySelector("h2").innerText = "Session Expired";
   new Promise((_r) => {
@@ -30,7 +29,22 @@ if (!window.sessionStorage.getItem("new-doc-validation")) {
   // upload new empty document
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: "PUT",
-    body: JSON.stringify({ title: "Untitled Document", content: "", last_visit: getDate(), owner: email })
+    body: JSON.stringify({
+      title: "Untitled Document",
+      content: "",
+      last_visit: getDate(),
+      created: getDate(),
+      owner: email,
+      description: "",
+      type: "markdown",
+      visibility: "public",
+      language: "en",
+      theme: "light",
+      font: "comfortaa",
+      fontSize: 16,
+      indentSize: 8,
+      authors: [ email ],
+    })
   }).then(() => {
     // add document to user document list
     window.sessionStorage.removeItem("new-doc-validation");

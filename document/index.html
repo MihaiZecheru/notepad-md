@@ -163,6 +163,160 @@
       </div>
     </div>
   </div>
+  <div class="modal fade modal-dialog-scrollable " tabindex="-1" id="settings-modal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Document Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" style="margin-bottom: 0!important;" id="change-bold-text-color-modal-body">
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-title" class="help-button-label col-form-label disable-highlighting">Title</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Title" data-bs-content="The document's title. Give your document a memorable name."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <input type="text" class="form-control" id="settings-modal-document-title">
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="document-description" class="help-button-label col-form-label disable-highlighting">Description</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Description" data-bs-content="The document's description. What's your document about? Write a short summary!"><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <textarea class="form-control" style="resize: none;" id="settings-modal-document-description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="document-visibility" class="help-button-label col-form-label disable-highlighting">Visibility</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Visiblity" data-bs-content="The document's visibility specifies who can see your document. Public: anyone with the link can view. Private: only you can view."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <select class="form-select" id="settings-modal-document-visibility">
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-type" class="help-button-label col-form-label disable-highlighting">Type</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Type" data-bs-content="The document's type changes the writing mode. Markdown is default; the text will compile into HTML. Plain Text disables compiling; leaves the document as is. Code turns on syntax highlighting, disables autocorrect, and disables compiling."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <select class="form-select" id="settings-modal-document-type">
+              <option value="markdown">Markdown</option>
+              <option value="text">Plain Text</option>
+              <option value="code">Code</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-language" class="help-button-label col-form-label disable-highlighting">Language</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Language" data-bs-content="The document's language determines syntax highlighting is the document Type is Code, otherwise it's an indicator and disables autocorrect if not set to English."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <select class="form-select" id="settings-modal-document-language">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="py">Python</option>
+              <option value="js">JavaScript</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="cs">C#</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-theme" class="help-button-label col-form-label disable-highlighting">Theme</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Theme" data-bs-content="The document's theme determines the color and background of Notepad MD."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <select class="form-select" id="settings-modal-document-theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="solarized-dark">Solarized Dark</option>
+              <option value="solarized-light">Solarized Light</option>
+              <option value="monokai">Monokai</option>
+              <option value="material">Material</option>
+              <option value="github">GitHub</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="kuroir">Kuroir</option>
+              <option value="twilight">Twilight</option>
+              <option value="xcode">XCode</option>
+              <option value="textmate">TextMate</option>
+              <option value="solarized">Solarized</option>
+              <option value="terminal">Terminal</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-font" class="help-button-label col-form-label disable-highlighting">Font</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Font" data-bs-content="The document's font. Choose something pretty!"><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <select class="form-select" id="settings-modal-document-font">
+              <option value="comfortaa">Comfortaa</option>
+              <option value="roboto">Roboto</option>
+              <option value="montserrat">Montserrat</option>
+              <option value="source-code-pro">Source Code Pro</option>
+              <option value="dina">Dina</option>
+              <option value="input">Input</option>
+              <option value="fira-code">Fira Code</option>
+              <option value="hack">Hack</option>
+              <option value="jetbrains-mono">JetBrains Mono</option>
+              <option value="monoid">Monoid</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-font-size" class="help-button-label col-form-label disable-highlighting">Font Size</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Font Size" data-bs-content="The document's font size in pixels, which can be between 1 and 50. The default is 16"><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <input type="range" class="form-range" id="settings-modal-document-font-size" min="1" max="50" step="1">
+              <span id="settings-modal-document-font-size-label" class="btn btn-secondary" style="cursor: default!important;"></span>
+            <script>
+              const settingsModalDocumentFontSize = document.getElementById("settings-modal-document-font-size");
+              const settingsModalDocumentFontSizeLabel = document.getElementById("settings-modal-document-font-size-label");
+              settingsModalDocumentFontSize.oninput = () => {
+                settingsModalDocumentFontSizeLabel.innerText = settingsModalDocumentFontSize.value;
+              }
+            </script>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-indent-size" class="help-button-label col-form-label disable-highlighting">Indent Size</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Indent Size" data-bs-content="The amount of spaces that pressing tab will insert, can be between 2 and 10. The default is 8."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <input type="range" class="form-range" id="settings-modal-document-indent-size" min="2" max="10">
+            <span id="settings-modal-document-indent-size-label" class="btn btn-secondary span-btn" style="cursor: default!important;"></span>
+            <script>
+              const settingsModalDocumentIndentSize = document.getElementById("settings-modal-document-indent-size");
+              const settingsModalDocumentIndentSizeLabel = document.getElementById("settings-modal-document-indent-size-label");
+              settingsModalDocumentIndentSize.oninput = () => {
+                settingsModalDocumentIndentSizeLabel.innerText = settingsModalDocumentIndentSize.value;
+              }
+            </script>
+          </div>
+          <div class="mb-3">
+            <div style="display: flex; align-items: center;">
+              <label for="settings-modal-document-authors" class="help-button-label col-form-label disable-highlighting">Authors</label>
+              <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Authors" data-bs-content="The collaborators / writers of the document. Who has permission to make changes to your document? To give a user edit permissions to your document, type their email below and press enter. To revoke their permission, press the X below."><span class="material-symbols-outlined">help</span></button>
+            </div>
+            <div class="tag-main">
+              <form class="tag-form" autocomplete="off">
+                <div class="input-container">
+                  <input type="text" class="form-control" id="input" placeholder="email@example.com">
+                </div>
+                <div class="tag-container">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="settings-modal-save-btn">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="settings-modal-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade" id="change-title-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -187,10 +341,13 @@
   </div>
   <div id="footer" class="align-items justify-content overflow-auto">
     <span style="position: absolute; left: 1rem;">© Mihai Zecheru 2022</span>
-    <span style="margin-right: 1rem;">Notepad MD</span>
-    <a href="#" style="height: 4.5vh; cursor: pointer;" tabindex="-1" id="notepad-redirect">
-      <img src="/static/notepad.png" alt="favicon" style="height: 4.5vh; cursor: pointer;">
-    </a>
+    <div style="display: flex; align-items: center">
+      <button class="document-button disable-highlighting" tabindex="-1" id="settings"><span class="material-symbols-outlined" style="margin-right: .2rem;">settings</span></button>
+      <span style="margin-right: 1rem;">Notepad MD</span>
+      <a href="#" style="height: 4.5vh; cursor: pointer;" tabindex="-1" id="notepad-redirect">
+        <img src="/static/notepad.png" alt="favicon" style="height: 4.5vh; cursor: pointer;">
+      </a>
+    </div>
     <div id="user-buttons-container">
       <button id="login-btn-footer" class="user-button" tabindex="-1">Login</button>
       <button id="register-btn-footer" class="user-button" tabindex="-1">Register</button>

@@ -7,7 +7,7 @@
   font-weight: 600;
 }
 
-button:not(.document-button):not(#title-button):not(.btn):not(.btn-close) {
+button:not(.document-button):not(#title-button):not(.btn):not(.btn-close):not(.help-button) {
   cursor: pointer;
   margin: 10px 0;
   border-radius: 3rem;
@@ -15,7 +15,7 @@ button:not(.document-button):not(#title-button):not(.btn):not(.btn-close) {
   padding: 0.28rem;
 }
 
-button:not(.document-button):not(#title-button):not(.btn):not(.btn-close):not(.user-button) {
+button:not(.document-button):not(#title-button):not(.btn):not(.btn-close):not(.user-button):not(.help-button) {
   width: 6em;
 }
 

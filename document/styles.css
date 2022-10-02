@@ -193,3 +193,116 @@ b {
 .circle-picker span > div:hover {
   transform: scale(1.2);
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300&display=swap');
+
+:root {
+  --off-white: #f8f8f8;
+  --off-black: #444444;
+  --color: var(--off-black);
+  --shadow: 0 0 30px #cccccc;
+  --xs: 0.2rem;
+  --sm: 0.5rem;
+  --md: 0.8rem;
+  --lg: 1rem;
+  --xlg: 1.5rem;
+  --xxlg: 2rem;
+  --transition: 0.3s linear all;
+}
+
+.tag-main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tag-form {
+  /* box-shadow: var(--shadow); */
+  border-radius: .5em;
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: var(--lg);
+  width: 100%;
+}
+
+.tag-h1 {
+  color: var(--off-black);
+}
+
+.tag-input {
+  width: 100%!important;
+  border: 1.5px solid var(--color);
+  outline-color: var(--color);
+  padding: var(--sm);
+  border-radius: .5em;
+}
+
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tag-tag {
+  border-radius: .5em;
+  font-size: var(--md);
+  margin-right: var(--sm);
+  padding: var(--xs) var(--sm);
+  margin-bottom: var(--sm);
+  cursor: default!important;
+}
+
+.remove-tag {
+  cursor: pointer;
+  margin-left: .4em;
+}
+
+@media screen and (max-width: 1024px) {
+  .tag-form {
+      width: 75vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .tag-main {
+      justify-content: flex-start;
+      margin: var(--lg) 0;
+  }
+
+  .tag-form {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+  }
+
+  .input-container {
+      grid-template-columns: 1fr;
+  }
+
+  .tag-button {
+      padding: var(--sm) 0;
+  }
+}
+
+.help-button-label {
+  padding: 0;
+}
+
+.help-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 0 .2em 0;
+  padding: 0;
+  margin-left: .25em;
+  height: 1.5em;
+  width: 1.5em;
+  transition: all .2s ease-in-out;
+}
+
+.help-button:hover {
+  transform: scale(1.1);
+}

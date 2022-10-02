@@ -34,6 +34,14 @@ if (mode === "view") {
 
 let BOLD_COLOR = "#FF69B4";
 
+async function saveSettings() {
+  setSaveStatus('saving');
+  await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
+    method: 'PUT',
+    body: JSON.stringify(documentData)
+  }).then(() => { setSaveStatus('saved') });
+}
+
 const isUrl = string => {
   try { return Boolean(new URL(string)); }
   catch(e) { return false; }
@@ -233,8 +241,24 @@ if (!document_uuid) window.location.href = "/account/me/documents/?error=missing
 let previousHTML = "";
 let previousText = "";
 
-// get the document title
-let title = "Untitled Document";
+const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
+
+let documentData = {
+  title: "Untitled Document",
+  owner: email,
+  content: "",
+  last_visit: Date.now(),
+  created: null,
+  description: "",
+  type: "markdown",
+  visibility: "public",
+  language: "en",
+  theme: "light",
+  font: "comfortaa",
+  fontSize: 16,
+  indentSize: 8,
+  authors: [ email.replace(/,/g, ".") ]
+};
 
 let NOTEPAD_DISABLED = false;
 
@@ -243,8 +267,15 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   method: "GET",
 }).then(r => r.json()).then(_doc => {
   if (!_doc) window.location.href = "/account/me/documents/?error=invalid_id";
-  const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
-  if (_doc.owner !== email) {
+  
+  documentData = _doc;
+  documentData.last_visit = Date.now();
+  documentData.authors?.forEach(_email => _email.replace(/,/g, "."));
+
+  if (_doc.owner !== email && !documentData.authors.includes(email)) {
+    // nobody can see if the document is private
+    if (_doc.visibility === "private") window.location.href = "/account/me/documents/?error=private_document";
+    // only the owner can edit if the document is public, but everyone can see
     notepad.style.opacity = '0.5';
     notepad.style.cursor = 'not-allowed';
     notepad.style.userSelect = "none";
@@ -260,6 +291,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     document.querySelector("main div > span").setAttribute("title", "Notepad Fullscreen | Disabled");
     notepad.setAttribute("title", "You do not have permission to edit this document");
   }
+
   previousHTML = _doc.content || "";
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
   // fill in checkboxes
@@ -296,11 +328,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     document.body.appendChild(_e_);
   });
 
-  title = _doc.title;
+  documentData.title = _doc.title;
   const title_ele = document.querySelector("document-title");
-  title_ele.innerText = title;
+  title_ele.innerText = documentData.title;
   title_ele.style.color = "#0d6efd";
-  document.title = title;
+  document.title = documentData.title;
   notepad.value = previousText = htmlToMarkdown(_doc.content || "");
   notepad.setSelectionRange(0, 0);
 
@@ -593,7 +625,22 @@ async function saveDocument() {
   // upload the document to the server
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: "PUT",
-    body: JSON.stringify({ title, content: html, last_visit: getDate(), owner: email })
+    body: JSON.stringify({
+      title: documentData.title,
+      owner: documentData.owner.replace(/\./g, ","),
+      content: html,
+      last_visit: getDate(),
+      created: documentData.created,
+      description: documentData.description,
+      type: documentData.type,
+      visibility: documentData.visibility,
+      language: documentData.language,
+      theme: documentData.theme,
+      font: documentData.font,
+      fontSize: documentData.fontSize,
+      indentSize: documentData.indentSize,
+      authors: documentData.authors,
+    })
   });
 
   hideSpinner();
@@ -714,6 +761,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
       // strikethrough
       case "KeyS":
+        if (event.ctrlKey) break;
         event.preventDefault();
         if (sel.length === 0) {
           insertText("~~~~", -2);
@@ -1140,7 +1188,7 @@ document.getElementById("table").addEventListener("click", () => {
 const modal_new_title_input = document.querySelector("div.modal-body > form > div.mb-3 > input");
 
 document.querySelector("document-title").addEventListener("click", () => {
-  modal_new_title_input.value = title;
+  modal_new_title_input.value = documentData.title;
   new bootstrap.Modal(document.getElementById("change-title-modal")).show();
   new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
 });
@@ -1162,30 +1210,30 @@ modal_new_title_input.addEventListener("keydown", (event) => {
 
 document.querySelector("div.modal-footer #change").addEventListener("click", () => {
   const new_title = modal_new_title_input.value.trim();
-  if (new_title === title) return;
+  if (new_title === documentData.title) return;
 
   const document_title = document.querySelector("document-title");
 
   if (!new_title || new_title === "Untitled Document") {
-    title = "Untitled Document";
+    documentData.title = "Untitled Document";
     document_title.style.color = "tomato";
   } else {
-    title = new_title;
+    documentData.title = new_title;
     document_title.style.color = "#0d6efd";
   }
 
-  document.title = title;
+  document.title = documentData.title;
 
   // upload the new title to the server
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/title.json`, {
     method: "PUT",
-    body: JSON.stringify(title)
+    body: JSON.stringify(documentData.title)
   }).then(() => {
     fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
       method: "PUT",
       body: JSON.stringify(getDate())
     }).then(() => {
-      document_title.innerText = title;
+      document_title.innerText = documentData.title;
     });
   });
 });
@@ -1212,7 +1260,7 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="https://notes.mzecheru.com/static/notepad.png">
-    <title>${title}</title>
+    <title>${documentData.title}</title>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -1239,11 +1287,11 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
       }
     </style>
   </body>
-  </html>`, `${title}.html`);
+  </html>`, `${documentData.title}.html`);
 });
 
 document.getElementById("download-document-as-nmd-btn").addEventListener('click', () => {
-  download(getHtml(), `${title}.nmd`);
+  download(getHtml(), `${documentData.title}.nmd`);
 });
 
 document.getElementById("copy-html-btn").addEventListener('click', () => {
@@ -1255,7 +1303,76 @@ document.getElementById("copy-md-btn").addEventListener('click', () => {
 });
 
 document.getElementById("download-notepad-as-txt-btn").addEventListener('click', () => {
-  download(notepad.value.trim(), `${title}.txt`);
+  download(notepad.value.trim(), `${documentData.title}.txt`);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!e.altKey) return;
+
+  if (e.code === "Digit1") {
+    e.preventDefault();
+    if (NOTEPAD_DISABLED) return;
+    if (doc.dataset.fullscreen === "true" ? true : false) {
+      // exit fullscreen
+      document.querySelector(".dropleft > span").click();
+    }
+    document.querySelector("main div > span").click();
+  }
+  
+  if (e.code === "Digit2") {
+    e.preventDefault();
+    if (notepad.dataset.fullscreen === "true" ? true : false) {
+      // notepad is fullscreen, so we need to exit it first
+      document.querySelector("main div > span").click();
+    };
+    document.querySelector(".dropleft > span").click();
+  }
+
+  if (e.shiftKey && e.code === "T") {
+    e.preventDefault();
+    document.querySelector("document-title").click();
+    return;
+  }
+
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    e.preventDefault();
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    return;
+  }
+
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
+    e.preventDefault();
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
+    return;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
+    e.preventDefault();
+    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
+    return;
+  }
+});
+
+doc.addEventListener*('keydown', (e) => {
+  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
+    e.preventDefault();
+    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    return;
+  }
+  
+  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
+    e.preventDefault();
+    document.querySelectorAll("span.fullscreen")[1].click();
+    notepad.focus();
+    return;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
+    e.preventDefault();
+    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
+    return;
+  }
 });
 
 /* notepad fullscreen - Alt+1 */
@@ -1375,14 +1492,7 @@ document.body.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (e.altKey && e.code === "Digit2") {
-    document.querySelector(".dropleft > span").click();
-  }
-
-  if (e.altKey && e.code === "Digit1") {
-    document.querySelector("main div > span").click();
-  }
-
+  // escape
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     e.preventDefault();
     document.querySelectorAll("span.fullscreen")[1].click();
@@ -1390,6 +1500,12 @@ document.body.addEventListener('keydown', (e) => {
     return;
   }
 
+  // document settings
+  if (e.ctrlKey && e.altKey && e.code === "KeyS") {
+    document.getElementById("settings").click();
+  }
+
+  // document summary
   if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
     e.preventDefault();
     const clean = string => {
@@ -1533,3 +1649,164 @@ document.getElementById('file-upload-modal-confirm-btn').addEventListener('click
     }
   }
 });
+
+const tagInput = document.querySelector('#input');
+const form = document.querySelector(".tag-form");
+const tagContainer = document.querySelector('.tag-container');
+let tags = [];
+
+const createTag = (tagValue) => {
+  const value = tagValue.trim();
+
+  const email_regex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  if (!value.match(email_regex)) {
+    tagInput.style.transition = "all 0.2s ease-in-out";
+    tagInput.style.transform = "scale(1.05)";
+    new Promise(_r => {
+      setTimeout(() => {
+        tagInput.style.transform = "scale(1)";
+      }, 200);
+    });
+    return;
+  }
+
+  if (value === '' || tags.includes(value)) return;
+
+  const tag = document.createElement('span');
+  const tagContent = document.createTextNode(value);
+  tag.setAttribute('class', 'tag-tag btn btn-secondary');
+  tag.appendChild(tagContent);
+
+  const close = document.createElement('span');
+  close.setAttribute('class', 'remove-tag disable-highlighting');
+  close.innerHTML = '&#10006;';
+  close.onclick = handleRemoveTag;
+  tag.appendChild(close);
+
+  if (!tags.includes(tag)) {
+    tagContainer.appendChild(tag);
+    tags.push(tag);
+  }
+
+  tagInput.value = '';
+  tagInput.focus();
+};
+
+const handleRemoveTag = (e) => {
+  const item = e.target.textContent;
+  if (e.target.parentElement.innerText.replace(/✖/g, "") === email.replace(/,/g, ".")) {
+    e.target.parentElement.style.transition = "all 0.2s ease-in-out";
+    e.target.parentElement.style.transform = "scale(1.1)";
+    new Promise(_r => {
+      setTimeout(() => {
+        e.target.parentElement.style.transform = "scale(1)";
+        _r();
+      }, 200);
+    });
+    return;
+  }
+
+  e.target.parentElement.remove();
+  tags.splice(tags.indexOf(item), 1);
+
+  documentData.authors.splice(documentData.authors.indexOf(e.target.parentElement.innerText), 1);
+};
+
+const handleFormSubmit = (e) => {
+  e.preventDefault();
+  createTag(tagInput.value);
+};
+
+tagInput.addEventListener('keyup', (e) => {
+    if (e.key === ',' || e.key === " ") {
+      createTag(tagInput.value.substring(0, tagInput.value.length - 1));
+    }
+});
+
+form.addEventListener('submit', handleFormSubmit);
+
+document.getElementById("settings").addEventListener('click', () => {
+  saveDocument();
+  let eles = [];
+  
+  const title_ele = document.getElementById("settings-modal-document-title");
+  title_ele.value = documentData.title;
+  eles.push(title_ele);
+
+  const description_ele = document.getElementById("settings-modal-document-description");
+  description_ele.value = documentData.description || "";
+  eles.push(description_ele);
+  
+  const visibility_ele = document.getElementById("settings-modal-document-visibility");
+  visibility_ele.value = documentData.visibility || "public";
+  eles.push(visibility_ele);
+
+  const type_ele = document.getElementById("settings-modal-document-type");
+  type_ele.value = documentData.type || "markdown";
+  eles.push(type_ele);
+
+  const language_ele = document.getElementById("settings-modal-document-language");
+  language_ele.value = documentData.language || "en";
+  eles.push(language_ele);
+
+  const theme_ele = document.getElementById("settings-modal-document-theme");
+  theme_ele.value = documentData.theme || "light";
+  eles.push(theme_ele);
+
+  const font_ele = document.getElementById("settings-modal-document-font");
+  font_ele.value = documentData.font || "comfortaa";
+  eles.push(font_ele);
+
+  const font_size_ele = document.getElementById("settings-modal-document-font-size");
+  font_size_ele.value = documentData.fontSize || 16;
+  eles.push(font_size_ele);
+
+  const font_size_label_ele = document.getElementById("settings-modal-document-font-size-label");
+  font_size_label_ele.innerText = documentData.fontSize || 16;
+
+  const indent_size_ele = document.getElementById("settings-modal-document-indent-size");
+  indent_size_ele.value = documentData.indentSize || 8;
+  eles.push(indent_size_ele);
+
+  const indent_size_label_ele = document.getElementById("settings-modal-document-indent-size-label");
+  indent_size_label_ele.innerText = documentData.indentSize || 8;
+
+  eles.push(document.getElementById("settings-modal-document-authors"));
+  eles.push(document.getElementById("settings-modal"));
+
+  documentData.authors?.forEach(author => {
+    createTag(author.replace(/,/, "."));
+  });
+
+  eles.forEach(ele => {
+    console.log(ele)
+    ele?.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.code === "KeyS") {
+        e.preventDefault();
+        document.getElementById("settings-modal-save-btn").click();
+      }
+    });
+  });
+
+  new bootstrap.Modal(document.getElementById("settings-modal")).show();
+});
+
+document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
+  documentData.title = document.getElementById("settings-modal-document-title").value;
+  documentData.description = document.getElementById("settings-modal-document-description").value;
+  documentData.visibility = document.getElementById("settings-modal-document-visibility").value;
+  documentData.type = document.getElementById("settings-modal-document-type").value;
+  documentData.language = document.getElementById("settings-modal-document-language").value;
+  documentData.theme = document.getElementById("settings-modal-document-theme").value;
+  documentData.font = document.getElementById("settings-modal-document-font").value;
+  documentData.fontSize = parseInt(document.getElementById("settings-modal-document-font-size").value);
+  documentData.indentSize = parseInt(document.getElementById("settings-modal-document-indent-size").value);
+  documentData.authors = [...new Set((tags.map(tag => tag.innerText.replace(/,/g, ".").replace(/✖/g, ""))))];
+  tags = [...new Set(tags)];
+  saveSettings().then(() => {
+    window.location.reload();
+  });
+});
+
+// initialize popovers
+[...document.querySelectorAll('[data-bs-toggle="popover"]')].forEach(el => new bootstrap.Popover(el))
