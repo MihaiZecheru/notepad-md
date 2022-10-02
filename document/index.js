@@ -1375,6 +1375,14 @@ document.body.addEventListener('keydown', (e) => {
     return;
   }
 
+  if (e.altKey && e.code === "Digit2") {
+    document.querySelector(".dropleft > span").click();
+  }
+
+  if (e.altKey && e.code === "Digit1") {
+    document.querySelector("main div > span").click();
+  }
+
   if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
     e.preventDefault();
     document.querySelectorAll("span.fullscreen")[1].click();
