@@ -31,9 +31,12 @@ document.getElementById("searchbox").addEventListener("input", (e) => {
   if (search.length > 0) {
     document.querySelectorAll("div.card").forEach((card) => {
       const title = card.querySelector("span.card-title").innerText.toLowerCase();
-      const content = card.querySelector("p.card-text").innerText.toLowerCase();
-      if (title.includes(search) || content.includes(search)) card.style.display = "flex";
-      else card.style.display = "none";
+      const content = card.querySelector("p.card-text").innerText.toLowerCase(); // if the card body is the desc then this will be the description
+      const description = card.querySelector("p.card-text").attributes.getNamedItem('data-content')?.value || ""; // so this is getting the content
+      if (title.includes(search) || content.includes(search) || description.includes(search)) card.style.display = "flex";
+      else {
+        if (card.id !== "create-new-document-card") card.style.display = "none";
+      }
     });
   } else {
     document.querySelectorAll("div.card").forEach((card) => {
@@ -75,7 +78,6 @@ let DOC_BEING_RENAMED;
 let DOC_BEING_DELETED;
 
 async function createCard(doc) {
-  console.log(doc.description)
   const content = doc.description || doc.content || "";
   const should_parse_text = doc.description ? false : true;
 
@@ -84,7 +86,7 @@ async function createCard(doc) {
   ele.innerHTML = 
   `<div class="card-body" id="${doc.id}">
   <span class="card-title"><a href="/document/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc?.title?.length > max_title_length ? doc?.title?.substring(0, max_title_length) + "..." : doc?.title ? doc.title : "DELETED DOCUMENT"}</a></span>
-  <p class="card-text">${should_parse_text ? parseText(content) : content}</p>
+  <p class="card-text"${doc.description ? " data-content=" + doc.content : ""}>${should_parse_text ? parseText(content) : content}</p>
   </div>
 
   <div class="card-footer user-select-none">
