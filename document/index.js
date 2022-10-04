@@ -554,6 +554,12 @@ function compileMarkdown(text) {
   })
   .replace(/<\/ol><br>/g, "</ol><rbr>")
 
+  // right-align brackets
+  .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
+  
+  // center brackets
+  .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
+
   // headers
   .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
   .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
@@ -568,12 +574,6 @@ function compileMarkdown(text) {
     const rows_html = rows.map((row) => "<tr>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-rig  ht-align">${cell.trim()}</td>` : `<td>${cell.trim()}</td>`).join("")) + "</tr>").join("");
     return `<table>${headers}${rows_html}</table>`;
   })
-
-  // right-align brackets
-  .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
-  
-  // center brackets
-  .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
 
   // footnote-bottom
   .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
