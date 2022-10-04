@@ -899,6 +899,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       
       // table
       case "KeyT":
+        if (event.shiftKey) break;
         event.preventDefault();
         insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
         break;
