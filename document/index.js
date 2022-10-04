@@ -570,10 +570,10 @@ function compileMarkdown(text) {
   })
 
   // right-align brackets
-  .replace(/\{\{(.*?)\}\}/g, "<div style='text-align: right;'>$1</div>")
+  .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
   
   // center brackets
-  .replace(/\{(.*?)\}/g, "<center>$1</center>")
+  .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
 
   // footnote-bottom
   .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
@@ -674,9 +674,10 @@ async function saveDocument() {
     setSaveStatus("saved");
     return;
   }
-
+  
   setSaveStatus("saving");
-
+  
+  // notepad.scrollBy(0, document.evaluate("//*[text()[contains(., 'caravel')]][last()]", notepad).iterateNext().getBoundingClientRect().top); // TODO: look into this
   text = text.trimEnd();
   
   // set the previous text to the current text
