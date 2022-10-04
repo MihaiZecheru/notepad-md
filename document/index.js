@@ -813,6 +813,18 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   if (event.altKey) {
     switch (event.code) {
+      // scroll down
+      case "ArrowDown":
+        event.preventDefault();
+        notepad.scrollBy(0, 30);
+        break;
+
+      // scroll up
+      case "ArrowUp":
+        event.preventDefault();
+        notepad.scrollBy(0, -30);
+        break;
+      
       // horizontal rule
       case "KeyR":
         event.preventDefault();
