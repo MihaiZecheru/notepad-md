@@ -320,7 +320,23 @@ const langs = {
   "en": "english",
   "sp": "spanish",
   "fr": "french"
-}
+};
+
+const fonts = {
+  "comfortaa": "Comfortaa",
+  "calibri": "Calibri",
+  "roboto": "Roboto",
+  "helvetica": "Helvetica",
+  "times-new-roman": "Times New Roman",
+  "montserrat": "Montserrat",
+  "source-code-pro": "Source Code Pro",
+  "arial": "Arial",
+  "open-sans": "Open Sans",
+  "consolas": "Consolas",
+  "fira-code": "Fira Code",
+  "jetbrains-mono": "JetBrains Mono",
+  "josefin-sans": "Josefin Sans"
+};
 
 // get the document content
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
@@ -345,6 +361,8 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
       }
     }
   }
+
+  notepad.style.fontFamily = fonts[documentData.font];
 
   if (_doc.owner !== email && !documentData.authors.includes(email.replace(/,/g, "."))) {
     // nobody can see if the document is private
