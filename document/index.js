@@ -23,12 +23,14 @@ if (mode === "view") {
   }).then(() => {
     document.querySelector(".dropleft > span").click();
     document.getElementById("notepad").blur();
+    window.history.replaceState({}, document.title, `/document/?id=${document_uuid}`);
   });
 } else if (mode === "edit") {
   new Promise((r_) => {
     setTimeout(r_, 250);
   }).then(() => {
     document.querySelector("main div > span").click();
+    window.history.replaceState({}, document.title, `/document/?id=${document_uuid}`);
   });
 }
 
@@ -1775,7 +1777,7 @@ document.getElementById("print-document-btn").addEventListener('click', () => {
 });
 
 document.getElementById('file-upload-modal-confirm-btn').addEventListener('click', () => {
-  for (var i = 0, f; f = files[i]; i++) {
+  for (var i = 0, f; f = window.files[i]; i++) {
     const reader = new FileReader();
     reader.readAsText(f);
     
