@@ -1680,7 +1680,10 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
   }
 });
 
-doc.addEventListener*('keydown', (e) => {
+// minimize doc, fixes bug where on code mode the page opens with the doc in fullscreen
+for (let i = 0; i < 2; i++) document.querySelector(".dropleft > span").click();
+
+doc.addEventListener('keydown', (e) => {
   if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
     e.preventDefault();
     document.getElementById("footnotes-alert-placeholder").innerHTML = "";
