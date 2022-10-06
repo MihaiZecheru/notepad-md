@@ -333,6 +333,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.authors?.forEach(_email => _email.replace(/,/g, "."));
 
   if (documentData.type === "code") {
+    document.getElementById(`theme-${documentData.theme}`).disabled = false;
     const lang = langs[documentData.language];
     let _doc_lang = _doc.content.match(/<code class="language-(.*?)">/g);
     if (_doc_lang) {
