@@ -60,7 +60,7 @@ function get_footnote_count() {
 }
 
 function htmlToMarkdown(html) {
-  html = `<br>${html}<br>`;
+  html = `<br>${html.replace(/<pre><code class="language-(.*?)">/g, "").replace(/<\/code><\/pre>/g, "")}<br>`;
   
   // tab
   switch (documentData.indentSize) {
@@ -101,163 +101,166 @@ function htmlToMarkdown(html) {
       break;
   }
 
-  // blockquote
-  let text = html.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
+  let text = html.replace(/(&nbsp;)/g, " ");
 
-  // right-align
-  .replace(/<div style='text-align: right;'>(.*?)<\/div>/g, "{{$1}}")
+  if (documentData.type === "markdown") {
+    //                       blockquote
+    text = text.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
 
-  // pink color (pink bold)
-  .replace(/<b>(.*?)<\/b>/g, "**$1**")
+    // right-align
+    .replace(/<div style='text-align: right;'>(.*?)<\/div>/g, "{{$1}}")
 
-  // italic
-  .replace(/<i>(.*?)<\/i>/g, "*$1*")
+    // pink color (pink bold)
+    .replace(/<b>(.*?)<\/b>/g, "**$1**")
 
-  // underline
-  .replace(/<u>(.*?)<\/u>/g, "__$1__")
+    // italic
+    .replace(/<i>(.*?)<\/i>/g, "*$1*")
 
-  // strikethrough
-  .replace(/<del>(.*?)<\/del>/g, "~~$1~~")
+    // underline
+    .replace(/<u>(.*?)<\/u>/g, "__$1__")
 
-  // highlight
-  .replace(/<mark>(.*?)<\/mark>/g, "`$1`")
+    // strikethrough
+    .replace(/<del>(.*?)<\/del>/g, "~~$1~~")
 
-  // heading 1
-  .replace(/<h1>(.*?)<\/h1>/g, "# $1")
+    // highlight
+    .replace(/<mark>(.*?)<\/mark>/g, "`$1`")
 
-  // heading 2
-  .replace(/<h2>(.*?)<\/h2>/g, "## $1")
+    // heading 1
+    .replace(/<h1>(.*?)<\/h1>/g, "# $1")
 
-  // heading 3
-  .replace(/<h3>(.*?)<\/h3>/g, "### $1")
+    // heading 2
+    .replace(/<h2>(.*?)<\/h2>/g, "## $1")
 
-  // heading 4
-  .replace(/<h4>(.*?)<\/h4>/g, "#### $1")
+    // heading 3
+    .replace(/<h3>(.*?)<\/h3>/g, "### $1")
 
-  // heading 5
-  .replace(/<h5>(.*?)<\/h5>/g, "##### $1")
+    // heading 4
+    .replace(/<h4>(.*?)<\/h4>/g, "#### $1")
 
-  // hyperlink
-  .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank' tabindex='-1'>(.*?)<\/a>/g, "[$2]($1)")
-  .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank'>(.*?)<\/a>/g, "[$2]($1)") // backwards compatibility
+    // heading 5
+    .replace(/<h5>(.*?)<\/h5>/g, "##### $1")
 
-  // image
-  .replace(/<img src="(.*?)" alt="(.*?)" id="(.*?)" style="width: 100%;"><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "![$2]($1)")
+    // hyperlink
+    .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank' tabindex='-1'>(.*?)<\/a>/g, "[$2]($1)")
+    .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank'>(.*?)<\/a>/g, "[$2]($1)") // backwards compatibility
 
-  // video and embed
-  .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" height="(.*?)%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe>/g, "&[$3]($2)")
+    // image
+    .replace(/<img src="(.*?)" alt="(.*?)" id="(.*?)" style="width: 100%;"><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "![$2]($1)")
 
-  // unordered list
-  .replace(/<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>(.*?)<\/li><\/ul><\/li><\/ul>/g, "\t- $1")
-  .replace(/<ul><li>(.*?)<\/li><\/ul>/g, "\n- $1")
+    // video and embed
+    .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" height="(.*?)%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe>/g, "&[$3]($2)")
 
-  // ordered list
-  .replace(/<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="(.*?)"><li>(.*?)<\/li><\/ol><\/li><\/ul>/g, "\t$1 $2")
-  .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
-  
-  // replacement br
-  .replace(/<rbr>/g, "\n")
+    // unordered list
+    .replace(/<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>(.*?)<\/li><\/ul><\/li><\/ul>/g, "\t- $1")
+    .replace(/<ul><li>(.*?)<\/li><\/ul>/g, "\n- $1")
 
-  // right-align
-  .replace(/<div style="text-align: right;">(.*?)<\/div>/g, "{{$1}}")
-  
-  // center
-  .replace(/<center>(.*?)<\/center>/g, "{$1}")
-
-  // checkbox
-  .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div>/g, (c) => {
-    const _text = c.substring(c.indexOf("document-content-label\">") + 24, c.indexOf("</label>"));
-
-    if (c.includes("checked")) {
-      return "- [x] " + _text;
-    } else {
-      return "- [] " + _text;
-    }
-  })
-
-  // table
-  .replace(/<table>(.*?)<\/table>/g, (table) => {
-    const columns = table.match(/<th>(.*?)<\/th>/g).length;
+    // ordered list
+    .replace(/<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="(.*?)"><li>(.*?)<\/li><\/ol><\/li><\/ul>/g, "\t$1 $2")
+    .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
     
-    table = '\n' + table
-      .replace(/<th>\{(.*?)\}/g, "| $1")
-      .replace(/(<\/th>\|)|(<\/th>)/g, " |")
-      .replace(/<(\/)?tr>/g, "")
-      .replace(/<(\/)?table>/g, "");
+    // replacement br
+    .replace(/<rbr>/g, "\n")
 
-    switch (columns) {
-      case 1:
-        table = table.replace(/<td>(.*?)<\/td>/g, "\n| $1 |");
-        break;
+    // right-align
+    .replace(/<div style="text-align: right;">(.*?)<\/div>/g, "{{$1}}")
+    
+    // center
+    .replace(/<center>(.*?)<\/center>/g, "{$1}")
 
-      case 2:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 |");
-        break;
+    // checkbox
+    .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div>/g, (c) => {
+      const _text = c.substring(c.indexOf("document-content-label\">") + 24, c.indexOf("</label>"));
 
-      case 3:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 |");
-        break;
+      if (c.includes("checked")) {
+        return "- [x] " + _text;
+      } else {
+        return "- [] " + _text;
+      }
+    })
 
-      case 4:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 |");
-        break;
+    // table
+    .replace(/<table>(.*?)<\/table>/g, (table) => {
+      const columns = table.match(/<th>(.*?)<\/th>/g).length;
+      
+      table = '\n' + table
+        .replace(/<th>\{(.*?)\}/g, "| $1")
+        .replace(/(<\/th>\|)|(<\/th>)/g, " |")
+        .replace(/<(\/)?tr>/g, "")
+        .replace(/<(\/)?table>/g, "");
 
-      case 5:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 |");
-        break;
+      switch (columns) {
+        case 1:
+          table = table.replace(/<td>(.*?)<\/td>/g, "\n| $1 |");
+          break;
 
-      case 6:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 |");
-        break;
+        case 2:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 |");
+          break;
 
-      case 7:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 |");
-        break;
+        case 3:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 |");
+          break;
 
-      case 8:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 |");
-        break;
+        case 4:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 |");
+          break;
 
-      case 9:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 |");
-        break;
+        case 5:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 |");
+          break;
 
-      case 10:
-        table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 | $10 |");
-        break;
-    }
+        case 6:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 |");
+          break;
 
-    return table;
-  })
+        case 7:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 |");
+          break;
 
-  // superscript
-  .replace(/<sup>(.*?)<\/sup>/g, "^$1^")
+        case 8:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 |");
+          break;
 
-  // footnote-bottom
-  .replace(/<span class='footnote-bottom' data-footnote-id="(.*?)" id="(.*?)">__\^(\d{1,5})\^__ (.*?)<\/span><br>/g, (c) => {
-    const footnote_id = c.substring(c.indexOf("data-footnote-id=\"") + 18, c.indexOf("\" id=\""));
-    const footnote_content = c.substring(c.indexOf("^__ ") + 4, c.indexOf("</span>"));
-    return `[^${footnote_id}]: ${footnote_content}<br>`;
-  })
-  // footnote-top
-  .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
+        case 9:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 |");
+          break;
 
-  // fix bottom footnotes
-  .replace(/\[<\/sup>(.*?)\]/g, "[^$1]")
+        case 10:
+          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 | $10 |");
+          break;
+      }
 
-  // horizontal rule
-  .replace(/<hr>/g, "---")
+      return table;
+    })
 
-  // newline
-  .replace(/<br>/g, "\n")
+    // superscript
+    .replace(/<sup>(.*?)<\/sup>/g, "^$1^")
+
+    // footnote-bottom
+    .replace(/<span class='footnote-bottom' data-footnote-id="(.*?)" id="(.*?)">__\^(\d{1,5})\^__ (.*?)<\/span><br>/g, (c) => {
+      const footnote_id = c.substring(c.indexOf("data-footnote-id=\"") + 18, c.indexOf("\" id=\""));
+      const footnote_content = c.substring(c.indexOf("^__ ") + 4, c.indexOf("</span>"));
+      return `[^${footnote_id}]: ${footnote_content}<br>`;
+    })
+    // footnote-top
+    .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
+
+    // fix bottom footnotes
+    .replace(/\[<\/sup>(.*?)\]/g, "[^$1]")
+
+    // horizontal rule
+    .replace(/<hr>/g, "---")
+  }
+
+  // newline                         replace &gt and &lt with > and <
+  text = text.replace(/<br>/g, "\n").replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 
   // .replace(//g, "\n")
-
-  if (text.substring(0, 1) === "\n") {
+  while (text.substring(0, 1) === "\n") {
     text = text.substring(1);
   }
 
-  if (text.slice(text.length - 1) === "\n") {
+  while (text.slice(text.length - 1) === "\n") {
     text = text.substring(0, text.length - 1);
   }
 
@@ -296,7 +299,6 @@ let documentData = {
 async function saveSettings() {
   showSpinner();
   setSaveStatus('saving');
-  documentData.content = compileMarkdown(notepad.innerHTML);
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: 'PUT',
     body: JSON.stringify(documentData)
@@ -304,6 +306,21 @@ async function saveSettings() {
 }
 
 let NOTEPAD_DISABLED = false;
+
+const langs = {
+  "py": "python",
+  "js": "javascript",
+  "ts": "typescript",
+  "json": "json",
+  "html": "html",
+  "css": "css",
+  "cs": "csharp",
+  "cpp": "cpp",
+  "c": "c",
+  "en": "english",
+  "sp": "spanish",
+  "fr": "french"
+}
 
 // get the document content
 fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
@@ -315,7 +332,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.last_visit = Date.now();
   documentData.authors?.forEach(_email => _email.replace(/,/g, "."));
 
-  if (_doc.owner !== email && !documentData.authors.includes(email)) {
+  if (documentData.type === "code") {
+    const lang = langs[documentData.language];
+    let _doc_lang = _doc.content.match(/<code class="language-(.*?)">/g);
+    if (_doc_lang) {
+      _doc_lang = _doc_lang[0].substring(23, _doc_lang[0].length - 2);
+      if (lang !== _doc_lang) {
+        documentData.content = documentData.content.replace(/<code class="language-(.*?)">/g, `<code class="language-${lang}">`);
+        // upload to firebase
+        saveSettings();
+      }
+    }
+  }
+
+  if (_doc.owner !== email && !documentData.authors.includes(email.replace(/,/g, "."))) {
     // nobody can see if the document is private
     if (_doc.visibility === "private") window.location.href = "/account/me/documents/?error=private_document";
     // only the owner can edit if the document is public, but everyone can see
@@ -337,11 +367,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
 
   doc.style.fontSize = documentData.fontSize + 'px';
   notepad.style.fontSize = documentData.fontSize + 'px';
-
   notepad.style.tabSize = documentData.indentSize;
 
   previousHTML = _doc.content || "";
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
+  hljs.highlightAll();
 
   // fill in checkboxes
   (async () => {
@@ -401,6 +431,159 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
       });
     });
   });
+}).then(() => {
+  if (documentData.type === "markdown") {
+    document.getElementById("italics").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("**", -1);
+      } else if (notepad.value.includes(sel)) {
+        insertText(`*${sel}*`, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("bold").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("****", -2);
+      } else if (notepad.value.includes(sel)) {
+        insertText(`**${sel}**`, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("underline").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("____", -2);
+      } else if (notepad.value.includes(sel)) {
+        insertText(`__${sel}__`, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("strikethrough").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("~~~~", -2);
+      } else if (notepad.value.includes(sel)) {
+        insertText(`~~${sel}~~`, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("highlight").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("``", -1);
+      } else if (notepad.value.includes(sel)) {
+        insertText(`\`${sel}\``, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("link").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("[]()", -3);
+      } else if (notepad.value.includes(sel)) {
+        if (isUrl(sel)) {
+          insertText(`[](${sel})`, 0 - (3 + sel.length));
+        } else {
+          insertText("[]()", -3);
+        }
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("image").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("![]()", -3);
+      } else if (notepad.value.includes(sel)) {
+        if (isUrl(sel)) {
+          insertText(`![](${sel})`, 0 - (3 + sel.length));
+        } else {
+          insertText("![]()", -3);
+        }
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("video").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("$[]()", -3);
+      } else if (notepad.value.includes(sel)) {
+        if (isUrl(sel)) {
+          insertText(`$[](${sel})`, 0 - (3 + sel.length));
+        } else {
+          insertText("$[]()", -3);
+        }
+      }
+      notepad.focus();
+    });
+
+    document.getElementById("embed").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("&[]()", -3);
+      } else if (notepad.value.includes(sel)) {
+        if (isUrl(sel)) {
+          insertText(`&[](${sel})`, 0 - (3 + sel.length));
+        } else {
+          insertText("&[]()", -3);
+        }
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("quote").addEventListener("click", () => {
+      const sel = window.getSelection().toString();
+      if (sel.length === 0) {
+        insertText("> ");
+      } else if (notepad.value.includes(sel)) {
+        insertText(`> ${sel}`, 0);
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("unordered-list").addEventListener("click", () => {
+      insertText("- \n- \n- ", -6);
+      notepad.focus();
+    });
+  
+    document.getElementById("ordered-list").addEventListener("click", () => {
+      insertText("1. \n2. \n3. ", -8);
+      notepad.focus();
+    });
+  
+    document.getElementById("checkbox").addEventListener("click", (event) => {
+      if (event.ctrlKey)  {
+        const sel = window.getSelection().toString();
+        if (sel.length === 0) {
+          insertText("- [x] ");
+        } else if (notepad.value.includes(sel)) {
+          insertText(`- [x] ${sel}`, 0);
+        }
+      }
+      else {
+        const sel = window.getSelection().toString();
+        if (sel.length === 0) {
+          insertText("- [] ");
+        } else if (notepad.value.includes(sel)) {
+          insertText(`- [] ${sel}`, 0);
+        }
+      }
+      notepad.focus();
+    });
+  
+    document.getElementById("table").addEventListener("click", () => {
+      insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
+      notepad.focus();
+    });    
+  }
 });
 
 notepad.focus();
@@ -429,207 +612,220 @@ function compileMarkdown(text) {
   text = "\n" + text + "\n";
 
   // tab
-  switch (documentData.indentSize) {
-    case 2:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;");
-      break;
+  if (documentData.type !== "code") {
+    switch (documentData.indentSize) {
+      case 2:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;");
+        break;
 
-    case 3:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
-      break;
+      case 3:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 4:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
-    
-    case 5:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
+      case 4:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+      
+      case 5:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 6:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
+      case 6:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 7:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
+      case 7:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 8:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
+      case 8:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 9:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
+      case 9:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
 
-    case 10:
-      text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-      break;
-  }
-
-  //              newline
-  let html = text.replace(/\n/g, "<br>")
-
-  // escape characters
-  .replace(/\\#/g, "<HASHTAG>")
-  .replace(/\\\*/g, "<ASTERISK>")
-  .replace(/\\_/g, "<UNDERSCORE>")
-  .replace(/\\~/g, "<TILDE>")
-  .replace(/\\`/g, "<BACKTICK>")
-  .replace(/\\\^/g, "<CARRET>")
-  .replace(/\\\\/g, "<BACKSLASH>")
-
-  // blockquote
-  .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
-
-  // pink color (pink bold)
-  .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-
-  // italics  
-  .replace(/\*(.*?)\*/g, "<i>$1</i>")
-
-  // underline
-  .replace(/__(.*?)__/g, "<u>$1</u>")
-
-  // strikethrough
-  .replace(/\~\~(.*?)\~\~/g, "<del>$1</del>")
-
-  // img
-  .replace(/!\[(.*?)\]\((.*?)\)/g, (c) => {
-    const uuid = uuid4();
-    const content = c.match(/\[(.*?)\]/g)[0];
-    const url = c.match(/\((.*?)\)/g)[0];
-    return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: 100%;"><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`
-  })
-
-  // video and embed
-  .replace(/(\$|&)\[(.*?)\]\((.*?)\)/g, (c) => {
-    const uuid = uuid4();
-    const content = c.match(/\[(.*?)\]/g)[0];
-    const url = c.match(/\((.*?)\)/g)[0];
-    const height = content.substring(1, content.length - 1);
-    return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`
-  })
-
-  // hyperlink
-  .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
-  
-  // highlight
-  .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
-  
-  // checkbox
-  .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
-    const uuid = uuid4();
-    const is_filled = c.match(/\[x\]/g) !== null;
-    const content = c.match(/\ (.*?)<br>/g)[0];
-    if (content.includes("|<br>")) {
-      return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 5).trim()}</label></div>\|<br>`
-    } else {
-      return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 4).trim()}</label></div><br>`;
+      case 10:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
     }
-  })
-
-  // horizontal rule
-  .replace(/<br>---/g, "<br><hr>")
-
-  // unordered list
-  .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
-    const content = c.substring(6 + 42 + 2);
-    return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
-  })
-  .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
-    const content = c.substring(6);
-    return `<ul><li>${content}</li></ul>`;
-  })
-  .replace(/<\/ul><br>/g, "</ul><rbr>")
-  
-  // ordered list
-  .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
-    const number = c.match(/\d{1,3}\./g)[0];
-    const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
-    return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
-  })
-  .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
-    const number = c.match(/\d{1,3}/g)[0];
-    const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
-    return `<ol start="${number}"><li>${content}</li></ol>`;
-  })
-  .replace(/<\/ol><br>/g, "</ol><rbr>")
-
-  // right-align brackets
-  .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
-  
-  // center brackets
-  .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
-
-  // headers
-  .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
-  .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
-  .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><rbr>")
-  .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><rbr>")
-  .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><rbr>")
-
-  // table
-  .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
-    let rows = c.split('<br>').slice(1);
-    const headers = "<tr>" + rows.shift().split('|').slice(1, -1).map((header) => `<th><center>${header.trim()}</center></th>`).join("") + "</tr>";
-    const rows_html = rows.map((row) => "<tr>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-rig  ht-align">${cell.trim()}</td>` : `<td>${cell.trim()}</td>`).join("")) + "</tr>").join("");
-    return `<table>${headers}${rows_html}</table>`;
-  })
-
-  // footnote-bottom
-  .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
-    const footnote_id = c.substring(2, c.indexOf("]"));
-    const footnote_uuid = footnote_uuids[footnote_id];
-    const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
-    return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
-  })
-
-  // footnote-top
-  .replace(/\[\^(\d{1,5})\]/g, (c) => {
-    const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
-    const footnote_uuid = footnote_uuids[footnote_id]?.trim();
-    if (!footnote_uuid) return c;
-    return `<span class="footnote-top" onclick="show_footnote('${footnote_uuid}')"><sup>[${footnote_id}]</sup></span>`;
-  })
-
-  // superscript
-  .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
-
-  // escape characters
-  .replace(/<HASHTAG>/g, "#")
-  .replace(/<ASTERISK>/g, "*")
-  .replace(/<UNDERSCORE>/g, "_")
-  .replace(/<TILDE>/g, "~")
-  .replace(/<BACKTICK>/g, "`")
-  .replace(/<CARRET>/g, "^")
-  .replace(/<BACKSLASH>/g, "\\")
-
-  // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
-  .replace(/<i><\/i>/g, "")
-  .replace(/<b><\/b>/g, "")
-  .replace(/<u><\/u>/g, "")
-  .replace(/<s><\/s>/g, "")
-  .replace(/<sup><\/sup>/g, "")
-  .replace(/<center><\/center>/g, "")
-  .replace(/<div style="text-align: right;"><\/div>/g, "")
-  .replace(/<h1><\/h1>/g, "")
-  .replace(/<h2><\/h2>/g, "")
-  .replace(/<h3><\/h3>/g, "")
-  .replace(/<h4><\/h4>/g, "")
-  .replace(/<h5><\/h5>/g, "")
-  .replace(/<mark><\/mark>/g, "")
-  .replace(/<div class='blockquote'><\/div>/g, "")
-
-  if (html.startsWith("<br>")) {
-    html = html.substring(4, html.length);
-  }
-  
-  if (html.endsWith("<br>")) {
-    return html.substring(0, html.length - 4);
   }
 
-  return html;
+  if (documentData.type === "markdown") {
+    let html = text
+    // escape characters
+    .replace(/\\#/g, "<HASHTAG>")
+    .replace(/\\\*/g, "<ASTERISK>")
+    .replace(/\\_/g, "<UNDERSCORE>")
+    .replace(/\\~/g, "<TILDE>")
+    .replace(/\\`/g, "<BACKTICK>")
+    .replace(/\\\^/g, "<CARRET>")
+    .replace(/\\\\/g, "<BACKSLASH>")
+
+    // blockquote
+    .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
+
+    // pink color (pink bold)
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+
+    // italics  
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+
+    // underline
+    .replace(/__(.*?)__/g, "<u>$1</u>")
+
+    // strikethrough
+    .replace(/\~\~(.*?)\~\~/g, "<del>$1</del>")
+
+    // img
+    .replace(/!\[(.*?)\]\((.*?)\)/g, (c) => {
+      const uuid = uuid4();
+      const content = c.match(/\[(.*?)\]/g)[0];
+      const url = c.match(/\((.*?)\)/g)[0];
+      return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: 100%;"><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`
+    })
+
+    // video and embed
+    .replace(/(\$|&)\[(.*?)\]\((.*?)\)/g, (c) => {
+      const uuid = uuid4();
+      const content = c.match(/\[(.*?)\]/g)[0];
+      const url = c.match(/\((.*?)\)/g)[0];
+      const height = content.substring(1, content.length - 1);
+      return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`
+    })
+
+    // hyperlink
+    .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
+    
+    // highlight
+    .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
+    
+    // checkbox
+    .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
+      const uuid = uuid4();
+      const is_filled = c.match(/\[x\]/g) !== null;
+      const content = c.match(/\ (.*?)<br>/g)[0];
+      if (content.includes("|<br>")) {
+        return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 5).trim()}</label></div>\|<br>`
+      } else {
+        return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 4).trim()}</label></div><br>`;
+      }
+    })
+
+    // horizontal rule
+    .replace(/<br>---/g, "<br><hr>")
+
+    // unordered list
+    .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
+      const content = c.substring(6 + 42 + 2);
+      return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
+    })
+    .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
+      const content = c.substring(6);
+      return `<ul><li>${content}</li></ul>`;
+    })
+    .replace(/<\/ul><br>/g, "</ul><rbr>")
+    
+    // ordered list
+    .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+      const number = c.match(/\d{1,3}\./g)[0];
+      const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
+      return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+    })
+    .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+      const number = c.match(/\d{1,3}/g)[0];
+      const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
+      return `<ol start="${number}"><li>${content}</li></ol>`;
+    })
+    .replace(/<\/ol><br>/g, "</ol><rbr>")
+
+    // right-align brackets
+    .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
+    
+    // center brackets
+    .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
+
+    // headers
+    .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
+    .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
+    .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><rbr>")
+    .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><rbr>")
+    .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><rbr>")
+
+    // table
+    .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
+      let rows = c.split('<br>').slice(1);
+      const headers = "<tr>" + rows.shift().split('|').slice(1, -1).map((header) => `<th><center>${header.trim()}</center></th>`).join("") + "</tr>";
+      const rows_html = rows.map((row) => "<tr>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-rig  ht-align">${cell.trim()}</td>` : `<td>${cell.trim()}</td>`).join("")) + "</tr>").join("");
+      return `<table>${headers}${rows_html}</table>`;
+    })
+
+    // footnote-bottom
+    .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
+      const footnote_id = c.substring(2, c.indexOf("]"));
+      const footnote_uuid = footnote_uuids[footnote_id];
+      const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
+      return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
+    })
+
+    // footnote-top
+    .replace(/\[\^(\d{1,5})\]/g, (c) => {
+      const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
+      const footnote_uuid = footnote_uuids[footnote_id]?.trim();
+      if (!footnote_uuid) return c;
+      return `<span class="footnote-top" onclick="show_footnote('${footnote_uuid}')"><sup>[${footnote_id}]</sup></span>`;
+    })
+
+    // superscript
+    .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
+
+    // escape characters
+    .replace(/<HASHTAG>/g, "#")
+    .replace(/<ASTERISK>/g, "*")
+    .replace(/<UNDERSCORE>/g, "_")
+    .replace(/<TILDE>/g, "~")
+    .replace(/<BACKTICK>/g, "`")
+    .replace(/<CARRET>/g, "^")
+    .replace(/<BACKSLASH>/g, "\\")
+
+    // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
+    .replace(/<i><\/i>/g, "")
+    .replace(/<b><\/b>/g, "")
+    .replace(/<u><\/u>/g, "")
+    .replace(/<s><\/s>/g, "")
+    .replace(/<sup><\/sup>/g, "")
+    .replace(/<center><\/center>/g, "")
+    .replace(/<div style="text-align: right;"><\/div>/g, "")
+    .replace(/<h1><\/h1>/g, "")
+    .replace(/<h2><\/h2>/g, "")
+    .replace(/<h3><\/h3>/g, "")
+    .replace(/<h4><\/h4>/g, "")
+    .replace(/<h5><\/h5>/g, "")
+    .replace(/<mark><\/mark>/g, "")
+    .replace(/<div class='blockquote'><\/div>/g, "")
+    
+    html = html.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+
+    if (html.startsWith("<br>")) {
+      html = html.substring(4, html.length);
+    }
+    
+    if (html.endsWith("<br>")) {
+      return html.substring(0, html.length - 4);
+    }
+  
+    return html;
+  } else if (documentData.type === "code") {
+    // <pre><code class="language-python">HTML</code></pre>
+    const lang = langs[documentData.language];
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.classList.add("language-" + lang);
+    code.textContent = text.replace(/&gt;/g, ">").replace(/&lt;/g, "<");;
+    pre.appendChild(code);
+    return pre.outerHTML;
+  }
 }
 
 function showSpinner() {
@@ -678,15 +874,14 @@ async function saveDocument() {
   }
   
   setSaveStatus("saving");
-  
-  // notepad.scrollBy(0, document.evaluate("//*[text()[contains(., 'caravel')]][last()]", notepad).iterateNext().getBoundingClientRect().top); // TODO: look into this
+
   text = text.trimEnd();
-  
+
   // set the previous text to the current text
   previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
   
   // compile the markdown to html
-  const html = compileMarkdown(text);
+  let html = compileMarkdown(text);
 
   // check if the new html is different from the previous html
   if (html === previousHTML) {
@@ -697,6 +892,7 @@ async function saveDocument() {
 
   // set the document div to the new html
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${html}`;
+  hljs.highlightAll();
 
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
@@ -747,6 +943,7 @@ async function saveDocument() {
     })
   });
 
+  documentData.content = html;
   hideSpinner();
   setSaveStatus("saved");
 }
@@ -768,7 +965,6 @@ function insertText(text, cursor_movement = 0) {
   const previousScrollLocation = notepad.scrollTop;
   document.execCommand('insertHTML', false, el.innerHTML);
   notepad.scrollTop = previousScrollLocation;
-  
   notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
 }
 
@@ -789,7 +985,7 @@ async function check_for_changes() {
 document.getElementById("notepad").addEventListener("keydown", (event) => {
   check_for_changes();
   const sel = window.getSelection().toString();
-  
+
   // close alert if present, exit fullscreen if in fullscreen, or unfocus notepad otherwise
   if (event.key === "Escape") {
     event.preventDefault();
@@ -829,93 +1025,109 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       
       // horizontal rule
       case "KeyR":
-        event.preventDefault();
-        insertText("---");
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          insertText("---");
+        }
         break;
 
       // video
       case "KeyV":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("$[]()", -3);
-        } else if (notepad.value.includes(sel)) {
-          if (isUrl(sel)) {
-            insertText(`$[](${sel})`, 0 - (3 + sel.length));
-          } else {
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
             insertText("$[]()", -3);
+          } else if (notepad.value.includes(sel)) {
+            if (isUrl(sel)) {
+              insertText(`$[](${sel})`, 0 - (3 + sel.length));
+            } else {
+              insertText("$[]()", -3);
+            }
           }
         }
         break;
 
       // lists
       case "KeyL":
-        if (event.shiftKey) {
-          event.preventDefault();
-          insertText("1. \n2. \n3. ", -8);
-        } else {
-          event.preventDefault();
-          insertText("- \n- \n- ", -6);
+        if (documentData.type === "markdown") {
+          if (event.shiftKey) {
+            event.preventDefault();
+            insertText("1. \n2. \n3. ", -8);
+          } else {
+            event.preventDefault();
+            insertText("- \n- \n- ", -6);
+          }
         }
         break;
       
       // checkbox
       case "KeyC":
-        // unchecked
-        if (event.shiftKey) {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("- [x] ");
-          } else if (notepad.value.includes(sel)) {
-            insertText(`- [x] ${sel}`, 0);
-          }
-        } else { // checked
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("- [] ");
-          } else if (notepad.value.includes(sel)) {
-            insertText(`- [] ${sel}`, 0);
+        if (documentData.type === "markdown") {
+          // unchecked
+          if (event.shiftKey) {
+            event.preventDefault();
+            if (sel.length === 0) {
+              insertText("- [x] ");
+            } else if (notepad.value.includes(sel)) {
+              insertText(`- [x] ${sel}`, 0);
+            }
+          } else { // checked
+            event.preventDefault();
+            if (sel.length === 0) {
+              insertText("- [] ");
+            } else if (notepad.value.includes(sel)) {
+              insertText(`- [] ${sel}`, 0);
+            }
           }
         }
         break;
 
       // strikethrough
       case "KeyS":
-        if (event.ctrlKey) break;
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("~~~~", -2);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`~~${sel}~~`, 0);
+        if (documentData.type === "markdown") {
+          if (event.ctrlKey) break;
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("~~~~", -2);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`~~${sel}~~`, 0);
+          }
         }
         break;
 
       // highlight
       case "KeyH":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("``", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`\`${sel}\``, 0);
+        if (documentData.type === "markdown") { 
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("``", -1);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`\`${sel}\``, 0);
+          }
         }
         break;
       
       // table
       case "KeyT":
         if (event.shiftKey) break;
-        event.preventDefault();
-        insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
+        }
         break;
       
       // iframe embed
       case "KeyE":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("&[]()", -3);
-        } else if (notepad.value.includes(sel)) {
-          if (isUrl(sel)) {
-            insertText(`&[](${sel})`, 0 - (3 + sel.length));
-          } else {
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
             insertText("&[]()", -3);
+          } else if (notepad.value.includes(sel)) {
+            if (isUrl(sel)) {
+              insertText(`&[](${sel})`, 0 - (3 + sel.length));
+            } else {
+              insertText("&[]()", -3);
+            }
           }
         }
         break; 
@@ -990,15 +1202,17 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
             notepad.selectionStart = notepad.selectionEnd = start;
           }
         } else {
-          // hyperlink
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("[]()", -3);
-          } else if (notepad.value.includes(sel)) {
-            if (isUrl(sel)) {
-              insertText(`[](${sel})`, 0 - (3 + sel.length));
-            } else {
+          if (documentData.type === "markdown") {
+            // hyperlink
+            event.preventDefault();
+            if (sel.length === 0) {
               insertText("[]()", -3);
+            } else if (notepad.value.includes(sel)) {
+              if (isUrl(sel)) {
+                insertText(`[](${sel})`, 0 - (3 + sel.length));
+              } else {
+                insertText("[]()", -3);
+              }
             }
           }
         }
@@ -1042,34 +1256,40 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
       // italics
       case "KeyI":
-        if (event.shiftKey) {
-          return;
-        }
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("**", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`*${sel}*`, 0);
+        if (documentData.type === "markdown") {
+          if (event.shiftKey) {
+            return;
+          }
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("**", -1);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`*${sel}*`, 0);
+          }
         }
         break;
 
       // pink color (pink bold)
       case "KeyB":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("****", -2);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`**${sel}**`, 0);
-        };
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("****", -2);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`**${sel}**`, 0);
+          };
+        }
         break;
 
       // underline
       case "KeyU":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("____", -2);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`__${sel}__`, 0);
+        if (documentData.type === "markdown") {  
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("____", -2);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`__${sel}__`, 0);
+          }
         }
         break;
 
@@ -1081,237 +1301,100 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
       // highlight
       case "KeyH":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("``", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`\`${sel}\``, 0);
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("``", -1);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`\`${sel}\``, 0);
+          }
         }
         break;
 
       // image
       case "KeyM":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("![]()", -3);
-        } else if (notepad.value.includes(sel)) {
-          if (isUrl(sel)) {
-            insertText(`![](${sel})`, 0 - (3 + sel.length));
-          } else {
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
             insertText("![]()", -3);
+          } else if (notepad.value.includes(sel)) {
+            if (isUrl(sel)) {
+              insertText(`![](${sel})`, 0 - (3 + sel.length));
+            } else {
+              insertText("![]()", -3);
+            }
           }
         }
         break;
 
       // quote
       case "KeyQ":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("> ");
-        } else if (notepad.value.includes(sel)) {
-          insertText(`> ${sel}`, 0);
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("> ");
+          } else if (notepad.value.includes(sel)) {
+            insertText(`> ${sel}`, 0);
+          }
         }
         break;
 
       // footnote
       case "Digit6":
-        if (event.shiftKey) {
-          event.preventDefault();
-          const location = notepad.selectionStart;
-          const footnote_count = get_footnote_count() + 1;
-          insertText(`[^${footnote_count}]`);
-          notepad.selectionStart = notepad.value.length;
-          notepad.value += `\n[^${footnote_count}]: `;
-          notepad.selectionStart = notepad.selectionEnd = location + `[^${footnote_count}]`.length;
+        if (documentData.type === "markdown") {
+          if (event.shiftKey) {
+            event.preventDefault();
+            const location = notepad.selectionStart;
+            const footnote_count = get_footnote_count() + 1;
+            insertText(`[^${footnote_count}]`);
+            notepad.selectionStart = notepad.value.length;
+            notepad.value += `\n[^${footnote_count}]: `;
+            notepad.selectionStart = notepad.selectionEnd = location + `[^${footnote_count}]`.length;
+          }
         }
         break;
 
       // superscript
       case "Period":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("^^", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`^${sel}^`, 0);
+        if (documentData.type === "markdown") {  
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("^^", -1);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`^${sel}^`, 0);
+          }
         }
         break;
 
       // center align
       case "BracketLeft":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("{}", -1);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`{${sel}}`, 0);
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("{}", -1);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`{${sel}}`, 0);
+          }
         }
         break;
 
       // right align
       case "BracketRight":
-        event.preventDefault();
-        if (sel.length === 0) {
-          insertText("{{}}", -2);
-        } else if (notepad.value.includes(sel)) {
-          insertText(`{{${sel}}}`, 0);
+        if (documentData.type === "markdown") {
+          event.preventDefault();
+          if (sel.length === 0) {
+            insertText("{{}}", -2);
+          } else if (notepad.value.includes(sel)) {
+            insertText(`{{${sel}}}`, 0);
+          }
         }
         break;
     }
   }
 });
 
-document.getElementById("italics").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("**", -1);
-  } else if (notepad.value.includes(sel)) {
-    insertText(`*${sel}*`, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("bold").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("****", -2);
-  } else if (notepad.value.includes(sel)) {
-    insertText(`**${sel}**`, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("underline").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("____", -2);
-  } else if (notepad.value.includes(sel)) {
-    insertText(`__${sel}__`, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("strikethrough").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("~~~~", -2);
-  } else if (notepad.value.includes(sel)) {
-    insertText(`~~${sel}~~`, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("highlight").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("``", -1);
-  } else if (notepad.value.includes(sel)) {
-    insertText(`\`${sel}\``, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("link").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("[]()", -3);
-  } else if (notepad.value.includes(sel)) {
-    if (isUrl(sel)) {
-      insertText(`[](${sel})`, 0 - (3 + sel.length));
-    } else {
-      insertText("[]()", -3);
-    }
-  }
-  notepad.focus();
-});
-
-document.getElementById("image").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("![]()", -3);
-  } else if (notepad.value.includes(sel)) {
-    if (isUrl(sel)) {
-      insertText(`![](${sel})`, 0 - (3 + sel.length));
-    } else {
-      insertText("![]()", -3);
-    }
-  }
-  notepad.focus();
-});
-
-document.getElementById("video").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("$[]()", -3);
-  } else if (notepad.value.includes(sel)) {
-    if (isUrl(sel)) {
-      insertText(`$[](${sel})`, 0 - (3 + sel.length));
-    } else {
-      insertText("$[]()", -3);
-    }
-  }
-  notepad.focus();
-});
-
 document.getElementById("save").addEventListener("click", () => {
   saveDocument();
-  notepad.focus();
-});
-
-document.getElementById("embed").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("&[]()", -3);
-  } else if (notepad.value.includes(sel)) {
-    if (isUrl(sel)) {
-      insertText(`&[](${sel})`, 0 - (3 + sel.length));
-    } else {
-      insertText("&[]()", -3);
-    }
-  }
-  notepad.focus();
-});
-
-document.getElementById("quote").addEventListener("click", () => {
-  const sel = window.getSelection().toString();
-  if (sel.length === 0) {
-    insertText("> ");
-  } else if (notepad.value.includes(sel)) {
-    insertText(`> ${sel}`, 0);
-  }
-  notepad.focus();
-});
-
-document.getElementById("unordered-list").addEventListener("click", () => {
-  insertText("- \n- \n- ", -6);
-  notepad.focus();
-});
-
-document.getElementById("ordered-list").addEventListener("click", () => {
-  insertText("1. \n2. \n3. ", -8);
-  notepad.focus();
-});
-
-document.getElementById("checkbox").addEventListener("click", (event) => {
-  if (event.ctrlKey)  {
-    const sel = window.getSelection().toString();
-    if (sel.length === 0) {
-      insertText("- [x] ");
-    } else if (notepad.value.includes(sel)) {
-      insertText(`- [x] ${sel}`, 0);
-    }
-  }
-  else {
-    const sel = window.getSelection().toString();
-    if (sel.length === 0) {
-      insertText("- [] ");
-    } else if (notepad.value.includes(sel)) {
-      insertText(`- [] ${sel}`, 0);
-    }
-  }
-  notepad.focus();
-});
-
-document.getElementById("table").addEventListener("click", () => {
-  insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
   notepad.focus();
 });
 
@@ -1915,7 +1998,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(document.getElementById("settings-modal-document-authors"));
   eles.push(document.getElementById("settings-modal"));
 
-  documentData.authors?.forEach(author => {
+  (documentData.authors || [ email ]).forEach(author => {
     createTag(author.replace(/,/, "."));
   });
 
@@ -1932,8 +2015,9 @@ document.getElementById("settings").addEventListener('click', () => {
 });
 
 document.getElementById("settings-modal").addEventListener("hidden.bs.modal", () => {
-  saveDocument();
-  window.location.reload();
+  saveDocument().then(() => {
+    window.location.reload();
+  });
 });
 
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
@@ -1948,11 +2032,12 @@ document.getElementById("settings-modal-save-btn").addEventListener('click', () 
   documentData.indentSize = parseInt(document.getElementById("settings-modal-document-indent-size").value);
   documentData.authors = [...new Set((tags.map(tag => tag.innerText.replace(/,/g, ".").replace(/✖/g, ""))))];
   tags = [...new Set(tags)];
-  saveSettings().then(() => {
-    window.location.reload();
+  saveDocument().then(() => {
+    saveSettings().then(() => {
+      window.location.reload();
+    });
   });
 });
-
 
 document.getElementById("settings-modal-document-description").addEventListener('input', (e) => {
   const remainingChars = description_box_character_limit - e.target.value.length;
