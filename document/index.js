@@ -362,6 +362,12 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   }
 
+  // disable autocomplete
+  if (documentData.type === "code" || documentData.language !== "en") {
+    notepad.removeAttribute("spellcheck");
+    notepad.removeAttribute("autocomplete");
+  }
+
   notepad.style.fontFamily = fonts[documentData.font];
 
   if (_doc.owner !== email && !documentData.authors.includes(email.replace(/,/g, "."))) {
