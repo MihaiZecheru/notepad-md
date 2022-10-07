@@ -250,6 +250,15 @@ function htmlToMarkdown(html) {
 
     // horizontal rule
     .replace(/<hr>/g, "---")
+
+    // escape characters
+    .replace(/<span class='replaced-symbol'>(.*?)<\/span>/g, "\\$1")
+
+    // ol cleanup
+    .replace(/<\/ol>/g, "<br>")
+    .replace(/<li>/g, "")
+    .replace(/<\/li>/g, "")
+    .replace(/<ol start="(.*?)">/g, "$1. ")
   }
 
   // newline                         replace &gt and &lt with > and <
@@ -678,25 +687,34 @@ function compileMarkdown(text) {
   }
 
   if (documentData.type === "markdown") {
-    let html = text
+    let html = text.replace(/\n/g, "<br>")
+
     // escape characters
-    .replace(/\\#/g, "<HASHTAG>")
+    .replace(/\\\#/g, "<HASHTAG>")
     .replace(/\\\*/g, "<ASTERISK>")
-    .replace(/\\_/g, "<UNDERSCORE>")
-    .replace(/\\~/g, "<TILDE>")
-    .replace(/\\`/g, "<BACKTICK>")
+    .replace(/\\\_/g, "<UNDERSCORE>")
+    .replace(/\\\~/g, "<TILDE>")
+    .replace(/\\\`/g, "<BACKTICK>")
     .replace(/\\\^/g, "<CARRET>")
     .replace(/\\\\/g, "<BACKSLASH>")
-
+    .replace(/\\\./g, "<PERIOD>")
+    .replace(/\\\|/g, "<PIPE>")
+    .replace(/\\\(/g, "<LEFTPAREN>")
+    .replace(/\\\)/g, "<RIGHTPAREN>")
+    .replace(/\\\[/g, "<LEFTBRACKET>")
+    .replace(/\\\]/g, "<RIGHTBRACKET>")
+    .replace(/\\\{/g, "<LEFTBRACE>")
+    .replace(/\\\}/g, "<RIGHTBRACE>")
+    
     // blockquote
-    .replace(/>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
-
+    .replace(/<br>>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
+    
     // pink color (pink bold)
     .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-
+    
     // italics  
     .replace(/\*(.*?)\*/g, "<i>$1</i>")
-
+    
     // underline
     .replace(/__(.*?)__/g, "<u>$1</u>")
 
@@ -742,10 +760,6 @@ function compileMarkdown(text) {
     .replace(/<br>---/g, "<br><hr>")
 
     // unordered list
-    .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
-      const content = c.substring(6 + 42 + 2);
-      return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
-    })
     .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
       const content = c.substring(6);
       return `<ul><li>${content}</li></ul>`;
@@ -753,11 +767,6 @@ function compileMarkdown(text) {
     .replace(/<\/ul><br>/g, "</ul><rbr>")
     
     // ordered list
-    .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
-      const number = c.match(/\d{1,3}\./g)[0];
-      const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
-      return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
-    })
     .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
       const number = c.match(/\d{1,3}/g)[0];
       const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
@@ -806,13 +815,21 @@ function compileMarkdown(text) {
     .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
 
     // escape characters
-    .replace(/<HASHTAG>/g, "#")
-    .replace(/<ASTERISK>/g, "*")
-    .replace(/<UNDERSCORE>/g, "_")
-    .replace(/<TILDE>/g, "~")
-    .replace(/<BACKTICK>/g, "`")
-    .replace(/<CARRET>/g, "^")
-    .replace(/<BACKSLASH>/g, "\\")
+    .replace(/<HASHTAG>/g, "<span class='replaced-symbol'>#</span>")
+    .replace(/<ASTERISK>/g, "<span class='replaced-symbol'>*</span>")
+    .replace(/<UNDERSCORE>/g, "<span class='replaced-symbol'>_</span>")
+    .replace(/<TILDE>/g, "<span class='replaced-symbol'>~</span>")
+    .replace(/<BACKTICK>/g, "<span class='replaced-symbol'>`</span>")
+    .replace(/<CARRET>/g, "<span class='replaced-symbol'>^</span>")
+    .replace(/<BACKSLASH>/g, "<span class='replaced-symbol'>\\</span>")
+    .replace(/<PIPE>/g, "<span class='replaced-symbol'>|</span>")
+    .replace(/<PERIOD>/g, "<span class='replaced-symbol'>.</span>")
+    .replace(/<LEFTPAREN>/g, "<span class='replaced-symbol'>(</span>")
+    .replace(/<RIGHTPAREN>/g, "<span class='replaced-symbol'>)</span>")
+    .replace(/<LEFTBRACKET>/g, "<span class='replaced-symbol'>[</span>")
+    .replace(/<RIGHTBRACKET>/g, "<span class='replaced-symbol'>]</span>")
+    .replace(/<LEFTBRACE>/g, "<span class='replaced-symbol'>{</span>")
+    .replace(/<RIGHTBRACE>/g, "<span class='replaced-symbol'>}</span>")
 
     // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
     .replace(/<i><\/i>/g, "")
@@ -829,7 +846,7 @@ function compileMarkdown(text) {
     .replace(/<h5><\/h5>/g, "")
     .replace(/<mark><\/mark>/g, "")
     .replace(/<div class='blockquote'><\/div>/g, "")
-    
+
     html = html.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 
     if (html.startsWith("<br>")) {
