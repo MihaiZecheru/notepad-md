@@ -3,7 +3,253 @@
 import { setCookie, getCookie } from "/modules/cookies.mjs";
 import { max_title_length } from "../../../modules/max_lengths.mjs";
 
-let email, password;
+let email;
+
+function compileMarkdown(text, docType, indentSize, language) {
+  // create a unique id for each set of footnotes in the document
+  const footnote_ids = get_footnote_ids();
+  let footnote_uuids = {};
+  for (let i = 0; i < get_footnote_count(); i++) {
+    footnote_uuids[footnote_ids[i]] = uuid4();
+  }
+
+  // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
+  text = "\n" + text + "\n";
+
+  // tab
+  if (docType !== "code") {
+    switch (indentSize) {
+      case 2:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;");
+        break;
+
+      case 3:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 4:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+      
+      case 5:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 6:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 7:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 8:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 9:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+
+      case 10:
+        text = text.replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        break;
+    }
+  }
+
+  if (docType === "markdown") {
+    let html = text.replace(/\n/g, "<br>")
+
+    // escape characters
+    .replace(/\\\#/g, "<HASHTAG>")
+    .replace(/\\\*/g, "<ASTERISK>")
+    .replace(/\\\_/g, "<UNDERSCORE>")
+    .replace(/\\\~/g, "<TILDE>")
+    .replace(/\\\`/g, "<BACKTICK>")
+    .replace(/\\\^/g, "<CARRET>")
+    .replace(/\\\\/g, "<BACKSLASH>")
+    .replace(/\\\./g, "<PERIOD>")
+    .replace(/\\\|/g, "<PIPE>")
+    .replace(/\\\(/g, "<LEFTPAREN>")
+    .replace(/\\\)/g, "<RIGHTPAREN>")
+    .replace(/\\\[/g, "<LEFTBRACKET>")
+    .replace(/\\\]/g, "<RIGHTBRACKET>")
+    .replace(/\\\{/g, "<LEFTBRACE>")
+    .replace(/\\\}/g, "<RIGHTBRACE>")
+    
+    // blockquote
+    .replace(/<br>>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
+    
+    // pink color (pink bold)
+    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+    
+    // italics  
+    .replace(/\*(.*?)\*/g, "<i>$1</i>")
+    
+    // underline
+    .replace(/__(.*?)__/g, "<u>$1</u>")
+
+    // strikethrough
+    .replace(/\~\~(.*?)\~\~/g, "<del>$1</del>")
+
+    // img
+    .replace(/!\[(.*?)\]\((.*?)\)/g, (c) => {
+      const uuid = uuid4();
+      const content = c.match(/\[(.*?)\]/g)[0];
+      const url = c.match(/\((.*?)\)/g)[0];
+      return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: 100%;"><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`
+    })
+
+    // video and embed
+    .replace(/(\$|&)\[(.*?)\]\((.*?)\)/g, (c) => {
+      const uuid = uuid4();
+      const content = c.match(/\[(.*?)\]/g)[0];
+      const url = c.match(/\((.*?)\)/g)[0];
+      const height = content.substring(1, content.length - 1);
+      return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`
+    })
+
+    // hyperlink
+    .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' rel='noopener noreferrer' target='_blank' tabindex='-1'>$1</a>")
+    
+    // highlight
+    .replace(/\`(.*?)\`/g, "<mark>$1</mark>")
+    
+    // checkbox
+    .replace(/- \[.?\]\ (.*?)<br>/g, (c) => {
+      const uuid = uuid4();
+      const is_filled = c.match(/\[x\]/g) !== null;
+      const content = c.match(/\ (.*?)<br>/g)[0];
+      if (content.includes("|<br>")) {
+        return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 5).trim()}</label></div>\|<br>`
+      } else {
+        return `<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="${uuid}" class="form-check-input"${is_filled ? " checked" : ""}><label for="${uuid}" class="form-check-label document-content-label">${content.substring(4, content.length - 4).trim()}</label></div><br>`;
+      }
+    })
+
+    // horizontal rule
+    .replace(/<br>---/g, "<br><hr>")
+
+    // unordered list
+    .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
+      const content = c.substring(6 + 42 + 2);
+      return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
+    })
+    .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
+      const content = c.substring(6);
+      return `<ul><li>${content}</li></ul>`;
+    })
+    .replace(/<\/ul><br>/g, "</ul><rbr>")
+    
+    // ordered list
+    .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+      const number = c.match(/\d{1,3}\./g)[0];
+      const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
+      return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+    })
+
+    .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+      const number = c.match(/\d{1,3}/g)[0];
+      const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
+      return `<ol start="${number}"><li>${content}</li></ol>`;
+    })
+    .replace(/<\/ol><br>/g, "</ol><rbr>")
+
+    // right-align brackets
+    .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
+    
+    // center brackets
+    .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
+
+    // headers
+    .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
+    .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
+    .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><rbr>")
+    .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><rbr>")
+    .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><rbr>")
+
+    // table
+    .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
+      let rows = c.split('<br>').slice(1);
+      const headers = "<tr>" + rows.shift().split('|').slice(1, -1).map((header) => `<th><center>${header.trim()}</center></th>`).join("") + "</tr>";
+      const rows_html = rows.map((row) => "<tr>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-rig  ht-align">${cell.trim()}</td>` : `<td>${cell.trim()}</td>`).join("")) + "</tr>").join("");
+      return `<table>${headers}${rows_html}</table>`;
+    })
+
+    // footnote-bottom
+    .replace(/\[\^(\d{1,5})\]\: (.*?)<br>/g, (c) => {
+      const footnote_id = c.substring(2, c.indexOf("]"));
+      const footnote_uuid = footnote_uuids[footnote_id];
+      const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
+      return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
+    })
+
+    // footnote-top
+    .replace(/\[\^(\d{1,5})\]/g, (c) => {
+      const footnote_id = c.substring(c.indexOf("[^") + 2, c.length - 1);
+      const footnote_uuid = footnote_uuids[footnote_id]?.trim();
+      if (!footnote_uuid) return c;
+      return `<span class="footnote-top" onclick="show_footnote('${footnote_uuid}')"><sup>[${footnote_id}]</sup></span>`;
+    })
+
+    // superscript
+    .replace(/\^(.*?)\^/g, "<sup>$1</sup>")
+
+    // escape characters
+    .replace(/<HASHTAG>/g, "<span class='replaced-symbol'>#</span>")
+    .replace(/<ASTERISK>/g, "<span class='replaced-symbol'>*</span>")
+    .replace(/<UNDERSCORE>/g, "<span class='replaced-symbol'>_</span>")
+    .replace(/<TILDE>/g, "<span class='replaced-symbol'>~</span>")
+    .replace(/<BACKTICK>/g, "<span class='replaced-symbol'>`</span>")
+    .replace(/<CARRET>/g, "<span class='replaced-symbol'>^</span>")
+    .replace(/<BACKSLASH>/g, "<span class='replaced-symbol'>\\</span>")
+    .replace(/<PIPE>/g, "<span class='replaced-symbol'>|</span>")
+    .replace(/<PERIOD>/g, "<span class='replaced-symbol'>.</span>")
+    .replace(/<LEFTPAREN>/g, "<span class='replaced-symbol'>(</span>")
+    .replace(/<RIGHTPAREN>/g, "<span class='replaced-symbol'>)</span>")
+    .replace(/<LEFTBRACKET>/g, "<span class='replaced-symbol'>[</span>")
+    .replace(/<RIGHTBRACKET>/g, "<span class='replaced-symbol'>]</span>")
+    .replace(/<LEFTBRACE>/g, "<span class='replaced-symbol'>{</span>")
+    .replace(/<RIGHTBRACE>/g, "<span class='replaced-symbol'>}</span>")
+
+    // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
+    .replace(/<i><\/i>/g, "")
+    .replace(/<b><\/b>/g, "")
+    .replace(/<u><\/u>/g, "")
+    .replace(/<s><\/s>/g, "")
+    .replace(/<sup><\/sup>/g, "")
+    .replace(/<center><\/center>/g, "")
+    .replace(/<div style="text-align: right;"><\/div>/g, "")
+    .replace(/<h1><\/h1>/g, "")
+    .replace(/<h2><\/h2>/g, "")
+    .replace(/<h3><\/h3>/g, "")
+    .replace(/<h4><\/h4>/g, "")
+    .replace(/<h5><\/h5>/g, "")
+    .replace(/<mark><\/mark>/g, "")
+    .replace(/<div class='blockquote'><\/div>/g, "")
+
+    html = html.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
+
+    if (html.startsWith("<br>")) {
+      html = html.substring(4, html.length);
+    }
+    
+    if (html.endsWith("<br>")) {
+      return html.substring(0, html.length - 4);
+    }
+  
+    return html;
+  } else if (docType === "code") {
+    // <pre><code class="language-python">HTML</code></pre>
+    const lang = langs[language];
+    const pre = document.createElement("pre");
+    const code = document.createElement("code");
+    code.classList.add("language-" + lang);
+    code.textContent = text.replace(/&gt;/g, ">").replace(/&lt;/g, "<");;
+    pre.appendChild(code);
+    return pre.outerHTML;
+  }
+}
 
 if (!getCookie("nmd-validation")) window.location.href = "/account/login/?redirect=documents";
 else {
