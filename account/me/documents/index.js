@@ -3,7 +3,8 @@
 import { setCookie, getCookie } from "/modules/cookies.mjs";
 import { max_title_length } from "../../../modules/max_lengths.mjs";
 
-let email;
+// do not remove this password var; it is used further down
+let email, password;
 
 function compileMarkdown(text, docType, indentSize, language) {
   // create a unique id for each set of footnotes in the document
