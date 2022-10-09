@@ -1,0 +1,346 @@
+/* @import url('https://fonts.googleapis.com/css?family=Calibri'); */
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+/* @import url('https://fonts.googleapis.com/css?family=Helvetica'); */
+/* @import url('https://fonts.googleapis.com/css?family=Times+New+Roman'); */
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+/* @import url('https://fonts.googleapis.com/css?family=Arial'); */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+/* @import url('https://fonts.googleapis.com/css?family=Consolas'); */
+@import url('https://fonts.googleapis.com/css?family=Fira+Code');
+@import url('https://fonts.googleapis.com/css?family=JetBrains+Mono');
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+
+main {
+  width: 100%;
+  height: calc(100vh - 4.5vh - 2.5em);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+/* center the dotted line inside of it's parent div */
+
+#dotted-line {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#dotted-line div {
+  height: 95%;
+  border-left: .15em dashed #ccc;
+}
+
+document-title {
+  color: tomato;
+  cursor: pointer;
+}
+
+document-title:hover {
+  text-decoration: underline;
+}
+
+#markdown-reference-link {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#markdown-reference-link:hover {
+  text-decoration: underline;
+  color: #0d6efd;
+}
+
+.dropdown-toggle {
+  background: none;
+  margin: 0!important;
+  color: #28a745;
+  padding: 0!important;
+}
+
+.dropdown-item:hover {
+  color: #28a745;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dropdown-menu {
+  padding: 0!important;
+}
+
+.form-group {
+  width: 48vw;
+  height: 96.5%;
+}
+
+/* notepad */
+.form-group > textarea {
+  resize: none;
+  height: calc(100% - 3.5vh);
+  overflow-y: scroll;
+}
+
+/* since #document isn't a textarea, the above style can't apply to it */
+#document {
+  height: calc(100% - 3.13vh);
+  overflow-y: scroll;
+  padding: .375rem .75rem;
+}
+
+#header {
+  display: flex;
+  justify-content: center;
+  background: #477bff;
+  padding: 1vh;
+  height: 2.5em;
+  align-items: center;
+}
+
+.document-button {
+  border: none;
+  background: white;
+  font-family: 'Merriweather', serif;
+  height: 1.5em;
+  text-align: center;
+  font-size: 1em;
+  margin: 1px;
+  background: #477bff;
+}
+
+.document-button:hover {
+  background: #477bff;
+  color: white;
+}
+
+.document-button:active {
+  background: #477bff;
+  color: black;
+}
+
+#loading-spinner {
+  float: right;
+  margin-bottom: .25em;
+  margin-right: .25em!important;
+}
+
+/* move checkboxes closer together */
+.nmd-checkbox {
+  margin-bottom: -1rem!important;
+}
+
+.nmd-checkbox > label {
+  text-align: left;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+tr:nth-child(even) td:not(td:last-child) {
+  border-right: 1px solid whitesmoke;
+}
+
+.table-right-align {
+  text-align: right;
+}
+
+.document-content-label {
+  width: 100%;
+  text-align: right;
+} 
+
+ul:not(.list-group), ol {
+  margin-bottom: 0;
+  padding-left: 2.5rem!important;
+}
+
+div.blockquote {
+  margin-bottom: 0;
+  border-left: 0.25rem solid #477bff;
+  padding-left: 0.5rem; 
+}
+
+.fullscreen {
+  color: black;
+}
+
+.fullscreen:hover {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.footnote-top {
+  cursor: pointer;
+  color: #0d6efd;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-bottom: 0;
+}
+
+hr {
+  margin: 0;
+}
+
+#document {
+  font-weight: 900;
+}
+
+b {
+  font-weight: 900;
+  /* color: #FF69B4; /* default bold color */
+}
+
+.circle-picker span > div:hover {
+  transform: scale(1.2);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300&display=swap');
+
+:root {
+  --off-white: #f8f8f8;
+  --off-black: #444444;
+  --color: var(--off-black);
+  --shadow: 0 0 30px #cccccc;
+  --xs: 0.2rem;
+  --sm: 0.5rem;
+  --md: 0.8rem;
+  --lg: 1rem;
+  --xlg: 1.5rem;
+  --xxlg: 2rem;
+  --transition: 0.3s linear all;
+}
+
+.tag-main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tag-form {
+  /* box-shadow: var(--shadow); */
+  border-radius: .5em;
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: var(--lg);
+  width: 100%;
+}
+
+.tag-h1 {
+  color: var(--off-black);
+}
+
+.tag-input {
+  width: 100%!important;
+  border: 1.5px solid var(--color);
+  outline-color: var(--color);
+  padding: var(--sm);
+  border-radius: .5em;
+}
+
+.tag-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tag-tag {
+  border-radius: .5em;
+  font-size: var(--md);
+  margin-right: var(--sm);
+  padding: var(--xs) var(--sm);
+  margin-bottom: var(--sm);
+  cursor: default!important;
+}
+
+.remove-tag {
+  cursor: pointer;
+  margin-left: .4em;
+}
+
+@media screen and (max-width: 1024px) {
+  .tag-form {
+      width: 75vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .tag-main {
+      justify-content: flex-start;
+      margin: var(--lg) 0;
+  }
+
+  .tag-form {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+  }
+
+  .input-container {
+      grid-template-columns: 1fr;
+  }
+
+  .tag-button {
+      padding: var(--sm) 0;
+  }
+}
+
+.help-button-label {
+  padding: 0;
+}
+
+.help-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 0 .2em 0;
+  padding: 0;
+  margin-left: .25em;
+  height: 1.5em;
+  width: 1.5em;
+  transition: all .2s ease-in-out;
+}
+
+.help-button:hover {
+  transform: scale(1.1);
+}
+
+#settings-modal-document-description-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+}
+
+#settings-modal-document-description {
+  height: 100%;
+  width: 100%;
+}
+
+#settings-modal-document-description-character-counter {
+  position: absolute;
+  bottom: 0;
+  right: .50em;
+}
+
+pre {
+  position: absolute!important;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
