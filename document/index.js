@@ -73,7 +73,7 @@ const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
 
 let documentData = {
   title: "Untitled Document",
-  owner: email,
+  owner: null,
   content: "",
   last_visit: Date.now(),
   created: null,
@@ -85,7 +85,7 @@ let documentData = {
   font: "comfortaa",
   fontSize: 16,
   indentSize: 8,
-  authors: [ email.replace(/,/g, ".") ]
+  authors: [ null ]
 };
 
 async function saveSettings() {
@@ -168,7 +168,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.font = _doc?.font || documentData.font;
   documentData.fontSize = _doc?.fontSize || documentData.fontSize;
   documentData.indentSize = _doc?.indentSize || documentData.indentSize;
-  documentData.authors?.forEach(_email => _email.replace(/,/g, "."));
+  documentData.authors = _doc?.authors || email.replace(/,/g, ".");
 
   if (documentData.type === "code") {
     document.getElementById(`theme-${documentData.theme}`).disabled = false;
@@ -1580,7 +1580,7 @@ document.body.addEventListener('keydown', (e) => {
   }
 
   // document settings
-  if (e.ctrlKey && e.altKey && e.code === "KeyS") {
+  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/, ".") === email.replace(/,/, ".")) {
     document.getElementById("settings").click();
   }
 
@@ -1773,7 +1773,7 @@ const createTag = (tagValue) => {
 
 const handleRemoveTag = (e) => {
   const item = e.target.textContent;
-  if (e.target.parentElement.innerText.replace(/✖/g, "") === email.replace(/,/g, ".")) {
+  if (e.target.parentElement.innerText.replace(/✖/g, "") === documentData.owner.replace(/,/g, ".") || documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) {
     e.target.parentElement.style.transition = "all 0.2s ease-in-out";
     e.target.parentElement.style.transform = "scale(1.1)";
     new Promise(_r => {
@@ -1807,9 +1807,12 @@ const settingsModalDocumentDescriptionCharacterCounter = document.getElementById
 const description_box_character_limit = 500;
 
 document.getElementById("settings").addEventListener('click', () => {
+  // only allow the owner to edit the document settings
+  if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
+
   saveDocument();
   let eles = [];
-  
+
   const title_ele = document.getElementById("settings-modal-document-title");
   title_ele.value = documentData.title;
   eles.push(title_ele);
@@ -1856,9 +1859,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(document.getElementById("settings-modal-document-authors"));
   eles.push(document.getElementById("settings-modal"));
 
-  (documentData.authors || [ email ]).forEach(author => {
-    createTag(author.replace(/,/, "."));
-  });
+  [...new Set([ ...documentData.authors, documentData.owner.replace(/,/, ".") ])].forEach(createTag);
 
   eles.forEach(ele => {
     ele?.addEventListener('keydown', (e) => {
