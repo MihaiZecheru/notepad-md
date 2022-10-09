@@ -167,8 +167,9 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
 
   // disable autocomplete
   if (documentData.type === "code" || documentData.language !== "en") {
-    notepad.removeAttribute("spellcheck");
-    notepad.removeAttribute("autocomplete");
+    notepad.setAttribute("spellcheck", "false");
+  } else {
+    notepad.setAttribute("spellcheck", "true");
   }
 
   notepad.style.fontFamily = fonts[documentData.font];
