@@ -59,217 +59,6 @@ function get_footnote_count() {
   return Math.ceil(sumValues(footnotes_) / 2);
 }
 
-function htmlToMarkdown(html) {
-  html = `<br>${html.replace(/<pre><code class="language-(.*?)">/g, "").replace(/<\/code><\/pre>/g, "")}<br>`;
-  
-  // tab
-  switch (documentData.indentSize) {
-    case 2:
-      html = html.replace(/(&nbsp;){2}/g, "\t");
-      break;
-
-    case 3:
-      html = html.replace(/(&nbsp;){3}/g, "\t");
-      break;
-
-    case 4:
-      html = html.replace(/(&nbsp;){4}/g, "\t");
-      break;
-
-    case 5:
-      html = html.replace(/(&nbsp;){5}/g, "\t");
-      break;
-
-    case 6:
-      html = html.replace(/(&nbsp;){6}/g, "\t");
-      break;
-
-    case 7:
-      html = html.replace(/(&nbsp;){7}/g, "\t");
-      break;
-
-    case 8:
-      html = html.replace(/(&nbsp;){8}/g, "\t");
-      break;
-
-    case 9:
-      html = html.replace(/(&nbsp;){9}/g, "\t");
-      break;
-
-    case 10:
-      html = html.replace(/(&nbsp;){10}/g, "\t");
-      break;
-  }
-
-  let text = html.replace(/(&nbsp;)/g, " ");
-
-  if (documentData.type === "markdown") {
-    //                       blockquote
-    text = text.replace(/<div class='blockquote'>(.*?)<\/div>/g, "> $1<br>")
-
-    // right-align
-    .replace(/<div style='text-align: right;'>(.*?)<\/div>/g, "{{$1}}")
-
-    // pink color (pink bold)
-    .replace(/<b>(.*?)<\/b>/g, "**$1**")
-
-    // italic
-    .replace(/<i>(.*?)<\/i>/g, "*$1*")
-
-    // underline
-    .replace(/<u>(.*?)<\/u>/g, "__$1__")
-
-    // strikethrough
-    .replace(/<del>(.*?)<\/del>/g, "~~$1~~")
-
-    // highlight
-    .replace(/<mark>(.*?)<\/mark>/g, "`$1`")
-
-    // heading 1
-    .replace(/<h1>(.*?)<\/h1>/g, "# $1")
-
-    // heading 2
-    .replace(/<h2>(.*?)<\/h2>/g, "## $1")
-
-    // heading 3
-    .replace(/<h3>(.*?)<\/h3>/g, "### $1")
-
-    // heading 4
-    .replace(/<h4>(.*?)<\/h4>/g, "#### $1")
-
-    // heading 5
-    .replace(/<h5>(.*?)<\/h5>/g, "##### $1")
-
-    // hyperlink
-    .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank' tabindex='-1'>(.*?)<\/a>/g, "[$2]($1)")
-    .replace(/<a href='(.*?)' rel='noopener noreferrer' target='_blank'>(.*?)<\/a>/g, "[$2]($1)") // backwards compatibility
-
-    // image
-    .replace(/<img src="(.*?)" alt="(.*?)" id="(.*?)" style="width: 100%;"><label class="document-content-label" for="(.*?)">(.*?)<\/label>/g, "![$2]($1)")
-
-    // video and embed
-    .replace(/<iframe id="(.*?)" src="(.*?)" width="100%" height="(.*?)%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen><\/iframe>/g, "&[$3]($2)")
-
-    // unordered list
-    .replace(/<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>(.*?)<\/li><\/ul><\/li><\/ul>/g, "\t- $1")
-    .replace(/<ul><li>(.*?)<\/li><\/ul>/g, "\n- $1")
-
-    // ordered list
-    .replace(/<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="(.*?)"><li>(.*?)<\/li><\/ol><\/li><\/ul>/g, "\t$1 $2")
-    .replace(/<ol start=\"(.*?)\"><li>(.*?)<\/li><\/ol>/g, "\n$1. $2")
-    
-    // replacement br
-    .replace(/<rbr>/g, "\n")
-
-    // right-align
-    .replace(/<div style="text-align: right;">(.*?)<\/div>/g, "{{$1}}")
-    
-    // center
-    .replace(/<center>(.*?)<\/center>/g, "{$1}")
-
-    // checkbox
-    .replace(/<div class="mb-3 form-check nmd-checkbox"><input type="checkbox" id="(.*?)" class="form-check-input"><label for="(.*?)" class="form-check-label document-content-label">(.*?)<\/label><\/div>/g, (c) => {
-      const _text = c.substring(c.indexOf("document-content-label\">") + 24, c.indexOf("</label>"));
-
-      if (c.includes("checked")) {
-        return "- [x] " + _text;
-      } else {
-        return "- [] " + _text;
-      }
-    })
-
-    // table
-    .replace(/<table>(.*?)<\/table>/g, (table) => {
-      const columns = table.match(/<th>(.*?)<\/th>/g).length;
-      
-      table = '\n' + table
-        .replace(/<th>\{(.*?)\}/g, "| $1")
-        .replace(/(<\/th>\|)|(<\/th>)/g, " |")
-        .replace(/<(\/)?tr>/g, "")
-        .replace(/<(\/)?table>/g, "");
-
-      switch (columns) {
-        case 1:
-          table = table.replace(/<td>(.*?)<\/td>/g, "\n| $1 |");
-          break;
-
-        case 2:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 |");
-          break;
-
-        case 3:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 |");
-          break;
-
-        case 4:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 |");
-          break;
-
-        case 5:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 |");
-          break;
-
-        case 6:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 |");
-          break;
-
-        case 7:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 |");
-          break;
-
-        case 8:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 |");
-          break;
-
-        case 9:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 |");
-          break;
-
-        case 10:
-          table = table.replace(/<td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td><td>(.*?)<\/td>/g, "\n| $1 | $2 | $3 | $4 | $5 | $6 | $7 | $8 | $9 | $10 |");
-          break;
-      }
-
-      return table;
-    })
-
-    // superscript
-    .replace(/<sup>(.*?)<\/sup>/g, "^$1^")
-
-    // footnote-bottom
-    .replace(/<span class='footnote-bottom' data-footnote-id="(.*?)" id="(.*?)">__\^(\d{1,5})\^__ (.*?)<\/span><br>/g, (c) => {
-      const footnote_id = c.substring(c.indexOf("data-footnote-id=\"") + 18, c.indexOf("\" id=\""));
-      const footnote_content = c.substring(c.indexOf("^__ ") + 4, c.indexOf("</span>"));
-      return `[^${footnote_id}]: ${footnote_content}<br>`;
-    })
-    // footnote-top
-    .replace(/<span class="footnote-top" onclick="show_footnote\(\'(.*?)\'\)">\^\[(.*?)\]\^<\/span>/g, "[^$2]")
-
-    // fix bottom footnotes
-    .replace(/\[<\/sup>(.*?)\]/g, "[^$1]")
-
-    // horizontal rule
-    .replace(/<hr>/g, "---")
-
-    // escape characters
-    .replace(/<span class='replaced-symbol'>(.*?)<\/span>/g, "\\$1")
-  }
-
-  // newline                         replace &gt and &lt with > and <
-  text = text.replace(/<br>/g, "\n").replace(/&gt;/g, ">").replace(/&lt;/g, "<");
-
-  // .replace(//g, "\n")
-  while (text.substring(0, 1) === "\n") {
-    text = text.substring(1);
-  }
-
-  while (text.slice(text.length - 1) === "\n") {
-    text = text.substring(0, text.length - 1);
-  }
-
-  return text;
-}
-
 const notepad = document.getElementById("notepad");
 const doc = document.getElementById("document");
 
@@ -347,8 +136,19 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
 }).then(r => r.json()).then(_doc => {
   if (!_doc) window.location.href = "/account/me/documents/?error=invalid_id";
   
-  documentData = _doc;
+  documentData.title = _doc?.title || documentData.title;
+  documentData.owner = _doc?.owner || documentData.owner;
+  documentData.content = _doc?.content || documentData.content;
   documentData.last_visit = Date.now();
+  documentData.created = _doc?.created || documentData.created;
+  documentData.description = _doc?.description || documentData.description;
+  documentData.type = _doc?.type || documentData.type;
+  documentData.visibility = _doc?.visibility || documentData.visibility;
+  documentData.language = _doc?.language || documentData.language;
+  documentData.theme = _doc?.theme || documentData.theme;
+  documentData.font = _doc?.font || documentData.font;
+  documentData.fontSize = _doc?.fontSize || documentData.fontSize;
+  documentData.indentSize = _doc?.indentSize || documentData.indentSize;
   documentData.authors?.forEach(_email => _email.replace(/,/g, "."));
 
   if (documentData.type === "code") {
@@ -397,7 +197,8 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   notepad.style.fontSize = documentData.fontSize + 'px';
   notepad.style.tabSize = documentData.indentSize;
 
-  previousHTML = _doc.content || "";
+  notepad.value = previousText = _doc.content || "";
+  previousHTML = compileMarkdown(_doc.content) || "";
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
   hljs.highlightAll();
 
@@ -440,7 +241,6 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   title_ele.innerText = documentData.title;
   title_ele.style.color = "#0d6efd";
   document.title = documentData.title;
-  notepad.value = previousText = htmlToMarkdown(_doc.content || "");
   notepad.setSelectionRange(0, 0);
 
   // add bold contextmenu event listeners
@@ -762,7 +562,7 @@ function compileMarkdown(text) {
       const content = c.substring(6);
       return `<ul><li>${content}</li></ul>`;
     })
-    .replace(/<\/ul><br>/g, "</ul><rbr>")
+    .replace(/<\/ul><br>/g, "</ul><br>")
     
     // ordered list
     .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
@@ -776,20 +576,20 @@ function compileMarkdown(text) {
       const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
       return `<ol start="${number}"><li>${content}</li></ol>`;
     })
-    .replace(/<\/ol><br>/g, "</ol><rbr>")
+    .replace(/<\/ol><br>/g, "</ol><br>")
 
     // right-align brackets
-    .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div><rbr>")
+    .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div>")
     
     // center brackets
-    .replace(/\{(.*?)\}<br>/g, "<center>$1</center><rbr>")
+    .replace(/\{(.*?)\}/g, "<center>$1</center>")
 
     // headers
-    .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5><rbr>")
-    .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4><rbr>")
-    .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3><rbr>")
-    .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2><rbr>")
-    .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1><rbr>")
+    .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5>")
+    .replace(/#{4}\s?(.*?)<br>/g, "<h4>$1</h4>")
+    .replace(/#{3}\s?(.*?)<br>/g, "<h3>$1</h3>")
+    .replace(/#{2}\s?(.*?)<br>/g, "<h2>$1</h2>")
+    .replace(/#{1}\s?(.*?)<br>/g, "<h1>$1</h1>")
 
     // table
     .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
@@ -913,6 +713,7 @@ async function updateCheckbox(email, element_id, status) {
 async function saveDocument() {
   showSpinner();
   let text = notepad.value;
+
   if (text === previousText) {
     hideSpinner();
     setSaveStatus("saved");
@@ -920,7 +721,6 @@ async function saveDocument() {
   }
   
   setSaveStatus("saving");
-
   text = text.trimEnd();
 
   // set the previous text to the current text
@@ -942,7 +742,6 @@ async function saveDocument() {
 
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
-
   const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
 
   // check for checkboxes
@@ -974,7 +773,7 @@ async function saveDocument() {
     body: JSON.stringify({
       title: documentData.title,
       owner: documentData.owner.replace(/\./g, ","),
-      content: html,
+      content: text,
       last_visit: getDate(),
       created: documentData.created,
       description: documentData.description,
@@ -989,7 +788,7 @@ async function saveDocument() {
     })
   });
 
-  documentData.content = html;
+  documentData.content = text;
   hideSpinner();
   setSaveStatus("saved");
 }
@@ -1712,6 +1511,7 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.width = "100%";
     doc.style.height = "calc(100% - 3.13vh)";
     doc.style.zIndex = "0";
+    doc.style.paddingRight = "";
     
     const fullscreen_box = document.querySelector(".dropleft > span");
     fullscreen_box.innerText = "fullscreen";
