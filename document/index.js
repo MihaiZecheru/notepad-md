@@ -97,6 +97,25 @@ async function saveSettings() {
   }).then(() => { hideSpinner(); setSaveStatus('saved'); });
 }
 
+async function addBoldEventListeners() {
+  document.querySelectorAll("#document b").forEach(b => {
+    b.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      b.id = uuid4();
+      new BootstrapMenu(`#${b.id}`, {
+        actions: [{
+          name: "Change Color",
+          onClick: () => {
+            // select current element
+            document.querySelector(`.circle-picker > span > div > span > div[style*='box-shadow: ${BOLD_COLOR.startsWith("#") ? BOLD_COLOR : BOLD_COLOR.includes(",") ? "rgb(" + BOLD_COLOR + ")" : BOLD_COLOR}']`).click();
+            new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
+          }
+        }]
+      });
+    });
+  });
+}
+
 let NOTEPAD_DISABLED = false;
 
 const langs = {
@@ -227,6 +246,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/${JSON.parse(getCookie('nmd-validation')).email.replace(/\./g, ",")}/bold_color.json`, { 
     method: 'GET'
   }).then(res => res.json()).then(d => {
+    BOLD_COLOR = d;
     const _e_ = document.createElement("style");
     _e_.innerHTML = d.startsWith('#') ? `b { color: ${d}; }` : `b { color: rgb(${d}); }`;
     document.body.appendChild(_e_);
@@ -245,21 +265,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   notepad.setSelectionRange(0, 0);
 
   // add bold contextmenu event listeners
-  document.querySelectorAll("#document b").forEach(b => {
-    b.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-      b.id = uuid4();
-      new BootstrapMenu(`#${b.id}`, {
-        actions: [{
-          name: "Change Color",
-          onClick: () => {
-            new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
-            // document.getElementById("color-picker").value = BOLD_COLOR;
-          }
-        }]
-      });
-    });
-  });
+  addBoldEventListeners();
 }).then(() => {
   if (documentData.type === "markdown") {
     document.getElementById("italics").addEventListener("click", () => {
@@ -740,6 +746,8 @@ async function saveDocument() {
   // set the document div to the new html
   doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${html}`;
   hljs.highlightAll();
+
+  addBoldEventListeners();
 
   // set the previous html to the new html
   previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
