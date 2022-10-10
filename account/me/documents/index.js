@@ -831,19 +831,19 @@ function setGreen(ele) {
 }
 
 document.getElementById("share-view-link").addEventListener('click', () => {
-  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/view/id=?${id_for_share_link_modal}`;
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/view/?id=${id_for_share_link_modal}`;
   setGreen(document.getElementById("share-view-link"));
   document.getElementById("share-view-link").blur();
 });
 
 document.getElementById("share-edit-link").addEventListener('click', () => {
-  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/edit/id=?${id_for_share_link_modal}`;
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/edit/?id=${id_for_share_link_modal}`;
   setGreen(document.getElementById("share-edit-link"));
   document.getElementById("share-edit-link").blur();
 });
 
 document.getElementById("share-copy-link").addEventListener('click', () => {
-  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/copy/id=?${id_for_share_link_modal}`;
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/copy/?id=${id_for_share_link_modal}`;
   setGreen(document.getElementById("share-copy-link"));
   document.getElementById("share-copy-link").blur();
 });
