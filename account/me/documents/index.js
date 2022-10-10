@@ -353,7 +353,7 @@ async function createCard(doc) {
   ["card", "shadow", "mb-5", "bg-body", "rounded"].forEach(cls => ele.classList.add(cls));
   ele.innerHTML = 
   `<div class="card-body" id="${doc.id}">
-  <span class="card-title"><a href="/document/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc?.title?.length > max_title_length ? doc?.title?.substring(0, max_title_length) + "..." : doc?.title ? doc.title : "DELETED DOCUMENT"}</a></span>
+  <span class="card-title"><a href="/document/edit/?id=${doc.id}" class="btn btn-primary document-title-btn">${doc?.title?.length > max_title_length ? doc?.title?.substring(0, max_title_length) + "..." : doc?.title ? doc.title : "DELETED DOCUMENT"}</a></span>
   <p class="card-text"${doc.description ? " data-content=" + doc.content : ""}>${content.replace(/\n/g, "<br>")}</p>
   </div>
 
@@ -531,10 +531,10 @@ async function createCard(doc) {
     });
 
     document.getElementById("open-edit-modal-btn").onclick = () => {
-      window.location.href = `/document/?id=${doc.id}&mode=edit`;
+      window.location.href = `/document/?id=${doc.id}`;
     };
     document.getElementById("open-view-modal-btn").onclick = () => {
-      window.location.href = `/document/?id=${doc.id}&mode=view`;
+      window.location.href = `/document/?id=${doc.id}`;
     };
     new bootstrap.Modal("#preview-document-modal").show();
   }
@@ -631,7 +631,7 @@ async function createCard(doc) {
       }, {
         name: "Open (Edit)",
         onClick: () => {
-          window.location.href = `/document/edit/?id=${doc.id}&mode=edit`;
+          window.location.href = `/document/edit/?id=${doc.id}`;
         }
       }, {
         name: "Open (View)",
@@ -643,6 +643,11 @@ async function createCard(doc) {
         onClick: () => {
           id_for_share_link_modal = doc.id;
           new bootstrap.Modal(document.getElementById("share-link-modal")).show();
+        }
+      }, {
+        name: "Make A Copy",
+        onClick: () => {
+          window.location.href = `/document/copy/?id=${doc.id}`;
         }
       }, {
         name: "Rename",
