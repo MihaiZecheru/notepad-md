@@ -1537,7 +1537,7 @@ document.body.addEventListener('keydown', (e) => {
   }
 
   // document settings
-  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/, ".") === email.replace(/,/, ".")) {
+  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/h, ".")) {
     document.getElementById("settings").click();
   }
 
@@ -1555,7 +1555,7 @@ document.body.addEventListener('keydown', (e) => {
 
     const wordOccurrence = string => {
       let map = {};
-      const words = string.replace(/\n/g, " ").replace(/\./, " ").replace(/,/, " ").split(" ").map(word => word.replace(/\./g, " ").replace(/,/g, " ").toLowerCase().trim()).filter(word => word !== "" && isNaN(word));
+      const words = string.replace(/\n/g, " ").replace(/\./g, " ").replace(/,/g, " ").split(" ").map(word => word.replace(/\./g, " ").replace(/,/g, " ").toLowerCase().trim()).filter(word => word !== "" && isNaN(word));
 
       for (let i = 0; i < words.length; i++) {
         const item = words[i];
@@ -1574,7 +1574,7 @@ document.body.addEventListener('keydown', (e) => {
     const { total_words, indiv_words_count } = wordOccurrence(text);
     let expand_level = 1;
 
-    const sentences = text.split(".").map(sentence => sentence.replace(/\n/, " ")).filter(sentence => sentence.length >= 7);
+    const sentences = text.split(".").map(sentence => sentence.replace(/\n/g, " ")).filter(sentence => sentence.length >= 7);
     const sentence_count = sentences.length;
     const avg_words_per_sentence = (total_words / sentences.length).toFixed(2);
     document.getElementById("word-count-modal-body").innerHTML = `
@@ -2041,7 +2041,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(document.getElementById("settings-modal-document-authors"));
   eles.push(document.getElementById("settings-modal"));
 
-  [...new Set([ ...documentData.authors, documentData.owner.replace(/,/, ".") ])].forEach(createTag);
+  [...new Set([ ...documentData.authors, documentData.owner.replace(/,/g, ".") ])].forEach(createTag);
 
   eles.forEach(ele => {
     ele?.addEventListener('keydown', (e) => {
