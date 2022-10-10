@@ -187,6 +187,10 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   notepad.style.fontSize = documentData.fontSize + 'px';
   notepad.style.tabSize = documentData.indentSize;
   notepad.style.fontFamily = fonts[documentData.font];
+  
+  if (documentData.type !== "code") {
+    doc.style.fontFamily = fonts[documentData.font];
+  }
 
   notepad.value = previousText = _doc.content || "";
   previousHTML = compileMarkdown(_doc.content) || "";
