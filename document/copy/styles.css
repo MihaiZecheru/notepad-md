@@ -1,0 +1,40 @@
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+#margin {
+  margin-top: 15vh;
+}
+
+#logo > img {
+  width: 100px;
+}
+
+#logo > span {
+  font-size: 4em;
+}
+
+main {
+  margin-top: 3vh;
+}
+
+h1 {
+  font-size: 2em;
+  margin-bottom: 2vh;
+}
+
+button {
+  margin-top: 1.5vh;
+}
+
+main > img {
+  float: right;
+  margin-left: 50px;
+  margin-top: -110px;
+}
+
+main > b {
+  text-decoration: underline;
+  color: var(--nmd-blue);
+}
