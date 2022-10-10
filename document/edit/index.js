@@ -808,7 +808,7 @@ document.addEventListener("keypress", (event) => {
 });
 
 async function check_for_changes() {
-  if (previousText.trim() !== notepad.value.trim()) {
+  if (previousText.trimEnd() !== notepad.value.trimEnd()) {
     setSaveStatus("not-saved");
     previousText === notepad.value;
   }
@@ -1352,11 +1352,11 @@ document.getElementById("copy-html-btn").addEventListener('click', () => {
 });
 
 document.getElementById("copy-md-btn").addEventListener('click', () => {
-  navigator.clipboard.writeText(notepad.value.trim());
+  navigator.clipboard.writeText(notepad.value.trimEnd());
 });
 
 document.getElementById("download-notepad-as-txt-btn").addEventListener('click', () => {
-  download(notepad.value.trim(), `${documentData.title}.txt`);
+  download(notepad.value.trimEnd(), `${documentData.title}.txt`);
 });
 
 document.addEventListener('keydown', (e) => {
@@ -1640,7 +1640,7 @@ document.body.addEventListener('keydown', (e) => {
 });
 
 window.onbeforeunload = () => {
-  if (notepad.value.trim() !== "" && document.getElementById("save-status").innerText !== "No New Changes") {
+  if (notepad.value.trimEnd() !== "" && document.getElementById("save-status").innerText !== "No New Changes") {
     return "Are you sure you want to leave? Your changes will not be saved.";
   }
 }
