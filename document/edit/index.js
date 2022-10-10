@@ -155,7 +155,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   // only document authors can access the edit page
   if (!_doc.authors.includes(email.replace(/,/g, "."))) {
     if (_doc.visibility === "public") {
-      window.location.href = "/document/view/&id=" + document_uuid;
+      window.location.href = "/document/view/?id=" + document_uuid;
     } else {
       window.location.href = "/account/me/documents/?error=private_document";
     }
