@@ -39,7 +39,7 @@ if (!window.sessionStorage.getItem("new-doc-validation")) {
       type: "markdown",
       visibility: "public",
       language: "en",
-      theme: "light",
+      theme: "default",
       font: "comfortaa",
       fontSize: 16,
       indentSize: 8,
@@ -62,7 +62,7 @@ if (!window.sessionStorage.getItem("new-doc-validation")) {
         }).then(() => {
             setCookie("nmd-validation", JSON.stringify(cookie));
             setCookie("documents", JSON.stringify(getCookie("documents") ? JSON.parse(getCookie("documents")).concat([ document_uuid ]) : [ document_uuid ]));
-            window.location.href = `/document/?id=${document_uuid}`;
+            window.location.href = `/document/edit/?id=${document_uuid}`;
         });
       });
     };
