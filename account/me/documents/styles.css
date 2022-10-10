@@ -73,3 +73,19 @@ body {
 body::-webkit-scrollbar { 
   display: none;  /* Safari and Chrome */
 }
+
+.help-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 0 .2em 0;
+  padding: 0;
+  margin-left: .25em;
+  height: 1.5em;
+  width: 1.5em;
+  transition: all .2s ease-in-out;
+}
+
+.help-button:hover {
+  transform: scale(1.1);
+}

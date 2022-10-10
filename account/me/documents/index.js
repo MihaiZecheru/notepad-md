@@ -321,6 +321,7 @@ let documents_ = [];
 const main = document.querySelector("main");
 
 const modal_new_title_input = document.querySelector("#new-title");
+let id_for_share_link_modal;
 let DOC_BEING_RENAMED;
 let DOC_BEING_DELETED;
 
@@ -605,17 +606,18 @@ async function createCard(doc) {
       }, {
         name: "Open (Edit)",
         onClick: () => {
-          window.location.href = `/document/?id=${doc.id}&mode=edit`;
+          window.location.href = `/document/edit/?id=${doc.id}&mode=edit`;
         }
       }, {
         name: "Open (View)",
         onClick: () => {
-          window.location.href = `/document/?id=${doc.id}&mode=view`;
+          window.location.href = `/document/view/?id=${doc.id}`;
         }
       }, {
         name: "Copy Share Link",
         onClick: () => {
-          navigator.clipboard.writeText(`https://notes.mzecheru.com/document/?id=${doc.id}&mode=view`);
+          id_for_share_link_modal = doc.id;
+          new bootstrap.Modal(document.getElementById("share-link-modal")).show();
         }
       }, {
         name: "Rename",
@@ -790,3 +792,69 @@ document.getElementById("delete-doc-btn").addEventListener("click", () => {
     });
   });
 });
+
+function showSnackBar() {
+  var sb = document.getElementById("snackbar");
+  sb.className = "show";
+  setTimeout(()=>{ sb.className = sb.className.replace("show", ""); }, 3000);
+}
+
+function setGreen(ele) {
+  switch (ele.id) {
+    case "share-view-link":
+      document.getElementById("share-view-link").classList.remove("btn-secondary");
+      document.getElementById("share-view-link").classList.add("btn-primary");
+      document.getElementById("share-edit-link").classList.remove("btn-primary");
+      document.getElementById("share-edit-link").classList.add("btn-secondary");
+      document.getElementById("share-copy-link").classList.remove("btn-primary");
+      document.getElementById("share-copy-link").classList.add("btn-secondary");
+      break;
+
+    case "share-edit-link":
+      document.getElementById("share-view-link").classList.remove("btn-primary");
+      document.getElementById("share-view-link").classList.add("btn-secondary");
+      document.getElementById("share-edit-link").classList.remove("btn-secondary");
+      document.getElementById("share-edit-link").classList.add("btn-primary");
+      document.getElementById("share-copy-link").classList.remove("btn-primary");
+      document.getElementById("share-copy-link").classList.add("btn-secondary");
+      break;
+
+    case "share-copy-link":
+      document.getElementById("share-view-link").classList.remove("btn-primary");
+      document.getElementById("share-view-link").classList.add("btn-secondary");
+      document.getElementById("share-edit-link").classList.remove("btn-primary");
+      document.getElementById("share-edit-link").classList.add("btn-secondary");
+      document.getElementById("share-copy-link").classList.remove("btn-secondary");
+      document.getElementById("share-copy-link").classList.add("btn-primary");
+      break;
+  }
+}
+
+document.getElementById("share-view-link").addEventListener('click', () => {
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/view/id=?${id_for_share_link_modal}`;
+  setGreen(document.getElementById("share-view-link"));
+  document.getElementById("share-view-link").blur();
+});
+
+document.getElementById("share-edit-link").addEventListener('click', () => {
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/edit/id=?${id_for_share_link_modal}`;
+  setGreen(document.getElementById("share-edit-link"));
+  document.getElementById("share-edit-link").blur();
+});
+
+document.getElementById("share-copy-link").addEventListener('click', () => {
+  document.getElementById("share-link-input").value = `https://notes.mzecheru.com/document/copy/id=?${id_for_share_link_modal}`;
+  setGreen(document.getElementById("share-copy-link"));
+  document.getElementById("share-copy-link").blur();
+});
+
+document.getElementById("copy-share-link").addEventListener('click', () => {
+  if (document.getElementById("share-link-input").value) {
+    navigator.clipboard.writeText(document.getElementById("share-link-input").value);
+    showSnackBar();
+  }
+  document.getElementById("copy-share-link").blur(); 
+});
+
+// initialize popovers
+[...document.querySelectorAll('[data-bs-toggle="popover"]')].forEach(el => new bootstrap.Popover(el));
