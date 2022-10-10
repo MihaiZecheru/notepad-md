@@ -18,11 +18,6 @@ if (!getCookie("nmd-validation")) {
 
 let BOLD_COLOR = "#FF69B4";
 
-const isUrl = string => {
-  try { return Boolean(new URL(string)); }
-  catch(e) { return false }
-}
-
 function get_footnote_ids(value) {
   const footnotes = [...new Set(value.match(/\[\^(\d{1,5})\]/g))];
   if (!footnotes) return [];
@@ -48,6 +43,32 @@ const document_uuid = parameters.get('id');
 if (!document_uuid) window.location.href = "/account/me/documents/?error=missing_id&id=" + document_uuid;
 
 const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
+
+async function saveSettings() {
+  await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
+    method: 'PUT',
+    body: JSON.stringify(documentData)
+  });
+}
+
+async function addBoldEventListeners() {
+  document.querySelectorAll("#document b").forEach(b => {
+    b.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      b.id = uuid4();
+      new BootstrapMenu(`#${b.id}`, {
+        actions: [{
+          name: "Change Color",
+          onClick: () => {
+            // select current element
+            document.querySelector(`.circle-picker > span > div > span > div[style*='box-shadow: ${BOLD_COLOR.startsWith("#") ? BOLD_COLOR : BOLD_COLOR.includes(",") ? "rgb(" + BOLD_COLOR + ")" : BOLD_COLOR}']`).click();
+            new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
+          }
+        }]
+      });
+    });
+  });
+}
 
 let documentData = {
   title: "Untitled Document",
@@ -117,10 +138,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.fontSize = _doc?.fontSize || documentData.fontSize;
   documentData.indentSize = _doc?.indentSize || documentData.indentSize;
   documentData.authors = _doc?.authors || email.replace(/,/g, ".");
+  console.log(documentData.visibility)
 
-  if (!_doc.visibility === "public") {
+  if (documentData.visibility !== "public" && documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) {
     window.location.href = "/account/me/documents/?error=private_document";
-  } // STOPPED HERE, CONTINUE WHEN YOU GET BACK
+  }
 
   if (documentData.type === "code") {
     document.getElementById(`theme-${documentData.theme}`).disabled = false;
@@ -136,21 +158,26 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   }
 
-  // disable autocomplete
-  if (documentData.type === "code" || documentData.language !== "en") {
-    notepad.setAttribute("spellcheck", "false");
-  } else {
-    notepad.setAttribute("spellcheck", "true");
+  if (documentData.type !== "code") {
+    doc.style.fontFamily = fonts[documentData.font];
+  }
+
+  document.getElementById("owner-display").innerText = documentData.owner.replace(/,/g, ".");
+  if (documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
+    var css = 'document-title:hover { text-decoration: underline; cursor: pointer; }';
+    var style = document.createElement('style');
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+
+    document.getElementsByTagName('head')[0].appendChild(style);
   }
 
   doc.style.fontSize = documentData.fontSize + 'px';
-  notepad.style.fontSize = documentData.fontSize + 'px';
-  notepad.style.tabSize = documentData.indentSize;
-  notepad.style.fontFamily = fonts[documentData.font];
-
-  notepad.value = previousText = _doc.content || "";
-  previousHTML = compileMarkdown(_doc.content) || "";
-  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${previousHTML}`;
+  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${compileMarkdown(_doc.content) || ""}`;
   hljs.highlightAll();
 
   // fill in checkboxes
@@ -191,173 +218,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = documentData.title;
-  title_ele.style.color = "#0d6efd";
   document.title = documentData.title;
-  notepad.setSelectionRange(0, 0);
+  title_ele.style.fontWeight = "550";
+
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
+    method: "PUT",
+    body: JSON.stringify(getDate())
+  });
 
   // add bold contextmenu event listeners
   addBoldEventListeners();
-}).then(() => {
-  if (documentData.type === "markdown") {
-    document.getElementById("italics").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("**", -1);
-      } else if (notepad.value.includes(sel)) {
-        insertText(`*${sel}*`, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("bold").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("****", -2);
-      } else if (notepad.value.includes(sel)) {
-        insertText(`**${sel}**`, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("underline").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("____", -2);
-      } else if (notepad.value.includes(sel)) {
-        insertText(`__${sel}__`, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("strikethrough").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("~~~~", -2);
-      } else if (notepad.value.includes(sel)) {
-        insertText(`~~${sel}~~`, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("highlight").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("``", -1);
-      } else if (notepad.value.includes(sel)) {
-        insertText(`\`${sel}\``, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("link").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("[]()", -3);
-      } else if (notepad.value.includes(sel)) {
-        if (isUrl(sel)) {
-          insertText(`[](${sel})`, 0 - (3 + sel.length));
-        } else {
-          insertText("[]()", -3);
-        }
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("image").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("![]()", -3);
-      } else if (notepad.value.includes(sel)) {
-        if (isUrl(sel)) {
-          insertText(`![](${sel})`, 0 - (3 + sel.length));
-        } else {
-          insertText("![]()", -3);
-        }
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("video").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("$[]()", -3);
-      } else if (notepad.value.includes(sel)) {
-        if (isUrl(sel)) {
-          insertText(`$[](${sel})`, 0 - (3 + sel.length));
-        } else {
-          insertText("$[]()", -3);
-        }
-      }
-      notepad.focus();
-    });
-
-    document.getElementById("embed").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("&[]()", -3);
-      } else if (notepad.value.includes(sel)) {
-        if (isUrl(sel)) {
-          insertText(`&[](${sel})`, 0 - (3 + sel.length));
-        } else {
-          insertText("&[]()", -3);
-        }
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("quote").addEventListener("click", () => {
-      const sel = window.getSelection().toString();
-      if (sel.length === 0) {
-        insertText("> ");
-      } else if (notepad.value.includes(sel)) {
-        insertText(`> ${sel}`, 0);
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("unordered-list").addEventListener("click", () => {
-      insertText("- \n- \n- ", -6);
-      notepad.focus();
-    });
-  
-    document.getElementById("ordered-list").addEventListener("click", () => {
-      insertText("1. \n2. \n3. ", -8);
-      notepad.focus();
-    });
-  
-    document.getElementById("checkbox").addEventListener("click", (event) => {
-      if (event.ctrlKey)  {
-        const sel = window.getSelection().toString();
-        if (sel.length === 0) {
-          insertText("- [x] ");
-        } else if (notepad.value.includes(sel)) {
-          insertText(`- [x] ${sel}`, 0);
-        }
-      }
-      else {
-        const sel = window.getSelection().toString();
-        if (sel.length === 0) {
-          insertText("- [] ");
-        } else if (notepad.value.includes(sel)) {
-          insertText(`- [] ${sel}`, 0);
-        }
-      }
-      notepad.focus();
-    });
-  
-    document.getElementById("table").addEventListener("click", () => {
-      insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
-      notepad.focus();
-    });    
-  }
 });
 
-notepad.focus();
+doc.focus();
 
-fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
-  method: "PUT",
-  body: JSON.stringify(getDate())
-});
 
 function uuid4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -368,9 +242,9 @@ function uuid4() {
 
 function compileMarkdown(text) {
   // create a unique id for each set of footnotes in the document
-  const footnote_ids = get_footnote_ids();
+  const footnote_ids = get_footnote_ids(text);
   let footnote_uuids = {};
-  for (let i = 0; i < get_footnote_count(); i++) {
+  for (let i = 0; i < get_footnote_count(text); i++) {
     footnote_uuids[footnote_ids[i]] = uuid4();
   }
 
@@ -612,35 +486,6 @@ function compileMarkdown(text) {
   }
 }
 
-function showSpinner() {
-  document.getElementById("loading-spinner").style.visibility = "visible";
-}
-
-function hideSpinner() {
-  document.getElementById("loading-spinner").style.visibility = "hidden";
-}
-
-function setSaveStatus(status) {
-  let ele_;
-  switch (status) {
-    case "saved":
-      ele_ = document.getElementById("save-status");
-      ele_.innerText = "No New Changes";
-      ele_.style.color = "#28a745";
-      break;
-    case "saving":
-      ele_ = document.getElementById("save-status")
-      ele_.innerText = "Saving Changes...";
-      ele_.style.color = "#ffc107";
-      break;
-    case "not-saved":
-      ele_ = document.getElementById("save-status");
-      ele_.innerText = "Unsaved Changes";
-      ele_.style.color = "tomato";
-      break;
-  }
-}
-
 async function updateCheckbox(email, element_id, status) {
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${element_id}.json`, {
     method: "PUT",
@@ -648,544 +493,24 @@ async function updateCheckbox(email, element_id, status) {
   });
 }
 
-async function saveDocument() {
-  showSpinner();
-  let text = notepad.value;
-
-  if (text === previousText) {
-    hideSpinner();
-    setSaveStatus("saved");
-    return;
+document.body.addEventListener("keypress", (event) => {
+  if (event.key === "Tab") {
+    event.preventDefault();
+    doc.focus();
   }
-  
-  setSaveStatus("saving");
-  text = text.trimEnd();
-
-  // set the previous text to the current text
-  previousText = JSON.parse(JSON.stringify({text})).text; // deepcopy
-  
-  // compile the markdown to html
-  let html = compileMarkdown(text);
-
-  // check if the new html is different from the previous html
-  if (html === previousHTML) {
-    hideSpinner();
-    setSaveStatus("saved");
-    return;
-  }
-
-  // set the document div to the new html
-  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${html}`;
-  hljs.highlightAll();
-
-  addBoldEventListeners();
-
-  // set the previous html to the new html
-  previousHTML = JSON.parse(JSON.stringify({html})).html; // deepcopy
-  const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
-
-  // check for checkboxes
-  (async () => {
-    let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
-    if (checkboxes.length) {
-      // delete previous checkbox data
-      fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, {
-        method: "DELETE",
-      });
-    
-      checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", (event) => {
-          updateCheckbox(email, event.target.id, event.target.checked);
-        });
-
-        // upload checkbox data
-        fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${checkbox.id}.json`, {
-          method: "PUT",
-          body: JSON.stringify(checkbox.checked ? 1 : 0)
-        });
-      });
-    }
-  })();
-
-  // upload the document to the server
-  await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
-    method: "PUT",
-    body: JSON.stringify({
-      title: documentData.title,
-      owner: documentData.owner.replace(/\./g, ","),
-      content: text,
-      last_visit: getDate(),
-      created: documentData.created,
-      description: documentData.description,
-      type: documentData.type,
-      visibility: documentData.visibility,
-      language: documentData.language,
-      theme: documentData.theme,
-      font: documentData.font,
-      fontSize: documentData.fontSize,
-      indentSize: documentData.indentSize,
-      authors: documentData.authors,
-    })
-  });
-
-  documentData.content = text;
-  hideSpinner();
-  setSaveStatus("saved");
-}
-
-function getStartAndEndPositions() {
-  return { start: notepad.selectionStart, end: notepad.selectionEnd };
-}
-
-let location_before_last_insert = [ { start: 0, end: 0 } ];
-
-function insertText(text, cursor_movement = 0) {
-  const { start, end } = getStartAndEndPositions();
-  location_before_last_insert.unshift({ start, end });
-  notepad.focus();
-
-  document.execCommand('selectAll', false);
-  var el = document.createElement('p');
-  el.innerText = notepad.value.substring(0, start) + text + notepad.value.substring(end);
-  const previousScrollLocation = notepad.scrollTop;
-  document.execCommand('insertHTML', false, el.innerHTML);
-  notepad.scrollTop = previousScrollLocation;
-  notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
-}
+});
 
 document.addEventListener("keypress", (event) => {
   if (event.key === "Tab") {
     event.preventDefault();
-    notepad.focus();
+    doc.focus();
   }
-});
-
-async function check_for_changes() {
-  if (previousText.trim() !== notepad.value.trim()) {
-    setSaveStatus("not-saved");
-    previousText === notepad.value;
-  }
-}
-
-document.getElementById("notepad").addEventListener("keydown", (event) => {
-  check_for_changes();
-  const sel = window.getSelection().toString();
-
-  // close alert if present, exit fullscreen if in fullscreen, or unfocus notepad otherwise
-  if (event.key === "Escape") {
-    event.preventDefault();
-    if (document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-      document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-      return;
-    }
-    if (notepad.dataset.fullscreen === "true" ? true : false) {
-      document.querySelector("span.fullscreen").click();
-      notepad.focus();
-    } else {
-      notepad.blur();
-    }
-    return;
-  }
-
-  // replace tab with \t
-  if (event.key === "Tab") {
-    event.preventDefault();
-    setSaveStatus("not-saved");
-    insertText("\t");
-  }
-  
-  if (event.altKey) {
-    switch (event.code) {
-      // scroll down
-      case "ArrowDown":
-        event.preventDefault();
-        notepad.scrollBy(0, 30);
-        break;
-
-      // scroll up
-      case "ArrowUp":
-        event.preventDefault();
-        notepad.scrollBy(0, -30);
-        break;
-      
-      // horizontal rule
-      case "KeyR":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          insertText("---");
-        }
-        break;
-
-      // video
-      case "KeyV":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("$[]()", -3);
-          } else if (notepad.value.includes(sel)) {
-            if (isUrl(sel)) {
-              insertText(`$[](${sel})`, 0 - (3 + sel.length));
-            } else {
-              insertText("$[]()", -3);
-            }
-          }
-        }
-        break;
-
-      // lists
-      case "KeyL":
-        if (documentData.type === "markdown") {
-          if (event.shiftKey) {
-            event.preventDefault();
-            insertText("1. \n2. \n3. ", -8);
-          } else {
-            event.preventDefault();
-            insertText("- \n- \n- ", -6);
-          }
-        }
-        break;
-      
-      // checkbox
-      case "KeyC":
-        if (documentData.type === "markdown") {
-          // unchecked
-          if (event.shiftKey) {
-            event.preventDefault();
-            if (sel.length === 0) {
-              insertText("- [x] ");
-            } else if (notepad.value.includes(sel)) {
-              insertText(`- [x] ${sel}`, 0);
-            }
-          } else { // checked
-            event.preventDefault();
-            if (sel.length === 0) {
-              insertText("- [] ");
-            } else if (notepad.value.includes(sel)) {
-              insertText(`- [] ${sel}`, 0);
-            }
-          }
-        }
-        break;
-
-      // strikethrough
-      case "KeyS":
-        if (documentData.type === "markdown") {
-          if (event.ctrlKey) break;
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("~~~~", -2);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`~~${sel}~~`, 0);
-          }
-        }
-        break;
-
-      // highlight
-      case "KeyH":
-        if (documentData.type === "markdown") { 
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("``", -1);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`\`${sel}\``, 0);
-          }
-        }
-        break;
-      
-      // table
-      case "KeyT":
-        if (event.shiftKey) break;
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          insertText("|  | title2 | title3 |\n| content1 | content2 | content3 |", -55);
-        }
-        break;
-      
-      // iframe embed
-      case "KeyE":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("&[]()", -3);
-          } else if (notepad.value.includes(sel)) {
-            if (isUrl(sel)) {
-              insertText(`&[](${sel})`, 0 - (3 + sel.length));
-            } else {
-              insertText("&[]()", -3);
-            }
-          }
-        }
-        break; 
-    }
-  }
-
-  if (event.ctrlKey) {
-    switch (event.code) {
-      // ctrl + shift + right_arrow = select word
-      case "ArrowRight":
-        event.preventDefault();
-        const endOfWord = Math.min(
-          1 + notepad.value.indexOf(" ", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("\n", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf(".", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf(",", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("!", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("?", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("@", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("#", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("$", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("%", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("*", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("(", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf(")", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("{", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("}", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("[", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("]", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("`", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("~", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("__", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("^^", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("+", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("=", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("|", notepad.selectionEnd + 1) || 999999999,
-          1 + notepad.value.indexOf("\"", notepad.selectionEnd + 1) || 999999999,
-        ) - 1;
-        if (event.shiftKey) {
-          notepad.selectionEnd = endOfWord;
-        } else {
-          notepad.selectionStart = notepad.selectionEnd = endOfWord;
-        }
-        break;
-
-      // delete line
-      case "KeyK":
-        event.preventDefault();
-        if (event.shiftKey) {
-          const { start, end } = getStartAndEndPositions();
-          location_before_last_insert.unshift({ start, end });
-          if (notepad.selectionStart === notepad.selectionEnd) {
-            const lines = notepad.value.split("\n");
-            const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
-            let start_of_line = 0;
-            for (let i = 0; i < line - 1; i++) {
-              start_of_line += lines[i].length + 1;
-            }
-            const end_of_line = start_of_line + lines[line - 1].length;
-            document.execCommand('selectAll', false);
-            var el = document.createElement('p');
-            el.innerText = notepad.value.substring(0, start_of_line - 1) + notepad.value.substring(end_of_line);
-            const previousScrollLocation = notepad.scrollTop;
-            document.execCommand('insertHTML', false, el.innerHTML);
-            notepad.scrollTop = previousScrollLocation;
-            notepad.selectionStart = notepad.selectionEnd = start_of_line;
-          } else {
-            document.execCommand('selectAll', false);
-            var el = document.createElement('p');
-            el.innerText = notepad.value.substring(0, notepad.selectionStart) + notepad.value.substring(notepad.selectionEnd);
-            document.execCommand('insertHTML', false, el.innerHTML);
-            notepad.selectionStart = notepad.selectionEnd = start;
-          }
-        } else {
-          if (documentData.type === "markdown") {
-            // hyperlink
-            event.preventDefault();
-            if (sel.length === 0) {
-              insertText("[]()", -3);
-            } else if (notepad.value.includes(sel)) {
-              if (isUrl(sel)) {
-                insertText(`[](${sel})`, 0 - (3 + sel.length));
-              } else {
-                insertText("[]()", -3);
-              }
-            }
-          }
-        }
-        break;
-
-      // copy line is there is no currently selected text
-      case "KeyC":
-        if (notepad.selectionStart === notepad.selectionEnd) {
-          const lines = notepad.value.split("\n");
-          const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
-
-          let start_of_line = 0;
-          for (let i = 0; i < line - 1; i++) {
-            start_of_line += lines[i].length + 1;
-          }
-          const end_of_line = start_of_line + lines[line - 1].length;
-          navigator.clipboard.writeText(notepad.value.substring(start_of_line - 1, end_of_line));
-          notepad.selectionStart = notepad.selectionEnd = end_of_line;
-        }
-        break;
-
-      // word count, alternative shortcut (original is alt + shift + p)
-      case "KeyP":
-        if (event.shiftKey) {
-          event.preventDefault();
-          new bootstrap.Modal(document.getElementById("word-count-modal")).show();
-        }
-        break;
-
-      case "KeyZ":
-        new Promise((_r) => {
-          setTimeout(_r, 1);
-        }).then(() => {
-          if (notepad.selectionStart === 0 && notepad.selectionEnd === notepad.value.length) {
-            notepad.selectionStart = location_before_last_insert[0].start;
-            notepad.selectionEnd = location_before_last_insert[0].end;
-            location_before_last_insert.shift();
-          }
-        });
-        break;
-
-      // italics
-      case "KeyI":
-        if (documentData.type === "markdown") {
-          if (event.shiftKey) {
-            return;
-          }
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("**", -1);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`*${sel}*`, 0);
-          }
-        }
-        break;
-
-      // pink color (pink bold)
-      case "KeyB":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("****", -2);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`**${sel}**`, 0);
-          };
-        }
-        break;
-
-      // underline
-      case "KeyU":
-        if (documentData.type === "markdown") {  
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("____", -2);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`__${sel}__`, 0);
-          }
-        }
-        break;
-
-      // save document
-      case "KeyS":
-        event.preventDefault();
-        saveDocument();
-        break;
-
-      // highlight
-      case "KeyH":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("``", -1);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`\`${sel}\``, 0);
-          }
-        }
-        break;
-
-      // image
-      case "KeyM":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("![]()", -3);
-          } else if (notepad.value.includes(sel)) {
-            if (isUrl(sel)) {
-              insertText(`![](${sel})`, 0 - (3 + sel.length));
-            } else {
-              insertText("![]()", -3);
-            }
-          }
-        }
-        break;
-
-      // quote
-      case "KeyQ":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("> ");
-          } else if (notepad.value.includes(sel)) {
-            insertText(`> ${sel}`, 0);
-          }
-        }
-        break;
-
-      // footnote
-      case "Digit6":
-        if (documentData.type === "markdown") {
-          if (event.shiftKey) {
-            event.preventDefault();
-            const location = notepad.selectionStart;
-            const footnote_count = get_footnote_count() + 1;
-            insertText(`[^${footnote_count}]`);
-            notepad.selectionStart = notepad.value.length;
-            notepad.value += `\n[^${footnote_count}]: `;
-            notepad.selectionStart = notepad.selectionEnd = location + `[^${footnote_count}]`.length;
-          }
-        }
-        break;
-
-      // superscript
-      case "Period":
-        if (documentData.type === "markdown") {  
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("^^", -1);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`^${sel}^`, 0);
-          }
-        }
-        break;
-
-      // center align
-      case "BracketLeft":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("{}", -1);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`{${sel}}`, 0);
-          }
-        }
-        break;
-
-      // right align
-      case "BracketRight":
-        if (documentData.type === "markdown") {
-          event.preventDefault();
-          if (sel.length === 0) {
-            insertText("{{}}", -2);
-          } else if (notepad.value.includes(sel)) {
-            insertText(`{{${sel}}}`, 0);
-          }
-        }
-        break;
-    }
-  }
-});
-
-document.getElementById("save").addEventListener("click", () => {
-  saveDocument();
-  notepad.focus();
 });
 
 const modal_new_title_input = document.querySelector("div.modal-body > form > div.mb-3 > input");
 
 document.querySelector("document-title").addEventListener("click", () => {
+  if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
   modal_new_title_input.value = documentData.title;
   new bootstrap.Modal(document.getElementById("change-title-modal")).show();
   new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
@@ -1207,25 +532,10 @@ modal_new_title_input.addEventListener("keydown", (event) => {
 });
 
 document.querySelector("div.modal-footer #change").addEventListener("click", () => {
-  showSpinner();
-  setSaveStatus('saving');
   const new_title = modal_new_title_input.value.trim();
-  if (new_title === documentData.title) {
-    setSaveStatus('saved');
-    hideSpinner();
-    return;
-  }
+  if (new_title === documentData.title) return;
 
   const document_title = document.querySelector("document-title");
-
-  if (!new_title || new_title === "Untitled Document") {
-    documentData.title = "Unt itled Document";
-    document_title.style.color = "tomato";
-  } else {
-    documentData.title = new_title;
-    document_title.style.color = "#0d6efd";
-  }
-
   document.title = documentData.title;
 
   // upload the new title to the server
@@ -1238,8 +548,6 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
       body: JSON.stringify(getDate())
     }).then(() => {
       document_title.innerText = documentData.title;
-      setSaveStatus('saved');
-      hideSpinner();
     });
   });
 });
@@ -1255,7 +563,7 @@ function download(text, filename) {
 }
 
 function getHtml() {
-  return compileMarkdown(notepad.value.trimEnd());
+  return compileMarkdown(documentData.content);
 }
 
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
@@ -1305,37 +613,19 @@ document.getElementById("copy-html-btn").addEventListener('click', () => {
 });
 
 document.getElementById("copy-md-btn").addEventListener('click', () => {
-  navigator.clipboard.writeText(notepad.value.trim());
+  navigator.clipboard.writeText(documentData.content);
 });
 
 document.getElementById("download-notepad-as-txt-btn").addEventListener('click', () => {
-  download(notepad.value.trim(), `${documentData.title}.txt`);
+  download(documentData.content, `${documentData.title}.txt`);
 });
 
 document.addEventListener('keydown', (e) => {
   if (!e.altKey) return;
 
-  if (e.code === "Digit1") {
-    e.preventDefault();
-    if (NOTEPAD_DISABLED) return;
-    if (doc.dataset.fullscreen === "true" ? true : false) {
-      // exit fullscreen
-      document.querySelector(".dropleft > span").click();
-    }
-    document.querySelector("main div > span").click();
-  }
-  
-  if (e.code === "Digit2") {
-    e.preventDefault();
-    if (notepad.dataset.fullscreen === "true" ? true : false) {
-      // notepad is fullscreen, so we need to exit it first
-      document.querySelector("main div > span").click();
-    };
-    document.querySelector(".dropleft > span").click();
-  }
-
   if (e.shiftKey && e.code === "T") {
     e.preventDefault();
+    if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
     document.querySelector("document-title").click();
     return;
   }
@@ -1346,127 +636,12 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
   if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
     e.preventDefault();
     new bootstrap.Modal(document.getElementById("word-count-modal")).show();
     return;
   }
 });
-
-doc.addEventListener*('keydown', (e) => {
-  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-    e.preventDefault();
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-    return;
-  }
-  
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
-  if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
-    e.preventDefault();
-    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
-    return;
-  }
-});
-
-/* notepad fullscreen - Alt+1 */
-
-document.querySelector("main div > span").addEventListener('click', () => {
-  if (NOTEPAD_DISABLED) return;
-  const notepad_fullscreen = notepad.dataset.fullscreen === "true" ? true : false;
-  
-  if (!notepad_fullscreen) {
-    notepad.style.position = "fixed";
-    notepad.style.width = "98.75vw";
-    notepad.style.height = "calc(95vh - 2.8em)";
-    notepad.style.zIndex = "1000";
-
-    document.querySelector("main div > span").innerText = "fullscreen_exit";
-    document.getElementById("footer").style.visibility= "hidden";
-    document.getElementById("dotted-line").style.visibility= "hidden";
-    
-    notepad.dataset.fullscreen = true;
-    notepad.focus();
-  } else {
-    notepad.style.position = "relative";
-    notepad.style.width = "100%";
-    notepad.style.height = "calc(100% - 5vh)";
-    notepad.style.zIndex = "0";
-    
-    document.querySelector("main div > span").innerText = "fullscreen";
-    document.getElementById("footer").style.visibility= "visible";
-    document.getElementById("dotted-line").style.visibility= "visible";
-    
-    notepad.dataset.fullscreen = false;
-    notepad.focus();
-  }
-});
-
-/* doc fullscreen - Alt+2 */
-
-let doc_fullscreen_previous_styles = {};
-document.querySelector(".dropleft > span").addEventListener('click', () => {
-  const doc_fullscreen = doc.dataset.fullscreen === "true" ? true : false;
-  if (!doc_fullscreen) {
-    doc.style.position = "absolute";
-    doc.style.top = "0";
-    doc.style.left = "0";
-    doc.style.width = "100vw";
-    doc.style.height = "95vh";
-    
-    const fullscreen_box = document.querySelector(".dropleft > span");
-    doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
-    fullscreen_box.innerText = "fullscreen_exit";
-    fullscreen_box.style.position = "fixed";
-    fullscreen_box.style.top = "1vh";
-    fullscreen_box.style.right = "1.25vw";
-    fullscreen_box.style.float = "right";
-    fullscreen_box.style.zIndex = "1000";
-    
-    // prevent text from going all the way to the right edge; prevents overlap with the fullsreen_box
-    doc.style.paddingRight = `calc(${doc.offsetWidth - doc.clientWidth}px + 1.25vw + ${fullscreen_box.clientWidth}px)`;
-
-    // delete alert if it exists
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-    doc.dataset.fullscreen = true;
-    notepad.blur();
-    doc.tabIndex = 100;
-    doc.focus();
-    doc.tabIndex = -1;
-  } else {
-    doc.style.position = "relative";
-    doc.style.top = "";
-    doc.style.width = "100%";
-    doc.style.height = "calc(100% - 3.13vh)";
-    doc.style.zIndex = "0";
-    doc.style.paddingRight = "";
-    
-    const fullscreen_box = document.querySelector(".dropleft > span");
-    fullscreen_box.innerText = "fullscreen";
-    fullscreen_box.style = doc_fullscreen_previous_styles;
-    
-    // delete alert if it exists
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-    doc.dataset.fullscreen = false;
-    doc.blur();
-    notepad.focus();
-  }
-});
-
-// minimize doc, fixes bug where on code mode the page opens with the doc in fullscreen
-for (let i = 0; i < 2; i++) document.querySelector(".dropleft > span").click();
 
 doc.addEventListener('keydown', (e) => {
   if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
@@ -1475,13 +650,6 @@ doc.addEventListener('keydown', (e) => {
     return;
   }
   
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
   if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
     e.preventDefault();
     new bootstrap.Modal(document.getElementById("word-count-modal")).show();
@@ -1498,20 +666,13 @@ document.body.addEventListener('keydown', (e) => {
 
   // title
   if (e.altKey && e.shiftKey && e.code === "KeyT") {
+    if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
     document.querySelector("document-title").click();
     return;
   }
 
-  // escape
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
   // document settings
-  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/, ".") === email.replace(/,/, ".")) {
+  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
     document.getElementById("settings").click();
   }
 
@@ -1524,12 +685,12 @@ document.body.addEventListener('keydown', (e) => {
       return lowerCase;
     }
     
-    const text = doc.innerText || clean(notepad.value);
+    const text = clean(documentData.content);
     const character_count = text.replace(/\n/g, " ").length;
 
     const wordOccurrence = string => {
       let map = {};
-      const words = string.replace(/\n/g, " ").replace(/\./, " ").replace(/,/, " ").split(" ").map(word => word.replace(/\./g, " ").replace(/,/g, " ").toLowerCase().trim()).filter(word => word !== "" && isNaN(word));
+      const words = string.replace(/\n/g, " ").replace(/\./g, " ").replace(/,/g, " ").split(" ").map(word => word.replace(/\./g, " ").replace(/,/g, " ").toLowerCase().trim()).filter(word => word !== "" && isNaN(word));
 
       for (let i = 0; i < words.length; i++) {
         const item = words[i];
@@ -1548,7 +709,7 @@ document.body.addEventListener('keydown', (e) => {
     const { total_words, indiv_words_count } = wordOccurrence(text);
     let expand_level = 1;
 
-    const sentences = text.split(".").map(sentence => sentence.replace(/\n/, " ")).filter(sentence => sentence.length >= 7);
+    const sentences = text.split(".").map(sentence => sentence.replace(/\n/g, " ")).filter(sentence => sentence.length >= 7);
     const sentence_count = sentences.length;
     const avg_words_per_sentence = (total_words / sentences.length).toFixed(2);
     document.getElementById("word-count-modal-body").innerHTML = `
@@ -1588,15 +749,9 @@ document.body.addEventListener('keydown', (e) => {
   // print
   if (e.ctrlKey && e.code === "KeyP") {
     e.preventDefault();
-    printDiv("document");
+    _print("document");
   }
 });
-
-window.onbeforeunload = () => {
-  if (notepad.value.trim() !== "" && document.getElementById("save-status").innerText !== "No New Changes") {
-    return "Are you sure you want to leave? Your changes will not be saved.";
-  }
-}
 
 function showSnackBar() {
   var sb = document.getElementById("snackbar");
@@ -1698,192 +853,16 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
   });
 });
 
-function printDiv(divName) {
+function _print() {
   // delete alert if it's open
-  document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-  var printContents = document.getElementById(divName).innerHTML;
+  document.getElementById("footnotes-alert-placeholder").remove();
+  var printContents = compileMarkdown(documentData.content);
   document.body.innerHTML = printContents;
   window.print();
   window.location.reload();
 }
 
-document.getElementById("print-document-btn").addEventListener('click', () => {
-  printDiv("document");
-});
-
-document.getElementById('file-upload-modal-confirm-btn').addEventListener('click', () => {
-  for (var i = 0, f; f = window.files[i]; i++) {
-    const reader = new FileReader();
-    reader.readAsText(f);
-    
-    reader.onload = () => {
-      document.getElementById('notepad').value = reader.result;
-      saveDocument();
-    }
-  }
-});
-
-/* drag and drop image / video */
-
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js';
-import { ref, getStorage, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-storage.js';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCYatodI_Ps_C9Dl6HIo0tZTprwLdApCw8",
-  authDomain: "notepad-md-32479.firebaseapp.com",
-  databaseURL: "https://notepad-md-32479-default-rtdb.firebaseio.com",
-  projectId: "notepad-md-32479",
-  storageBucket: "notepad-md-32479.appspot.com",
-  messagingSenderId: "172344421800",
-  appId: "1:172344421800:web:5ea093a073ed4b748dc19d",
-  measurementId: "G-TY1F0SJL34"
-};
-
-const app = initializeApp(firebaseConfig);
-const storage = getStorage();
-
-function showFileUploadProgressModal() {
-  /*
-    <div class="modal fade" tabindex="-1" id="file-upload-progress-modal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Uploading File</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="file-upload-progress-modal-close-button"></button>
-          </div>
-          <div class="modal-body">
-            Your file is being uploaded to the database.<br><br>
-
-            Current progress: <mark><span id="file-upload-progress-modal-progress">0</span>%</mark>
-          </div>
-        </div>
-      </div>
-    </div>
-  */
-  let _modal = document.createElement("div");
-  _modal.classList.add("modal", "fade");
-  _modal.setAttribute("tabindex", "-1");
-  _modal.setAttribute("id", "file-upload-progress-modal");
-  _modal.setAttribute("aria-hidden", "true");
-  _modal.setAttribute("data-bs-backdrop", "static");
-  _modal.setAttribute("data-bs-keyboard", "false");
-  _modal.innerHTML = `
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Uploading Image</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="file-upload-progress-modal-close-button"></button>
-      </div>
-      <div class="modal-body">
-        Your file is being uploaded to the database.<br><br>
-
-        Current progress: <mark><span id="file-upload-progress-modal-progress">0</span>%</mark>
-      </div>
-    </div>
-  </div>`;
-  document.body.appendChild(_modal);
-  new bootstrap.Modal(document.getElementById("file-upload-progress-modal")).show();
-}
-
-function insertAtCursor(ele, value) {
-  value += "\n";
-  // Internet Explorer
-  if (document.selection) {
-    ele.focus();
-    sel = document.selection.createRange();
-    sel.text = value;
-  }
-  // Mozilla and Webkit
-  else if (ele.selectionStart || ele.selectionStart == '0') {
-    var startPos = ele.selectionStart;
-    var endPos = ele.selectionEnd;
-    document.execCommand('selectAll', false);
-    var el = document.createElement('p');
-    el.innerText = ele.value.substring(0, startPos)
-      + value
-      + ele.value.substring(endPos, ele.value.length);
-    document.execCommand('insertHTML', false, el.innerHTML);
-  } else {
-    ele.value += value;
-  }
-}
-
-window.files = [];
-
-notepad.addEventListener("dragover", (event) => {
-  event.preventDefault();
-});
-
-notepad.addEventListener('drop', (event) => {
-  event.stopPropagation(); 
-  event.preventDefault();
-  window.files = event.dataTransfer.files;
-
-  if (!window.files.length) return;
-
-  if (window.files.length > 1) {
-    new bootstrap.Modal(document.getElementById("only-one-file-upload-modal")).show();
-    return;
-  }
-
-  const file = files[0];
-  const fileRef = ref(storage, `${file.name}`);
-
-  if (file.type.startsWith("image/")) {
-    // upload the image to the firestore
-
-    showFileUploadProgressModal();
-    const uploadTask = uploadBytesResumable(fileRef, file);
-
-    uploadTask.on('state_changed', (snapshot) => {
-      const progress = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2);
-      document.getElementById("file-upload-progress-modal-progress").innerText = progress;
-    }, (error) => {
-      document.getElementById("file-upload-progress-modal-close-button").click();
-      new bootstrap.Modal(document.getElementById("file-upload-error-modal")).show();
-    }, () => {
-      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        const image = `![${file.name}](${downloadURL})`;
-        insertAtCursor(notepad, image);
-        // 250ms delay
-        new Promise(__r => {
-          setTimeout(() => {
-            document.getElementById("file-upload-progress-modal-close-button").click();
-            notepad.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyS', ctrlKey: true }));
-            __r();
-          }, 250);
-        });
-      });
-    });
-  } else if (file.type.startsWith("video/") && JSON.parse(getCookie("nmd-validation")).email === "zecheruchris@gmail.com") {
-    // upload the video to the firestore
-    showFileUploadProgressModal();
-    const uploadTask = uploadBytesResumable(fileRef, file);
-    uploadTask.on('state_changed', (snapshot) => {
-      const progress = ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(2);
-      document.getElementById("file-upload-progress-modal-progress").innerText = progress;
-    }, (error) => {
-      document.getElementById("file-upload-progress-modal-close-button").click();
-      new bootstrap.Modal(document.getElementById("file-upload-error-modal")).show();
-    }, () => {
-      getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-        const video = `$[${file.name}](${downloadURL})`;
-        insertAtCursor(notepad, video);
-        // 250ms delay
-        new Promise(__r => {
-          setTimeout(() => {
-            document.getElementById("file-upload-progress-modal-close-button").click();
-            notepad.dispatchEvent(new KeyboardEvent('keydown', { 'code': 'KeyS', ctrlKey: true }));
-            __r();
-          }, 250);
-        });
-      });
-    });
-  } else if (file.type.startsWith("text/")) {
-    // notify use that uploading the file will override their document's current text
-    new bootstrap.Modal(document.getElementById('file-upload-modal')).show();
-  }
-});
+document.getElementById("print-document-btn").addEventListener('click', _print);
 
 const tagInput = document.querySelector('#input');
 const form = document.querySelector(".tag-form");
@@ -1953,9 +932,9 @@ const handleFormSubmit = (e) => {
 };
 
 tagInput.addEventListener('keyup', (e) => {
-    if (e.key === ',' || e.key === " ") {
-      createTag(tagInput.value.substring(0, tagInput.value.length - 1));
-    }
+  if (e.key === ',' || e.key === " ") {
+    createTag(tagInput.value.substring(0, tagInput.value.length - 1));
+  }
 });
 
 form.addEventListener('submit', handleFormSubmit);
@@ -1966,7 +945,6 @@ document.getElementById("settings").addEventListener('click', () => {
   // only allow the owner to edit the document settings
   if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
 
-  saveDocument();
   let eles = [];
 
   const title_ele = document.getElementById("settings-modal-document-title");
@@ -2015,7 +993,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(document.getElementById("settings-modal-document-authors"));
   eles.push(document.getElementById("settings-modal"));
 
-  [...new Set([ ...documentData.authors, documentData.owner.replace(/,/, ".") ])].forEach(createTag);
+  [...new Set([ ...documentData.authors, documentData.owner.replace(/,/g, ".") ])].forEach(createTag);
 
   eles.forEach(ele => {
     ele?.addEventListener('keydown', (e) => {
@@ -2030,9 +1008,7 @@ document.getElementById("settings").addEventListener('click', () => {
 });
 
 document.getElementById("settings-modal").addEventListener("hidden.bs.modal", () => {
-  saveDocument().then(() => {
-    window.location.reload();
-  });
+  window.location.reload();
 });
 
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
@@ -2047,10 +1023,8 @@ document.getElementById("settings-modal-save-btn").addEventListener('click', () 
   documentData.indentSize = parseInt(document.getElementById("settings-modal-document-indent-size").value);
   documentData.authors = [...new Set((tags.map(tag => tag.innerText.replace(/,/g, ".").replace(/✖/g, ""))))];
   tags = [...new Set(tags)];
-  saveDocument().then(() => {
-    saveSettings().then(() => {
-      window.location.reload();
-    });
+  saveSettings().then(() => {
+    window.location.reload();
   });
 });
 

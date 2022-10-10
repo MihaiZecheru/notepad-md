@@ -54,16 +54,14 @@
       <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
     </symbol>
   </svg>
-  <main>
-    <div class="form-group disable-highlighting"></div>
-    <div id="dotted-line"><div></div></div> <!-- don't remove the nested div -->
-    <div class="form-group">
-      <div class="align-items" style="justify-content: space-between;">
-        <div class="align-items">
-          <label for="document" class="disable-highlighting" style="margin-right: .5em;"><document-title>Untitled Document</document-title></label>
+  <main style="background: var(--nmd-blue)">
+    <div class="form-group" style="width: 100%; background: var(--nmd-blue);">
+      <div class="align-items" style="width: 100%; justify-content: space-between;">
+        <div class="align-items" style="color: black; margin-left: .5vw">
+          <span id="owner-display"></span>
         </div>
+        <h5><document-title style="margin-left: -7vw;" class="disable-highlighting">Untitled Document</document-title></h5>
         <div class="dropleft btn-group">
-          <span class="material-symbols-outlined fullscreen disable-highlighting" style="position: relative; top: 95%;" title="Document Fullscreen | Alt+2">fullscreen</span>
           <button class="dropdown-toggle disable-highlighting" type="button" id="export-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Export
           </button>
@@ -126,51 +124,33 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" tabindex="-1" id="file-upload-modal" aria-hidden="true">
+  <div class="modal fade" tabindex="-1" id="share-link-modal" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Confirm Upload</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="file-upload-modal-body">
-          Uploading your file will overwrite the current document.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="file-upload-modal-confirm-btn">Okay</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" tabindex="-1" id="file-upload-error-modal" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Upload Error</h5>
+          <h5 class="modal-title">Share Document</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          There was an error uploading your file.
+          <div>
+            <p>Share this link with others to allow them to view, edit, or copy this document. Sharing will only work if document visibility is set to public.</p>
+          </div>
+          <div class="input-group mb-2">
+            <input type="text" class="form-control" id="share-link-input" readonly>
+            <button class="btn btn-outline-secondary" type="button" id="copy-share-link">Copy</button>
+          </div>
+          <div>
+            <button id="share-view-link" class="btn btn-secondary">Get View-Link</button>
+            <button id="share-edit-link" class="btn btn-secondary">Get Edit-Link</button>
+            <button id="share-copy-link" class="btn btn-secondary">Get Copy-Link</button>
+            <button class="help-button disable-highlighting" tabindex="-1" data-bs-toggle="popover" data-bs-trigger="focus" title="Share Links" id="share-links-btn"
+            data-bs-content="View link: will only allow users to view the document. Edit link: will allow users to edit and view the document. Copy link: will make a new document for the user that's identical to yours.">
+                                                                                                                                                                              <span class="material-symbols-outlined">help</span></button>
+          </div>
+          <span id="snackbar">Successfully Copied</span>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal fade" tabindex="-1" id="only-one-file-upload-modal" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Upload Failed</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          You can only upload one file at a time.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>

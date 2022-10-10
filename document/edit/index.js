@@ -235,7 +235,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = documentData.title;
-  title_ele.style.color = "#0d6efd";
+  title_ele.style.color = "#28a745";
   document.title = documentData.title;
   notepad.setSelectionRange(0, 0);
 
@@ -1274,7 +1274,7 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
     document_title.style.color = "tomato";
   } else {
     documentData.title = new_title;
-    document_title.style.color = "#0d6efd";
+    document_title.style.color = "#28a745";
   }
 
   document.title = documentData.title;

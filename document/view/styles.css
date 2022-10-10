@@ -37,22 +37,7 @@ main {
 }
 
 document-title {
-  color: black;
-  cursor: pointer;
-}
-
-document-title:hover {
-  text-decoration: underline;
-}
-
-#markdown-reference-link {
-  text-decoration: none;
-  cursor: pointer;
-}
-
-#markdown-reference-link:hover {
-  text-decoration: underline;
-  color: #0d6efd;
+  color: white;
 }
 
 .dropdown-toggle {
@@ -86,7 +71,7 @@ document-title:hover {
   margin-top: 5vh;
   height: 90vh;
   overflow-y: scroll;
-  padding: .375rem .75rem;
+  padding: .375rem .75rem .375rem .25rem;
   border-radius: 0;
 }
 
