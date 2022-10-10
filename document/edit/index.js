@@ -1537,7 +1537,7 @@ document.body.addEventListener('keydown', (e) => {
   }
 
   // document settings
-  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/h, ".")) {
+  if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
     document.getElementById("settings").click();
   }
 
@@ -1614,7 +1614,7 @@ document.body.addEventListener('keydown', (e) => {
   // print
   if (e.ctrlKey && e.code === "KeyP") {
     e.preventDefault();
-    printDiv("document");
+    _print("document");
   }
 });
 
@@ -1724,18 +1724,16 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
   });
 });
 
-function printDiv(divName) {
+function _print() {
   // delete alert if it's open
-  document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-  var printContents = document.getElementById(divName).innerHTML;
+  document.getElementById("footnotes-alert-placeholder").remove();
+  var printContents = compileMarkdown(documentData.content);
   document.body.innerHTML = printContents;
   window.print();
   window.location.reload();
 }
 
-document.getElementById("print-document-btn").addEventListener('click', () => {
-  printDiv("document");
-});
+document.getElementById("print-document-btn").addEventListener('click', _print);
 
 document.getElementById('file-upload-modal-confirm-btn').addEventListener('click', () => {
   for (var i = 0, f; f = window.files[i]; i++) {
