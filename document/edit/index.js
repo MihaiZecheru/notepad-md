@@ -1515,27 +1515,6 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
 // minimize doc, fixes bug where on code mode the page opens with the doc in fullscreen
 for (let i = 0; i < 2; i++) document.querySelector(".dropleft > span").click();
 
-doc.addEventListener('keydown', (e) => {
-  if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
-    e.preventDefault();
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
-    return;
-  }
-  
-  if (e.code === "Escape" && doc.dataset.fullscreen === "true" ? true : false) {
-    e.preventDefault();
-    document.querySelectorAll("span.fullscreen")[1].click();
-    notepad.focus();
-    return;
-  }
-
-  if (e.ctrlKey && e.shiftKey && e.code === "KeyP") {
-    e.preventDefault();
-    new bootstrap.Modal(document.getElementById("word-count-modal")).show();
-    return;
-  }
-});
-
 document.body.addEventListener('keydown', (e) => {
   if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
     e.preventDefault();
