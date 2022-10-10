@@ -7,6 +7,10 @@
   font-weight: 600;
 }
 
+:root {
+  --nmd-blue: #477bff;
+}
+
 button:not(.document-button):not(#title-button):not(.btn):not(.btn-close):not(.help-button) {
   cursor: pointer;
   margin: 10px 0;
@@ -36,7 +40,7 @@ mark {
   width: 100vw;
   height: 5vh;
   bottom: 0;
-  background: #477bff;
+  background: var(--nmd-blue);
 }
 
 #footer span:nth-child(2) {
@@ -53,7 +57,7 @@ mark {
 
 .user-button {
   margin: auto;
-  background: #477bff;
+  background: var(--nmd-blue);
   color: black;
   padding-left: 0.5em!important;
   padding-right: 0.5em!important;
@@ -73,13 +77,13 @@ mark {
 }
 
 #word-count-modal-more-btn:hover {
-  background: #477bff;
+  background: var(--nmd-blue);
 }
 
 /* general purpose */
 
 .blue {
-  background-color: #477bff;
+  background-color: var(--nmd-blue);
 }
 
 .justify-content {
