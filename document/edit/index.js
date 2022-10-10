@@ -793,6 +793,13 @@ function insertText(text, cursor_movement = 0) {
   notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
 }
 
+document.body.addEventListener("keypress", (event) => {
+  if (event.key === "Tab") {
+    event.preventDefault();
+    notepad.focus();
+  }
+});
+
 document.addEventListener("keypress", (event) => {
   if (event.key === "Tab") {
     event.preventDefault();
