@@ -80,7 +80,7 @@ let documentData = {
   type: "markdown",
   visibility: "public",
   language: "en",
-  theme: "light",
+  theme: "default",
   font: "comfortaa",
   fontSize: 16,
   indentSize: 8,
@@ -137,8 +137,8 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.font = _doc?.font || documentData.font;
   documentData.fontSize = _doc?.fontSize || documentData.fontSize;
   documentData.indentSize = _doc?.indentSize || documentData.indentSize;
-  documentData.authors = _doc?.authors || email.replace(/,/g, ".");
-  console.log(documentData.visibility)
+  documentData.authors = _doc?.authors || [ email.replace(/,/g, ".") ];
+  documentData.authors = documentData.authors.map(author => author.replace(/,/g, "."));
 
   if (documentData.visibility !== "public" && documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) {
     window.location.href = "/account/me/documents/?error=private_document";
@@ -969,7 +969,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(language_ele);
 
   const theme_ele = document.getElementById("settings-modal-document-theme");
-  theme_ele.value = documentData.theme || "light";
+  theme_ele.value = documentData.theme || "default";
   eles.push(theme_ele);
 
   const font_ele = document.getElementById("settings-modal-document-font");
