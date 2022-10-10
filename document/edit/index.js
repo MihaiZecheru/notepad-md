@@ -390,14 +390,14 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
       notepad.focus();
     });    
   }
+
+  fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
+    method: "PUT",
+    body: JSON.stringify(getDate())
+  });
 });
 
 notepad.focus();
-
-fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}/last_visit.json`, {
-  method: "PUT",
-  body: JSON.stringify(getDate())
-});
 
 function uuid4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
