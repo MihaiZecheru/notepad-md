@@ -1266,7 +1266,7 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
   const document_title = document.querySelector("document-title");
 
   if (!new_title || new_title === "Untitled Document") {
-    documentData.title = "Unt itled Document";
+    documentData.title = "Untitled Document";
     document_title.style.color = "tomato";
   } else {
     documentData.title = new_title;
