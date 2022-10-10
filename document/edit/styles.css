@@ -353,3 +353,9 @@ pre {
   font-size: 1.75em;
   margin: auto;
 }
+
+#save-status {
+  float: right;
+  margin: 0!important;
+  color: #28a745;
+}
