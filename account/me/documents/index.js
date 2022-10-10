@@ -6,13 +6,34 @@ import { max_title_length } from "../../../modules/max_lengths.mjs";
 // do not remove this password var; it is used further down
 let email, password;
 
-function compileMarkdown(text, docType, indentSize, language) {
+function get_footnote_ids(value) {
+  const footnotes = [...new Set(value.match(/\[\^(\d{1,5})\]/g))];
+  if (!footnotes) return [];
+  return footnotes.map(x => x.match(/\d{1,5}/)[0]);
+}
+
+function get_footnote_count(value) {
+  const footnotes_ = {};
+  const footnotes = value.match(/\[\^(\d{1,5})\]/g);
+  footnotes?.forEach((footnote, i) => {
+    footnotes_[footnote] = (footnotes_[footnote] || 0) + 1;
+    if (footnotes_[footnote] > 2) footnotes_[footnote] = 2;
+  })
+  const sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
+  if (!footnotes) return 0;
+  return Math.ceil(sumValues(footnotes_) / 2);
+}
+
+function compileMarkdown(text, docType, indentSize, language, BOLD_COLOR) {
   // create a unique id for each set of footnotes in the document
-  const footnote_ids = get_footnote_ids();
+  const footnote_ids = get_footnote_ids(text);
   let footnote_uuids = {};
-  for (let i = 0; i < get_footnote_count(); i++) {
+  for (let i = 0; i < get_footnote_count(text); i++) {
     footnote_uuids[footnote_ids[i]] = uuid4();
   }
+
+  const _e_ = document.createElement("style");
+  _e_.innerHTML = BOLD_COLOR.startsWith('#') ? `b { color: ${BOLD_COLOR}; }` : `b { color: rgb(${BOLD_COLOR}); }`;
 
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
   text = "\n" + text + "\n";
@@ -236,10 +257,10 @@ function compileMarkdown(text, docType, indentSize, language) {
     }
     
     if (html.endsWith("<br>")) {
-      return html.substring(0, html.length - 4);
+      return html.substring(0, html.length - 4) + _e_.outerHTML;
     }
   
-    return html;
+    return html + _e_.outerHTML;
   } else if (docType === "code") {
     // <pre><code class="language-python">HTML</code></pre>
     const lang = langs[language];
@@ -348,7 +369,7 @@ async function createCard(doc) {
   }
   documents_.push(doc);
 
-  const preview = () => {
+  const preview = async () => {
     document.getElementById("preview-document-modal-title").innerText = doc.title;
     document.getElementById("preview-document-modal-content").innerHTML = `
     <style>
@@ -416,7 +437,11 @@ async function createCard(doc) {
       hr {
         margin: 0;
       }
-    </style>` + doc.content;
+    </style>` + compileMarkdown(doc.content, doc.type, doc.indentSize, doc.language, await fetch(
+      `https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${doc.id}/${email.replace(/\./g, ",")}/bold_color.json`, {
+        method: "GET"
+      }).then(r => r.json())
+    );
 
     document.querySelectorAll(".nmd-checkbox > input").forEach((checkbox) => {
       checkbox.addEventListener("click", (e) => {
