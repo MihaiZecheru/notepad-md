@@ -63,7 +63,7 @@ let documentData = {
   type: "markdown",
   visibility: "public",
   language: "en",
-  theme: "light",
+  theme: "default",
   font: "comfortaa",
   fontSize: 16,
   indentSize: 8,
@@ -150,10 +150,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.font = _doc?.font || documentData.font;
   documentData.fontSize = _doc?.fontSize || documentData.fontSize;
   documentData.indentSize = _doc?.indentSize || documentData.indentSize;
-  documentData.authors = _doc?.authors || email.replace(/,/g, ".");
+  documentData.authors = _doc?.authors || [ email.replace(/,/g, ".") ];
+  documentData.authors = documentData.authors.map(author => author.replace(/,/g, "."));
 
   // only document authors can access the edit page
-  if (!_doc.authors.includes(email.replace(/,/g, "."))) {
+  if (!documentData.authors.includes(email.replace(/,/g, "."))) {
     if (_doc.visibility === "public") {
       window.location.href = "/document/view/?id=" + document_uuid;
     } else {
@@ -653,6 +654,8 @@ function compileMarkdown(text) {
     code.textContent = text.replace(/&gt;/g, ">").replace(/&lt;/g, "<");;
     pre.appendChild(code);
     return pre.outerHTML;
+  } else if (documentData.type === "text") {
+    return text;
   }
 }
 
@@ -2019,7 +2022,7 @@ document.getElementById("settings").addEventListener('click', () => {
   eles.push(language_ele);
 
   const theme_ele = document.getElementById("settings-modal-document-theme");
-  theme_ele.value = documentData.theme || "light";
+  theme_ele.value = documentData.theme || "default";
   eles.push(theme_ele);
 
   const font_ele = document.getElementById("settings-modal-document-font");
