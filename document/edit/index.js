@@ -1407,7 +1407,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-doc.addEventListener*('keydown', (e) => {
+doc.addEventListener('keydown', (e) => {
   if (e.code === "Escape" && document.getElementById("footnotes-alert-placeholder").innerHTML !== "") {
     e.preventDefault();
     document.getElementById("footnotes-alert-placeholder").innerHTML = "";
