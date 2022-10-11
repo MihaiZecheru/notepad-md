@@ -1364,6 +1364,10 @@ function getHtml() {
   return html;
 }
 
+document.getElementById("make-a-copy-btn").addEventListener("click", () => {
+  window.location.href = `/document/copy/?id=${document_uuid}`;
+});
+
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
   download(`<!DOCTYPE>
   <html lang="en">
