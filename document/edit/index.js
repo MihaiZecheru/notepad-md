@@ -284,7 +284,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   documentData.title = _doc.title;
   const title_ele = document.querySelector("document-title");
   title_ele.innerText = documentData.title;
-  title_ele.style.color = "#28a745";
+  title_ele.style.color = (title_ele.innerText === "Untitled Document") ? "tomato" : "var(--nmd-blue)";
   document.title = documentData.title;
   notepad.setSelectionRange(0, 0);
 
@@ -1299,6 +1299,9 @@ modal_new_title_input.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
     document.querySelector("div.modal-footer #change").click();
+  } else if (event.ctrlKey && event.code === "KeyS") {
+    event.preventDefault();
+    document.querySelector("div.modal-footer #change").click();
   } else {
     const title_length = modal_new_title_input.value.length;
     if (title_length == max_title_length) {
@@ -1327,7 +1330,7 @@ document.querySelector("div.modal-footer #change").addEventListener("click", () 
     document_title.style.color = "tomato";
   } else {
     documentData.title = new_title;
-    document_title.style.color = "#28a745";
+    document_title.style.color = "var(--nmd-blue)";
   }
 
   document.title = documentData.title;
@@ -1710,7 +1713,9 @@ document.body.addEventListener('keydown', (e) => {
 
   // title
   if (e.altKey && e.shiftKey && e.code === "KeyT") {
-    document.querySelector("document-title").click();
+    modal_new_title_input.value = documentData.title;
+    new bootstrap.Modal(document.getElementById("change-title-modal")).show();
+    new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
     return;
   }
 
