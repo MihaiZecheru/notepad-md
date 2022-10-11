@@ -198,7 +198,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   notepad.style.fontSize = documentData.fontSize + 'px';
   notepad.style.tabSize = documentData.indentSize;
   notepad.style.fontFamily = fonts[documentData.font];
-  doc.style.fontFamily = fonts[documentData.font];
+
+  // add font to document, has to be done through style tag to get all children of #document
+  let style = document.createElement("style");
+  style.innerHTML = `#document *, #document { font-family: "${fonts[documentData.font]}"!important; }`;
+  document.head.appendChild(style);
   
   if (documentData.type !== "code") {
     doc.style.fontSize = documentData.fontSize + 'px';
@@ -526,6 +530,8 @@ function compileMarkdown(text) {
     .replace(/\\\]/g, "<RIGHTBRACKET>")
     .replace(/\\\{/g, "<LEFTBRACE>")
     .replace(/\\\}/g, "<RIGHTBRACE>")
+    .replace(/\\\</g, "<LEFTANGLE>")
+    .replace(/\\\>/g, "<RIGHTANGLE>")
     
     // blockquote
     .replace(/<br>>\s(.*?)<br>/g, "<div class='blockquote'>$1</div>")
@@ -661,6 +667,7 @@ function compileMarkdown(text) {
     .replace(/<RIGHTBRACKET>/g, "<span class='replaced-symbol'>]</span>")
     .replace(/<LEFTBRACE>/g, "<span class='replaced-symbol'>{</span>")
     .replace(/<RIGHTBRACE>/g, "<span class='replaced-symbol'>}</span>")
+    .replace(/<LEFTANGLE>/g, "<").replace(/<RIGHTANGLE>/g, ">")
 
     // save datbase storage space by removing empty elements (eg. user types **********, creating a bunch of empty <b> or <i> tags)
     .replace(/<i><\/i>/g, "")
@@ -1383,12 +1390,12 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     <link rel="stylesheet" href="https://notes.mzecheru.com/modules/snackbar.css">
   </head>
   <body>
-  ${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-      </symbol>
-    </svg>
+  ${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' +
+    '<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">' +
+      '<symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">' +
+        '<path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>' +
+      '</symbol>' +
+    '</svg>' : ''}
     ${getHtml()}
     <script>
       document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
@@ -1405,12 +1412,12 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
       }
      
       input[type='checkbox']:focus {
-        border: 1px solid rgba(0,0,0,.25)!important;;
+        border: 1px solid rgba(0,0,0,.25)!important;
         box-shadow: none!important;
       }
      
       *, body {
-        font-family: "Comfortaa";
+        font-family: "${fonts[documentData.font]}"!important;
         font-weight: 600;
       }
     </style>
@@ -1429,12 +1436,105 @@ document.getElementById("download-document-as-nmd-btn").addEventListener('click'
   download(getHtml(), `${documentData.title}.nmd`);
 });
 
+window.getComputedStyle = window.getComputedStyle || function(element) {
+  return element.currentStyle;
+}
+
+function getStylesWithoutDefaults( element ) {
+
+  // creating an empty dummy object to compare with
+  var dummy = document.createElement( 'element-' + ( new Date().getTime() ) );
+  document.body.appendChild( dummy );
+
+  // getting computed styles for both elements
+  var defaultStyles = getComputedStyle( dummy );
+  var elementStyles = getComputedStyle( element );
+
+  // calculating the difference
+  var diff = {};
+  for( var key in elementStyles ) {
+    if(elementStyles.hasOwnProperty(key)
+          && defaultStyles[ key ] !== elementStyles[ key ] )
+    {
+      diff[ key ] = elementStyles[ key ];
+    }
+  }
+
+  // clear dom
+  dummy.remove();
+  return diff;
+}
+
+function addInlineStyles(ele) {
+  [...ele.childNodes].filter((child) => child.toString() !== "[object Text]").forEach(child => {
+    if (child.children.length) {
+      addInlineStyles(child);
+    }
+    let styles_ = "";
+    for (const [key, value] of Object.entries(getStylesWithoutDefaults(child))) {
+      styles_ += `${key}:${value};`;
+    }
+    child.setAttribute("style", styles_);
+  });
+}
+
+/* replace classes with inline styles */
 document.getElementById("copy-html-btn").addEventListener('click', () => {
-  navigator.clipboard.writeText(getHtml());
+  new bootstrap.Modal(document.getElementById("copy-html-modal")).show();
+});
+
+document.getElementById("use-stylesheets-btn").addEventListener('click', () => {
+  let html = `<!DOCTYPE>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://notes.mzecheru.com/static/notepad.png">
+    <title>${documentData.title}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://notes.mzecheru.com/document/edit/styles.css">
+    <link rel="stylesheet" href="https://notes.mzecheru.com/default.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
+    <link rel="stylesheet" href="https://notes.mzecheru.com/modules/snackbar.css">
+  </head>
+  <body>
+    ${getHtml()}
+    <style>
+      *, body {
+        font-family: "${fonts[documentData.font]}"!important;
+        font-weight: 600;
+      }
+    </style>
+  </body>`;
+  navigator.clipboard.writeText(html);
+});
+
+document.getElementById("use-inline-styles-btn").addEventListener('click', () => {
+  document.body.style.cursor = "wait";
+  document.body.style.opacity = "0.5";
+
+  new Promise(_r => {
+    setTimeout(_r, 200);
+  }).then(() => {
+    (async () => {
+      let html = getHtml();
+      let ele = document.createElement("div");
+      ele.innerHTML = html;
+      document.head.appendChild(ele);
+      addInlineStyles(ele);
+      navigator.clipboard.writeText(ele.innerHTML);
+    })().then(() => {
+      document.body.style.cursor = "default";
+      document.body.style.opacity = "1";
+    });
+  });
 });
 
 document.getElementById("copy-md-btn").addEventListener('click', () => {
-  navigator.clipboard.writeText(notepad.value.trimEnd());
+  navigator.clipboard.writeText(documentData.content);
 });
 
 document.getElementById("download-notepad-as-txt-btn").addEventListener('click', () => {

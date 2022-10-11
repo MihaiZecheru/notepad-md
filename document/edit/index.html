@@ -137,6 +137,28 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" tabindex="-1" id="copy-html-modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Copy Document As HTML</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Add styles using stylesheets or inline styles.<br><br>
+
+          Stylesheets is fast and the recommended option when not submitting to Canvas, however 
+          Canvas removes style tags, so it's necessary to use inline styles.<br><br>
+          This option is often slow and results in thousands of characters being copied to your clipboard.
+        </div>
+        <div class="modal-footer" style="justify-content: space-evenly;">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="use-stylesheets-btn">Use Stylesheets</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="use-inline-styles-btn">Use Inline Styles</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Don't Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade" tabindex="-1" id="share-link-modal" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
