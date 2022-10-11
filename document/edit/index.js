@@ -228,7 +228,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   })();
 
-  if (documentData.type === "markdown") {
+  if (documentData.type !== "markdown") {
     document.getElementById("footnotes-alert-placeholder").remove();
   }
 
@@ -1370,12 +1370,17 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://notes.mzecheru.com/document/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
-    </script><link rel="stylesheet" href="../default.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/prettify.css">
+    <link rel="stylesheet" href="https://notes.mzecheru.com/document/edit/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://notes.mzecheru.com/default.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <script src="https://notes.mzecheru.com/modules/bootstrap-menu.js"></script>
     <script src="https://notes.mzecheru.com/modules/show_footer.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <link rel="stylesheet" href="https://notes.mzecheru.com/modules/snackbar.css">
   </head>
   <body>
   ${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>
@@ -1385,10 +1390,35 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
       </symbol>
     </svg>
     ${getHtml()}
+    <script>
+      document.querySelectorAll("input[type='checkbox']").forEach((checkbox) => {
+        checkbox.addEventListener("click", (e) => {
+          e.preventDefault();
+        });
+        checkbox.style.cursor = "not-allowed";
+        checkbox.title = "View in Notepad MD to enable checkboxes";
+      });
+    </script>
+    <style>
+      input[type='checkbox']:active {
+        filter: brightness(1)!important;
+      }
+     
+      input[type='checkbox']:focus {
+        border: 1px solid rgba(0,0,0,.25)!important;;
+        box-shadow: none!important;
+      }
+     
+      *, body {
+        font-family: "Comfortaa";
+        font-weight: 600;
+      }
+    </style>
     <a class="btn btn-primary" href="https://notes.mzecheru.com/document/?id=${document_uuid}" style="position: fixed; right: .5vw; bottom: 1vh;">View in Notepad MD</a>
     <style>
       body {
-        margin-left: 1em;
+        margin-left: .5em;
+        margin-right: .5em;
       }
     </style>
   </body>
