@@ -38,7 +38,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
     }).then(r => r.json()).then(() => {
       fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents_id_list/${email}.json`, {
         method: "POST",
-        body: JSON.stringify(document_uuid)
+        body: JSON.stringify(new_uuid)
       }).then(() => {
         // user document count
         cookie.document_count++;
