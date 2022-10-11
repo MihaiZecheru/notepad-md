@@ -2,6 +2,7 @@
 
 import { getCookie, setCookie } from "../../modules/cookies.mjs";
 import { max_title_length } from "../../modules/max_lengths.mjs";
+import CHECKBOX_IDS from "../../modules/checkbox_ids.mjs";
 import getDate from "../../modules/date.mjs";
 
 const parameters = new URLSearchParams(window.location.search);
@@ -213,6 +214,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>${previousHTML}`;
   hljs.highlightAll();
 
+  // update checkbox ids and add event listeners
+  (async () => {
+    let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
+    if (checkboxes.length) {
+      checkboxes.forEach((checkbox, i) => {
+        checkbox.id = CHECKBOX_IDS[i];
+
+        checkbox.addEventListener("change", (event) => {
+          updateCheckbox(email, event.target.id, event.target.checked);
+        });
+      });
+    }
+  })();
+
   if (documentData.type === "markdown") {
     document.getElementById("footnotes-alert-placeholder").remove();
   }
@@ -233,7 +248,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     if (checkboxes.length) {
       const checkbox_data = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, { method: 'GET' }).then(r => r.json());
       checkboxes.forEach((checkbox) => {
-        checkbox.checked = checkbox_data[checkbox.id];
+        checkbox.checked = checkbox_data[checkbox.id] === 1 ? true : false;
         checkbox.addEventListener("change", (event) => {
           updateCheckbox(email, event.target.id, event.target.checked);
         });
@@ -772,20 +787,11 @@ async function saveDocument() {
   (async () => {
     let checkboxes = Array.from(doc.querySelectorAll("input[type='checkbox']"));
     if (checkboxes.length) {
-      // delete previous checkbox data
-      fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}.json`, {
-        method: "DELETE",
-      });
-    
-      checkboxes.forEach((checkbox) => {
+      checkboxes.forEach((checkbox, i) => {
+        checkbox.id = CHECKBOX_IDS[i];
+
         checkbox.addEventListener("change", (event) => {
           updateCheckbox(email, event.target.id, event.target.checked);
-        });
-
-        // upload checkbox data
-        fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/checkboxes/${document_uuid}/${email}/${checkbox.id}.json`, {
-          method: "PUT",
-          body: JSON.stringify(checkbox.checked ? 1 : 0)
         });
       });
     }
