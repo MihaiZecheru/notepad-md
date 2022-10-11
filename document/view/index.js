@@ -160,6 +160,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
 
   if (documentData.type !== "code") {
     doc.style.fontFamily = fonts[documentData.font];
+    doc.style.fontSize = documentData.fontSize + 'px';
   }
 
   document.getElementById("owner-display").innerText = documentData.owner.replace(/,/g, ".");
@@ -176,9 +177,19 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     document.getElementsByTagName('head')[0].appendChild(style);
   }
 
-  doc.style.fontSize = documentData.fontSize + 'px';
-  doc.innerHTML = `<div id="footnotes-alert-placeholder"></div>${compileMarkdown(_doc.content) || ""}`;
+  let html = compileMarkdown(documentData.content);
+  
+  if (documentData.type === "code") {
+    html = html.substring(0, 39) + html.substring(40, html.length);
+  }
+  
+  doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>${html || ""}`;
   hljs.highlightAll();
+  hljs.initLineNumbersOnLoad();
+
+  if (documentData.type === "markdown") {
+    document.getElementById("footnotes-alert-placeholder").remove();
+  }
 
   // fill in checkboxes
   (async () => {
@@ -406,9 +417,9 @@ function compileMarkdown(text) {
     // table
     .replace(/(<br>\|\s?(.*?)\s?\|(?:(?!<br>).)*){2,}/g, (c) => {
       let rows = c.split('<br>').slice(1);
-      const headers = "<tr>" + rows.shift().split('|').slice(1, -1).map((header) => `<th><center>${header.trim()}</center></th>`).join("") + "</tr>";
-      const rows_html = rows.map((row) => "<tr>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-rig  ht-align">${cell.trim()}</td>` : `<td>${cell.trim()}</td>`).join("")) + "</tr>").join("");
-      return `<table>${headers}${rows_html}</table>`;
+      const headers = "<tr class='nmd-tr'>" + rows.shift().split('|').slice(1, -1).map((header) => `<th class="nmd-th"><center>${header.trim()}</center></th>`).join("") + "</tr>";
+      const rows_html = rows.map((row) => "<tr class='nmd-tr'>" + (row.split('|').slice(1, -1).map((cell) => row.endsWith('!') ? `<td class="nmd-td"><center>${cell.trim()}</center></td>` : row.endsWith('$') ? `<td class="table-right-align nmd-td">${cell.trim()}</td>` : `<td class="nmd-td">${cell.trim()}</td>`).join("")) + "</tr>").join("");
+      return `<table class="nmd-table">${headers}${rows_html}</table>`;
     })
 
     // footnote-bottom
@@ -563,7 +574,9 @@ function download(text, filename) {
 }
 
 function getHtml() {
-  return compileMarkdown(documentData.content);
+  let html = compileMarkdown(notepad.value.trimEnd());
+  if (documentData.type === "code") return html.substring(0, 39) + html.substring(40, html.length);
+  return html;
 }
 
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
@@ -587,7 +600,7 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     <script src="https://notes.mzecheru.com/modules/show_footer.js"></script>
   </head>
   <body>
-    <div id="footnotes-alert-placeholder"></div>
+    ${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
       <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
         <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
@@ -856,7 +869,10 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
 function _print() {
   // delete alert if it's open
   document.getElementById("footnotes-alert-placeholder").remove();
-  var printContents = compileMarkdown(documentData.content);
+  let printContents = compileMarkdown(documentData.content);
+  if (documentData.type === "code") {
+    printContents = printContents.substring(0, 39) + printContents.substring(40, printContents.length);
+  }
   document.body.innerHTML = printContents;
   window.print();
   window.location.reload();
