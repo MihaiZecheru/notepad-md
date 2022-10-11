@@ -158,8 +158,9 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   }
 
+  doc.style.fontFamily = fonts[documentData.font];
+  
   if (documentData.type !== "code") {
-    doc.style.fontFamily = fonts[documentData.font];
     doc.style.fontSize = documentData.fontSize + 'px';
   }
 
