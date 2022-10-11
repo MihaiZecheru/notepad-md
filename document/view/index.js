@@ -620,6 +620,33 @@ function getHtml() {
   return html;
 }
 
+const theme_links = {
+  "default": `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/googlecode.min.css"> <!-- default style is googlecode + default -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">`,
+  "dark": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/ia-dark.min.css" disabled="disabled" title="dark" id="theme-dark">`,
+  "light": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/ia-light.min.css" disabled="disabled" title="dark" id="theme-light">`,
+  "hopscotch": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/hopscotch.min.css" disabled="disabled" title="dark" id="theme-hopscotch">`,
+  "helios": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/helios.min.css" disabled="disabled" title="dark" id="theme-helios">`,
+  "papercolor": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/papercolor-dark.min.css" disabled="disabled" title="dark" id="theme-papercolor">`,
+  "solarized-light": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/solarized-light.min.css" disabled="disabled" title="dark" id="theme-solarized-light">`,
+  "unikitty-light": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/unikitty-light.min.css" disabled="disabled" title="dark" id="theme-unikitty-light">`,
+  "github": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github.min.css" disabled="disabled" title="dark" id="theme-github">`,
+  "github-dark": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark.min.css" disabled="disabled" title="dark" id="theme-github-dark">`,
+  "github-dark-dimmed": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/github-dark-dimmed.min.css" disabled="disabled" title="dark" id="theme-github-dark-dimmed">`,
+  "hybrid": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/hybrid.min.css" disabled="disabled" title="dark" id="theme-hybrid">`,
+  "kimbie-dark": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/kimbie-dark.min.css" disabled="disabled" title="dark" id="theme-kimbie-dark">`,
+  "kimbie-light": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/kimbie-light.min.css" disabled="disabled" title="dark" id="theme-kimbie-light">`,
+  "monokai": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/monokai.min.css" disabled="disabled" title="dark" id="theme-monokai">`,
+  "monokai-sublime": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/monokai-sublime.min.css" disabled="disabled" title="dark" id="theme-monokai-sublime">`,
+  "snazzy": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/snazzy.min.css" disabled="disabled" title="dark" id="theme-snazzy">`,
+  "outrun-dark": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/outrun-dark.min.css" disabled="disabled" title="dark" id="theme-outrun-dark">`,
+  "felipec": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/felipec.min.css" disabled="disabled" title="dark" id="theme-felipec"> `,
+  "mocha": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/base16/mocha.min.css" disabled="disabled" title="dark" id="theme-mocha">`,
+  "rainbow": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/rainbow.min.css" disabled="disabled" title="dark" id="theme-rainbow">`,
+  "nord": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/nord.min.css" disabled="disabled" title="dark" id="theme-nord">`,
+  "pycharm": `<link rel="alternate stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/shades-of-purple.min.css" disabled="disabled" title="dark" id="theme-pycharm"></link>`
+};
+
 document.getElementById("download-document-as-html-btn").addEventListener('click', () => {
   download(`<!DOCTYPE>
   <html lang="en">
@@ -639,6 +666,7 @@ document.getElementById("download-document-as-html-btn").addEventListener('click
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/prettify.css">
     <script src="https://notes.mzecheru.com/modules/show_footer.js"></script>
+    ${theme_links[documentData.theme]}
   </head>
   <body>
   ${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' +
@@ -749,6 +777,7 @@ document.getElementById("use-stylesheets-btn").addEventListener('click', () => {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/> <!-- 'nano' theme -->
     <link rel="stylesheet" href="https://notes.mzecheru.com/modules/snackbar.css">
+    ${theme_links[documentData.theme]}
   </head>
   <body>
     ${getHtml()}
