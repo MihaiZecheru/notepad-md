@@ -17,6 +17,7 @@ if (!getCookie("nmd-validation")) {
 }
 
 let BOLD_COLOR = "#FF69B4";
+let LINE_NUMBERS_ENABLED;
 
 function get_footnote_ids(value) {
   const footnotes = [...new Set(value.match(/\[\^(\d{1,5})\]/g))];
@@ -44,7 +45,13 @@ if (!document_uuid) window.location.href = "/account/me/documents/?error=missing
 
 const email = JSON.parse(getCookie("nmd-validation")).email.replace(/\./g, ",");
 
-async function saveSettings() {
+async function saveSettings(update_line_numbers_enabled = true) {
+  if (update_line_numbers_enabled) {
+    await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/line_numbers.json`, {
+      method: 'PUT',
+      body: JSON.stringify(LINE_NUMBERS_ENABLED)
+    }).then(res => res.json());
+  }
   await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document_uuid}.json`, {
     method: 'PUT',
     body: JSON.stringify(documentData)
@@ -153,13 +160,16 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
       if (lang !== _doc_lang) {
         documentData.content = documentData.content.replace(/<code class="language-(.*?)">/g, `<code class="language-${lang}">`);
         // upload to firebase
-        saveSettings();
+        saveSettings(false);
       }
     }
+
+    // add "line-numbers" toggle switch to settings menu
+    document.getElementById("line-numbers-toggle").style.display = "block";
   }
 
   doc.style.fontFamily = fonts[documentData.font];
-  
+
   if (documentData.type !== "code") {
     doc.style.fontSize = documentData.fontSize + 'px';
   }
@@ -186,11 +196,20 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   
   doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>${html || ""}`;
   hljs.highlightAll();
-  hljs.initLineNumbersOnLoad();
 
   if (documentData.type === "markdown") {
     document.getElementById("footnotes-alert-placeholder").remove();
   }
+
+  (async () => {
+    LINE_NUMBERS_ENABLED = await fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/line_numbers.json`, { method: 'GET' }).then(res => res.json()) || false;
+    if (LINE_NUMBERS_ENABLED) {
+      document.getElementById("line-numbers-switch").checked = true;
+      hljs.initLineNumbersOnLoad();
+    } else {
+      document.getElementById("line-numbers-switch").checked = false;
+    }
+  })();
 
   // fill in checkboxes
   (async () => {
@@ -1029,6 +1048,7 @@ document.getElementById("settings-modal").addEventListener("hidden.bs.modal", ()
 });
 
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
+  LINE_NUMBERS_ENABLED = document.getElementById("line-numbers-switch").checked;
   documentData.title = document.getElementById("settings-modal-document-title").value;
   documentData.description = document.getElementById("settings-modal-document-description").value;
   documentData.visibility = document.getElementById("settings-modal-document-visibility").value;
@@ -1053,6 +1073,16 @@ document.getElementById("settings-modal-document-description").addEventListener(
     return;
   }
   settingsModalDocumentDescriptionCharacterCounter.innerText = remainingChars;
+});
+
+// add "line-numbers" toggle switch to settings menu
+document.getElementById("settings-modal-document-type").addEventListener('change', (e) => {
+  if (e.target.value === "code") {
+    document.getElementById("line-numbers-switch").checked = LINE_NUMBERS_ENABLED;
+    document.getElementById("line-numbers-toggle").style.display = "block";
+  } else {
+    document.getElementById("line-numbers-toggle").style.display = "none";
+  }
 });
 
 // initialize popovers
