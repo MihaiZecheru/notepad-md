@@ -1620,7 +1620,7 @@ document.body.addEventListener('keydown', (e) => {
     const { total_words, indiv_words_count } = wordOccurrence(text);
     let expand_level = 1;
 
-    const sentences = text.split(".").map(sentence => sentence.replace(/\n/g, " ")).filter(sentence => sentence.length >= 7);
+    const sentences = text.split(".").map(sentence => sentence.replace(/\n/g, " ")).filter(sentence => sentence.trim().length >= 7);
     const sentence_count = sentences.length;
     const avg_words_per_sentence = (total_words / sentences.length).toFixed(2);
     document.getElementById("word-count-modal-body").innerHTML = `
