@@ -617,7 +617,7 @@ function download(text, filename) {
 }
 
 function getHtml() {
-  let html = compileMarkdown(notepad.value.trimEnd());
+  let html = `<div style='font-family: "${fonts[documentData.font]}"; font-weight: 600;'>${compileMarkdown(documentData.content)}</div>`;
   // if (documentData.type === "code") return html.substring(0, 39) + html.substring(40, html.length);
   return html;
 }
@@ -781,7 +781,7 @@ document.getElementById("use-stylesheets-btn").addEventListener('click', () => {
     <link rel="stylesheet" href="https://notes.mzecheru.com/modules/snackbar.css">
     ${theme_links[documentData.theme]}
   </head>
-  <body>
+  <body style='font-family: "${fonts[documentData.font]}"!important; font-weight: 600!important;'>
     ${getHtml()}
     <style>
       *, body {
