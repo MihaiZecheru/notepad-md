@@ -253,7 +253,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/${JSON.parse(getCookie('nmd-validation')).email.replace(/\./g, ",")}/bold_color.json`, { 
     method: 'GET'
   }).then(res => res.json()).then(d => {
-    BOLD_COLOR = d;
+    BOLD_COLOR = d || "#FF69B4";
     const _e_ = document.createElement("style");
     _e_.innerHTML = d.startsWith('#') ? `b { color: ${d}; }` : `b { color: rgb(${d}); }`;
     document.body.appendChild(_e_);
