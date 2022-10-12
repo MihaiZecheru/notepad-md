@@ -586,7 +586,7 @@ function compileMarkdown(text) {
     })
 
     // horizontal rule
-    .replace(/<br>---/g, "<br><hr>")
+    .replace(/<br>---<br>/g, "<br><hr>")
 
     // unordered list
     .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
