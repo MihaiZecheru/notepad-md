@@ -17,7 +17,7 @@ if (!getCookie("nmd-validation")) {
   }
 }
 
-let BOLD_COLOR = "#FF69B4";
+let BOLD_COLOR = "255, 105, 180"; // #FF69B4 - pink
 let LINE_NUMBERS_ENABLED;
 
 function get_footnote_ids(value) {
@@ -69,7 +69,7 @@ async function addBoldEventListeners() {
           name: "Change Color",
           onClick: () => {
             // select current element
-            document.querySelector(`.circle-picker > span > div > span > div[style*='box-shadow: ${BOLD_COLOR.startsWith("#") ? BOLD_COLOR : BOLD_COLOR.includes(",") ? "rgb(" + BOLD_COLOR + ")" : BOLD_COLOR}']`).click();
+            document.querySelector(`.circle-picker > span > div > span > div[style*='box-shadow: rgb(${BOLD_COLOR})]`).click();
             new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
           }
         }]
@@ -253,7 +253,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/configurations/${document_uuid}/${JSON.parse(getCookie('nmd-validation')).email.replace(/\./g, ",")}/bold_color.json`, { 
     method: 'GET'
   }).then(res => res.json()).then(d => {
-    BOLD_COLOR = d || "#FF69B4";
+    BOLD_COLOR = d || "255, 105, 180";
     const _e_ = document.createElement("style");
     _e_.innerHTML = d.startsWith('#') ? `b { color: ${d}; }` : `b { color: rgb(${d}); }`;
     document.body.appendChild(_e_);
