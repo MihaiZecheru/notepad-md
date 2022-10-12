@@ -211,9 +211,9 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   notepad.value = previousText = _doc.content || "";
   previousHTML = compileMarkdown(_doc.content) || "";
   
-  if (documentData.type === "code" && previousHTML) {
-    previousHTML = previousHTML.substring(0, 39) + previousHTML.substring(40, previousHTML.length);
-  }
+  // if (documentData.type === "code" && previousHTML) {
+  //   previousHTML = previousHTML.substring(0, 39) + previousHTML.substring(40, previousHTML.length);
+  // }
 
   doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>${previousHTML}`;
   hljs.highlightAll();
@@ -233,7 +233,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   })();
 
   if (documentData.type !== "markdown") {
-    document.getElementById("footnotes-alert-placeholder").remove();
+    document.getElementById("footnotes-alert-placeholder")?.remove();
   }
 
   (async () => {
@@ -468,7 +468,9 @@ function compileMarkdown(text) {
   }
 
   // add new line to the bottom so that blockquotes at the bottom of the document get recognized, and to the top so lists at the top get recognized
-  text = "\n" + text + "\n";
+  if (documentData.type !== "code") {
+    text = "\n" + text + "\n";
+  }
 
   // tab
   if (documentData.type !== "code") {
@@ -702,7 +704,7 @@ function compileMarkdown(text) {
     const pre = document.createElement("pre");
     const code = document.createElement("code");
     code.classList.add("language-" + lang);
-    code.textContent = text.replace(/&gt;/g, ">").replace(/&lt;/g, "<");;
+    code.textContent = text.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
     pre.appendChild(code);
     return pre.outerHTML;
   } else if (documentData.type === "text") {
@@ -765,9 +767,9 @@ async function saveDocument() {
   // compile the markdown to html
   let html = compileMarkdown(text);
 
-  if (documentData.type === "code") {
-    html = html.substring(0, 39) + html.substring(40, html.length);
-  }
+  // if (documentData.type === "code") {
+  //   html = html.substring(0, 39) + html.substring(40, html.length);
+  // }
 
   // check if the new html is different from the previous html
   if (html === previousHTML) {
@@ -1363,7 +1365,7 @@ function download(text, filename) {
 
 function getHtml() {
   let html = compileMarkdown(notepad.value.trimEnd());
-  if (documentData.type === "code") return html.substring(0, 39) + html.substring(40, html.length);
+  // if (documentData.type === "code") return html.substring(0, 39) + html.substring(40, html.length);
   return html;
 }
 
@@ -1946,11 +1948,11 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
 
 function _print() {
   // delete alert if it's open
-  document.getElementById("footnotes-alert-placeholder").remove();
+  document.getElementById("footnotes-alert-placeholder")?.remove();
   let printContents = compileMarkdown(documentData.content);
-  if (documentData.type === "code") {
-    printContents = printContents.substring(0, 39) + printContents.substring(40, printContents.length);
-  }
+  // if (documentData.type === "code") {
+  //   printContents = printContents.substring(0, 39) + printContents.substring(40, printContents.length);
+  // }
   document.body.innerHTML = printContents;
   window.print();
   window.location.reload();
