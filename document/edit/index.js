@@ -918,7 +918,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       case "KeyR":
         if (documentData.type === "markdown") {
           event.preventDefault();
-          insertText("---");
+          insertText("---\n");
         }
         break;
 
