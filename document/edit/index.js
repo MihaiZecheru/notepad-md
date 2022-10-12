@@ -1653,7 +1653,7 @@ doc.addEventListener('keydown', (e) => {
 document.querySelector("main div > span").addEventListener('click', () => {
   if (NOTEPAD_DISABLED) return;
   const notepad_fullscreen = notepad.dataset.fullscreen === "true" ? true : false;
-  
+
   if (!notepad_fullscreen) {
     notepad.style.position = "fixed";
     notepad.style.width = "98.75vw";
@@ -1686,13 +1686,20 @@ document.querySelector("main div > span").addEventListener('click', () => {
 let doc_fullscreen_previous_styles = {};
 document.querySelector(".dropleft > span").addEventListener('click', () => {
   const doc_fullscreen = doc.dataset.fullscreen === "true" ? true : false;
+  const notepad_fullscreen = notepad.dataset.fullscreen === "true" ? true : false;
+  
+  if (notepad_fullscreen) {
+    // notepad is fullscreen, so we need to exit it first
+    document.querySelector("main div > span").click();
+  };
+
   if (!doc_fullscreen) {
     doc.style.position = "absolute";
     doc.style.top = "0";
     doc.style.left = "0";
     doc.style.width = "100vw";
     doc.style.height = "95vh";
-    
+
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
     fullscreen_box.innerText = "fullscreen_exit";
