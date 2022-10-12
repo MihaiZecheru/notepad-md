@@ -1053,6 +1053,10 @@ document.querySelectorAll(".circle-picker span > div > span > div").forEach(_ele
   });
 });
 
+document.getElementById("make-a-copy-btn").addEventListener("click", () => {
+  window.location.href = `/document/copy/?id=${document_uuid}`;
+});
+
 function _print() {
   // delete alert if it's open
   document.getElementById("footnotes-alert-placeholder").remove();
