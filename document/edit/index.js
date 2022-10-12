@@ -591,7 +591,7 @@ function compileMarkdown(text) {
     // unordered list
     .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
       const content = c.substring(6 + 42 + 2);
-      return `<ul><li style="list-style: none; margin-top: -1.5em"><ul><li>${content}</li></ul></li></ul>`;
+      return `<ul><li style="list-style: none;"><ul><li>${content}</li></ul></li></ul>`;
     })
     .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
       const content = c.substring(6);
@@ -603,7 +603,7 @@ function compileMarkdown(text) {
     .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
       const number = c.match(/\d{1,3}\./g)[0];
       const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
-      return `<ul style="margin-top: -1.5em"><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+      return `<ul><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
     })
 
     .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
