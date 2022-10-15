@@ -447,7 +447,7 @@ function compileMarkdown(text) {
     .replace(/\{\{(.*?)\}\}<br>/g, "<div style='text-align: right;'>$1</div>")
     
     // center brackets
-    .replace(/\{(.*?)\}/g, "<center>$1</center>")
+    .replace(/\{(.*?)\}<br>/g, "<center>$1</center>")
 
     // headers
     .replace(/#{5}\s?(.*?)<br>/g, "<h5>$1</h5>")
