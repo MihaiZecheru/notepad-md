@@ -514,7 +514,11 @@ function compileMarkdown(text) {
   }
 
   if (documentData.type === "markdown") {
-    let html = text.replace(/\n/g, "<br>")
+    // angle brackets
+    let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+
+    // newline
+    .replace(/\n/g, "<br>")
 
     // escape characters
     .replace(/\\\#/g, "<HASHTAG>")
@@ -686,8 +690,6 @@ function compileMarkdown(text) {
     .replace(/<h5><\/h5>/g, "")
     .replace(/<mark><\/mark>/g, "")
     .replace(/<div class='blockquote'><\/div>/g, "")
-
-    html = html.replace(/&gt;/g, ">").replace(/&lt;/g, "<");
 
     if (html.startsWith("<br>")) {
       html = html.substring(4, html.length);
