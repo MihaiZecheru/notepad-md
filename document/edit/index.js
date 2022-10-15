@@ -751,15 +751,14 @@ async function updateCheckbox(email, element_id, status) {
 }
 
 async function saveDocument() {
-  showSpinner();
   let text = notepad.value;
-
+  
   if (text === previousText) {
-    hideSpinner();
     setSaveStatus("saved");
     return;
   }
   
+  showSpinner();
   setSaveStatus("saving");
   text = text.trimEnd();
 
