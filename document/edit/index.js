@@ -639,7 +639,7 @@ function compileMarkdown(text) {
       const footnote_id = c.substring(2, c.indexOf("]"));
       const footnote_uuid = footnote_uuids[footnote_id];
       const footnote_content = c.substring(c.indexOf("]: ") + 3, c.length - 4);
-      return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><u><sup>${footnote_id}</sup></u> ${footnote_content}</span><br>`;
+      return `<span class='footnote-bottom' data-footnote-id="${footnote_id}" id="${footnote_uuid}"><sup><u>${footnote_id}</u></sup> ${footnote_content}</span><br>`;
     })
 
     // footnote-top
