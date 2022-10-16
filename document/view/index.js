@@ -420,30 +420,579 @@ function compileMarkdown(text) {
     })
 
     // horizontal rule
-    .replace(/<br>---<br>/g, "<br><hr>")
+    .replace(/<br>---<br>/g, "<br><hr>");
 
-    // unordered list
-    .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
-      const content = c.substring(6 + 42 + 2);
-      return `<ul><li style="list-style: none;"><ul><li>${content}</li></ul></li></ul>`;
-    })
-    .replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
+    const isUpperCase = (string) => /^[A-Z]*$/.test(string);
+    const indent_space = documentData.indentSize * 6;
+
+    const alphas = {
+      'a': '1', 'b': '2', 'c': '3',
+      'd': '4', 'e': '5', 'f': '6',
+      'g': '7', 'h': '8', 'i': '9',
+      'j': '10', 'k': '11', 'l': '12',
+      'm': '13', 'n': '14', 'o': '15',
+      'p': '16', 'q': '17', 'r': '18',
+      's': '19', 't': '20', 'u': '21',
+      'v': '22', 'w': '23', 'x': '24',
+      'y': '25', 'z': '26'
+    };
+
+    // nested unordered list, nested ordered list, & nested alpha list
+    switch (documentData.indentSize) {
+      case 2:
+        html = html.replace(/(&nbsp;){6}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+
+        })
+        
+        .replace(/(&nbsp;){4}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){2}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){6}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){4}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){2}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 6];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){4}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 4];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){2}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 2];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 3:
+        html = html.replace(/(&nbsp;){9}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){6}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){3}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){9}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){6}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){3}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){9}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 9];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 6];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){3}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 3];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 4:
+        html = html.replace(/(&nbsp;){12}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){4}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){12}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){4}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){12}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 12];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){8}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 8];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){4}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 4];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 5:
+        html = html.replace(/(&nbsp;){15}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){10}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){5}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){15}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){10}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){5}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){15}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 15];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){10}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 10];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){5}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 5];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 6:
+        html = html.replace(/(&nbsp;){18}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){12}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){6}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){18}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){12}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){6}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){18}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 18];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){12}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 12];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 6];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 7:
+        html = html.replace(/(&nbsp;){21}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){14}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){7}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){21}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){14}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){7}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){21}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 21];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){14}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 14];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){7}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 7];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 8:
+        html = html.replace(/(&nbsp;){24}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){16}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){8}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){24}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){16}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){24}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 24];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){16}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 16];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){8}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 8];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 9:
+        html = html.replace(/(&nbsp;){27}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){18}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){9}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){27}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){18}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){9}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){27}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 27];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){18}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 18];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){9}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 9];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+
+      case 10:
+        html = html.replace(/(&nbsp;){30}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 3 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-circle"><li>${content}</ul></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){20}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space * 2 + 2);
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul class="list-disc"><li>${content}</li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){10}- (.*?)(?:(?!<br>).)*/g, (c) => {
+          const content = c.substring(indent_space + 2);
+          return `<ul><li class="compiled-list"><ul><li>${content}</li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){30}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 3));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){20}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + (indent_space * 2));
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){10}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const number = c.match(/\d{1,3}/g)[0];
+          const content = c.substring(2 + number.length + indent_space);
+          return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){30}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 30];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 3));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+        })
+        
+        .replace(/(&nbsp;){20}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 20];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + (indent_space * 2));
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+        })
+
+        .replace(/(&nbsp;){10}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+          const letter = c.match(/[A-Za-z]/g)[4 * 10];
+          const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+          const content = c.substring(3 + indent_space);
+          const type = isUpperCase(letter) ? "A" : "a";
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+        });
+        break;
+    }
+
+    // regular unordered list
+    html = html.replace(/<br>- (.*?)(?:(?!<br>).)*/g, (c) => {
       const content = c.substring(6);
       return `<ul><li>${content}</li></ul>`;
     })
-    .replace(/<\/ul><br>/g, "</ul><br>")
-    
-    // ordered list
-    .replace(/(&nbsp;){8}\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
-      const number = c.match(/\d{1,3}\./g)[0];
-      const content = c.substring(c.indexOf(/\d{1,3}/g) + 6 + number.length + 44);
-      return `<ul><li style="list-style: none"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
-    })
+    .replace(/<\/ul><br>/g, "</ul>")
 
+    // regular ordered list
     .replace(/<br>\d{1,3}\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
       const number = c.match(/\d{1,3}/g)[0];
       const content = c.substring(c.indexOf(/\d{1,3}/g) + 5 + number.length + 2);
       return `<ol start="${number}"><li>${content}</li></ol>`;
+    })
+
+    // regular alpha list
+    .replace(/<br>[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+      const letter = c.match(/[A-Za-z]/g)[2];
+      const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
+      const content = c.substring(7);
+      const type = isUpperCase(letter) ? "A" : "a";
+      return `<ol type="${type}" start="${alpha}"><li>${content}</li></ol>`;
     })
     .replace(/<\/ol><br>/g, "</ol><br>")
 

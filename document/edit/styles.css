@@ -372,3 +372,28 @@ code {
 .hljs-ln-n {
   margin-right: .5em;
 }
+
+.compiled-list {
+  list-style: none;
+}
+
+.list-disc {
+  list-style-type: disc;
+}
+
+.list-circle {
+  list-style-type: circle;
+}
+
+ol.remove-list-padding {
+  padding-left: 1.25rem!important ;
+}
+
+ol > li.list-parenthesis {
+  list-style: none;
+}
+
+ol > li.list-parenthesis:before {
+  content: counter(list, lower-alpha) ") ";
+  counter-increment: list;
+}
