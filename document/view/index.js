@@ -1148,17 +1148,11 @@ async function updateCheckbox(email, element_id, status) {
   });
 }
 
-document.body.addEventListener("keypress", (event) => {
-  if (event.key === "Tab") {
-    event.preventDefault();
-    doc.focus();
-  }
-});
-
 document.addEventListener("keypress", (event) => {
   if (event.key === "Tab") {
     event.preventDefault();
     doc.focus();
+    return;
   }
 });
 
@@ -1168,7 +1162,10 @@ document.querySelector("document-title").addEventListener("click", () => {
   if (documentData.owner.replace(/,/g, ".") !== email.replace(/,/g, ".")) return;
   modal_new_title_input.value = documentData.title;
   new bootstrap.Modal(document.getElementById("change-title-modal")).show();
-  new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
+});
+
+document.getElementById("change-title-modal").addEventListener("shown.bs.modal", () => {
+  modal_new_title_input.select();
 });
 
 modal_new_title_input.addEventListener("keydown", (event) => {
@@ -1474,9 +1471,15 @@ document.body.addEventListener('keydown', (e) => {
     return;
   }
 
-  // document settings
   if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
     document.getElementById("settings").click();
+    return;
+  }
+
+  if (e.key === "Tab") {
+    e.preventDefault();
+    notepad.focus();
+    return;
   }
 
   // document summary
@@ -1861,3 +1864,11 @@ document.getElementById("settings-modal-document-type").addEventListener('change
 
 // initialize popovers
 [...document.querySelectorAll('[data-bs-toggle="popover"]')].forEach(el => new bootstrap.Popover(el))
+
+document.getElementById("settings-modal").addEventListener("shown.bs.modal", () => {
+  document.getElementById("settings-modal-document-title").select();
+});
+
+document.getElementById("search-modal").addEventListener("hidden.bs.modal", () => {
+  document.querySelector(".modal-backdrop.fade.show").remove();
+});
