@@ -1494,6 +1494,105 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
+  // table cell move
+  if (event.key === "Tab") {
+    event.preventDefault();
+    const lines = notepad.value.split("\n");
+    const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+
+    let start_of_line = 0;
+    for (let i = 0; i < line - 1; i++) {
+      start_of_line += lines[i].length + 1;
+    }
+    
+    const end_of_line = start_of_line + lines[line - 1].length;
+    let line_content = notepad.value.substring(start_of_line, end_of_line).trim();
+
+    if (line_content.startsWith("|") && line_content.endsWith("|")) {
+      // line_content = line_content.substring(1, line_content.length - 1);
+      const cells = line_content.split("|");
+      let cell = 0;
+      let cell_start = 0;
+
+      for (let i = 0; i < cells.length; i++) {
+        cell_start += cells[i].length + 1;
+        if (cell_start > notepad.selectionStart - start_of_line) {
+          cell = i;
+          break;
+        }
+      }
+
+      if (cell === cells.length - 2) {
+        // last cell, go to newline
+        if (!event.shiftKey) {
+          notepad.selectionStart = notepad.selectionEnd = end_of_line + 1;
+          return;
+        }
+      }
+
+      if (cell === cells.length - 1) {
+        if (!event.shiftKey) {
+          notepad.selectionStart = notepad.selectionEnd = start_of_line + cell_start + 2;
+        } else {
+          // go to previous cell
+          if (notepad.value[start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 2] === " ") {
+            notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 1;
+          } else {
+            notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 2;
+          }
+
+          if (notepad.value[start_of_line + cell_start - cells[cell].length - 3] === " ") {
+            notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 3;
+          } else {
+            notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 2;
+          }
+        }
+      } else {
+        if (event.shiftKey) {
+          if (cell === 0) {
+            notepad.selectionStart = notepad.selectionEnd = start_of_line - 1;
+            return;
+          }
+
+          // go to previous cell
+          if (notepad.value[start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 2] === " ") {
+            notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 1;
+          } else {
+            notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 2;
+          }
+
+          if (notepad.value[start_of_line + cell_start - cells[cell].length - 3] === " ") {
+            notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 3;
+          } else {
+            notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 2;
+          }
+
+          // notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 1;
+          // notepad.selectionEnd = start_of_line + cell_start - cells[cell - 1].length - 4;
+        } else {
+          // go to next cell
+          if (notepad.value[start_of_line - 1 + cell_start + cells[cell + 1].length] !== " ") {
+            notepad.selectionStart = start_of_line + cell_start;
+            notepad.selectionEnd = start_of_line + cell_start + cells[cell + 1].length;
+          } else {
+            if (notepad.value[start_of_line + cell_start] !== " ") {
+              notepad.selectionStart = start_of_line + cell_start;
+              notepad.selectionEnd = start_of_line + cell_start + cells[cell + 1].length - 1;
+            } else {
+              notepad.selectionStart = start_of_line + cell_start + 1;
+              notepad.selectionEnd = start_of_line + cell_start + cells[cell + 1].length - 1;
+            }
+          }
+        }
+      }
+    } else {
+      if (!event.shiftKey) {
+        insertText("\t");
+      }
+    }
+    return;
+  }
+
   // move the line back 1-tab worth
   if (event.code === "Tab" && event.shiftKey && notepad.selectionStart === notepad.selectionEnd) {
     event.preventDefault();
@@ -1533,13 +1632,6 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
-  // replace tab with \t
-  if (event.key === "Tab") {
-    event.preventDefault();
-    setSaveStatus("not-saved");
-    insertText("\t");
-  }
-  
   if (event.altKey) {
     switch (event.code) {
       // scroll down
