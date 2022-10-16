@@ -388,17 +388,40 @@ function compileMarkdown(text) {
     .replace(/!\[(.*?)\]\((.*?)\)/g, (c) => {
       const uuid = uuid4();
       const content = c.match(/\[(.*?)\]/g)[0];
+      const match = content.match(/\d+x\d+/g);
       const url = c.match(/\((.*?)\)/g)[0];
-      return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: 100%;"><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`
+      let width, height;
+      
+      if (match) {
+        width = match[0].split("x")[0];
+        height = match[0].split("x")[1];
+      }
+
+      if (width && height) {
+        return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: ${width}%!important; height: ${height}%!important;">`;
+      } else {
+        return `<img src="${url.substring(1, url.length - 1)}" alt="${content.substring(1, content.length - 1)}" id="${uuid}" style="width: 100%;"><label class="document-content-label" for="${uuid}">${content.substring(1, content.length - 1)}</label>`;
+      }
     })
 
     // video and embed
     .replace(/(\$|&)\[(.*?)\]\((.*?)\)/g, (c) => {
       const uuid = uuid4();
       const content = c.match(/\[(.*?)\]/g)[0];
+      const match = content.match(/\d+x\d+/g);
       const url = c.match(/\((.*?)\)/g)[0];
-      const height = content.substring(1, content.length - 1);
-      return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`
+      let width, height;
+
+      if (match) {
+        width = match[0].split("x")[0];
+        height = match[0].split("x")[1];
+      }
+      
+      if (width && height) {
+        return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="${width}%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`;
+      } else {
+        return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="100%" height="100%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`;
+      }
     })
 
     // hyperlink
