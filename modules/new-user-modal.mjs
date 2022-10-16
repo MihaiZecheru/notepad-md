@@ -30,8 +30,8 @@ export function createNewUserModal() {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="new-user">
-          <p>
-            Hey there! It looks like you're new here. Welcome to Notepad MD! If you're unfamiliar with markdown or this website, you can learn more about it on our help page <a href="/help/#markdown" rel="noopener noreferrer" target="_blank">here</a>.
+          <p style="margin-bottom: 0!important">
+            Hey there! It looks like you're new here. Welcome to Notepad MD!<br><br>If you're unfamiliar with markdown or this website, you can learn more about it on our help page <a href="/help/#markdown" rel="noopener noreferrer" target="_blank">here</a>.
           </p>
         </div>
         <div class="modal-footer">
