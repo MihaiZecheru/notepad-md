@@ -1453,17 +1453,17 @@ function insertText(text, cursor_movement = 0) {
   notepad.selectionStart = notepad.selectionEnd = start + text.length + cursor_movement;
 }
 
-document.body.addEventListener("keypress", (event) => {
-  if (event.key === "Tab") {
-    event.preventDefault();
-    notepad.focus();
-  }
-});
-
 document.addEventListener("keypress", (event) => {
   if (event.key === "Tab") {
     event.preventDefault();
     notepad.focus();
+    return;
+  }
+
+  if (event.ctrlKey && event.shiftKey && event.code === "KeyF") {
+    event.preventDefault();
+    new bootstrap.Modal(document.getElementById("search-modal")).show();
+    return;
   }
 });
 
@@ -1814,6 +1814,14 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
   if (event.ctrlKey) {
     switch (event.code) {
+      // search func
+      case "KeyF":
+        if (event.shiftKey) {
+          event.preventDefault();
+          new bootstrap.Modal(document.getElementById("search-modal")).show();
+        }
+        break;
+
       // ctrl + shift + right_arrow = select word
       case "ArrowRight":
         event.preventDefault();
@@ -2082,7 +2090,10 @@ const modal_new_title_input = document.querySelector("div.modal-body > form > di
 document.querySelector("document-title").addEventListener("click", () => {
   modal_new_title_input.value = documentData.title;
   new bootstrap.Modal(document.getElementById("change-title-modal")).show();
-  new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
+});
+
+document.getElementById("change-title-modal").addEventListener("shown.bs.modal", () => {
+  modal_new_title_input.select();
 });
 
 modal_new_title_input.addEventListener("keydown", (event) => {
@@ -2434,6 +2445,11 @@ doc.addEventListener('keydown', (e) => {
     new bootstrap.Modal(document.getElementById("word-count-modal")).show();
     return;
   }
+
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyF") {
+    e.preventDefault();
+    new bootstrap.Modal(document.getElementById("search-modal")).show();
+  }
 });
 
 /* notepad fullscreen - Alt+1 */
@@ -2541,7 +2557,6 @@ document.body.addEventListener('keydown', (e) => {
   if (e.altKey && e.shiftKey && e.code === "KeyT") {
     modal_new_title_input.value = documentData.title;
     new bootstrap.Modal(document.getElementById("change-title-modal")).show();
-    new Promise((_r) => setTimeout(_r, 500)).then(() => modal_new_title_input.select());
     return;
   }
 
@@ -2556,6 +2571,19 @@ document.body.addEventListener('keydown', (e) => {
   // document settings
   if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
     document.getElementById("settings").click();
+    return;
+  }
+
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyF") {
+    e.preventDefault();
+    new bootstrap.Modal(document.getElementById("search-modal")).show();
+    return;
+  }
+
+  if (e.key === "Tab") {
+    e.preventDefault();
+    notepad.focus();
+    return;
   }
 
   // document summary
@@ -3086,6 +3114,10 @@ document.getElementById("settings-modal").addEventListener("hidden.bs.modal", ()
   });
 });
 
+document.getElementById("settings-modal").addEventListener("shown.bs.modal", () => {
+  document.getElementById("settings-modal-document-title").select();
+});
+
 document.getElementById("settings-modal-save-btn").addEventListener('click', () => {
   LINE_NUMBERS_ENABLED = document.getElementById("line-numbers-switch").checked;
   documentData.title = document.getElementById("settings-modal-document-title").value;
@@ -3126,5 +3158,112 @@ document.getElementById("settings-modal-document-type").addEventListener('change
   }
 });
 
+document.getElementById("search-modal").addEventListener("hidden.bs.modal", () => {
+  document.getElementById("search-input").value = "";
+  document.getElementById("replace-input").value = "";
+  document.querySelector(".modal-backdrop.fade.show")?.remove();
+  notepad.focus();
+});
+
 // initialize popovers
 [...document.querySelectorAll('[data-bs-toggle="popover"]')].forEach(el => new bootstrap.Popover(el))
+
+document.getElementById("search-modal").addEventListener("shown.bs.modal", () => {
+  document.getElementById("search-input").focus();
+});
+
+document.getElementById("search-input").addEventListener('keydown', (e) => {
+  if (e.code === "Enter") {
+    e.preventDefault();
+    document.getElementById("replace-button").click();
+  }
+
+  if (e.code === "Tab") {
+    e.preventDefault();
+    new Promise(_r => {
+      setTimeout(_r, 1);
+    }).then(() => {
+      if (e.shiftKey) {
+        document.getElementById("close-search-bottom-btn").focus();
+      } else {
+        document.getElementById("replace-input").focus();
+      }
+    })
+  }
+});
+
+document.getElementById("replace-input").addEventListener('keydown', (e) => {
+  if (e.code === "Enter") {
+    e.preventDefault();
+    document.getElementById("replace-button").click();
+  }
+
+  if (e.code === "Tab") {
+    e.preventDefault();
+    new Promise(_r => {
+      setTimeout(_r, 1);
+    }).then(() => {
+      if (e.shiftKey) {
+        document.getElementById("search-input").focus();
+      } else {
+        document.getElementById("replace-button").focus();
+      }
+    });
+  }
+});
+
+document.getElementById("replace-button").addEventListener('keydown', (e) => {
+  if (e.code === "Enter") {
+    e.preventDefault();
+    document.getElementById("replace-button").click();
+  }
+
+  if (e.code === "Tab") {
+    e.preventDefault();
+    new Promise(_r => {
+      setTimeout(_r, 1);
+    }).then(() => {
+      if (e.shiftKey) {
+        document.getElementById("replace-input").focus();
+      } else {
+        document.getElementById("close-search-bottom-btn").focus();
+      }
+    });
+  }
+});
+
+document.getElementById("close-search-bottom-btn").addEventListener('keydown', (e) => {
+  if (e.code === "Enter") {
+    e.preventDefault();
+    document.getElementById("close-search-bottom-btn").click();
+  }
+
+  if (e.code === "Tab") {
+    e.preventDefault();
+    new Promise(_r => {
+      setTimeout(_r, 1);
+    }).then(() => {
+      if (e.shiftKey) {
+        document.getElementById("replace-button").focus();
+      } else {
+        document.getElementById("search-input").focus();
+      }
+    });
+  }
+});
+
+document.getElementById("replace-button").addEventListener('click', () => {
+  const search = document.getElementById("search-input").value;
+  const replace = document.getElementById("replace-input").value;
+  document.getElementById("replace-button").blur();
+  if (search === "") {
+    document.getElementById("search-input").focus();
+    return;
+  } else if (replace === "") {
+    document.getElementById("replace-input").focus();
+    return;
+  }
+  notepad.value = notepad.value.replaceAll(search, replace);
+  setSaveStatus("not-saved");
+  document.getElementById("close-search-btn").click();
+});
