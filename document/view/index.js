@@ -416,7 +416,7 @@ function compileMarkdown(text) {
         width = match[0].split("x")[0];
         height = match[0].split("x")[1];
       }
-      console.log(content, height, width);
+
       if (width && height) {
         return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="${width}%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`;
       } else {
