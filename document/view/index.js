@@ -474,28 +474,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){6}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 6];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){4}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){4}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 4];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){2}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){2}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 2];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -533,28 +536,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){9}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){9}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 9];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){6}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 6];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){3}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){3}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 3];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -592,28 +598,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){12}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){12}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 12];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){8}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){8}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 8];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){4}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){4}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 4];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -651,28 +660,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){15}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){15}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 15];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){10}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){10}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 10];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){5}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){5}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 5];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -710,28 +722,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){18}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){18}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 18];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){12}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){12}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 12];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){6}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){6}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 6];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -769,28 +784,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){21}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){21}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 21];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){14}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){14}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 14];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){7}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){7}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 7];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -828,28 +846,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){24}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){24}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 24];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){16}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){16}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 16];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){8}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){8}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 8];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -887,28 +908,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){27}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){27}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 27];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){18}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){18}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 18];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){9}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){9}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 9];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
 
@@ -946,28 +970,31 @@ function compileMarkdown(text) {
           return `<ul><li class="compiled-list"><ol start="${number}"><li>${content}</li></ol></li></ul>`;
         })
         
-        .replace(/(&nbsp;){30}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){30}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 30];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 3));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul></li></ul>`;
         })
         
-        .replace(/(&nbsp;){20}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){20}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 20];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + (indent_space * 2));
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul></li></ul>`;
         })
 
-        .replace(/(&nbsp;){10}[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+        .replace(/(&nbsp;){10}[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
           const letter = c.match(/[A-Za-z]/g)[4 * 10];
           const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
           const content = c.substring(3 + indent_space);
           const type = isUpperCase(letter) ? "A" : "a";
-          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}"><li>${content}</li></ol></li></ul>`;
+          const paren_list = c.match(/\)/g)?.slice(-1) ? true : false;
+          return `<ul><li class="compiled-list"><ol type="${type}" start="${alpha}" ${paren_list ? 'class="remove-list-padding"' : ''}><li ${paren_list ? 'class="list-parenthesis"' : ''}>${content}</li></ol></li></ul>`;
         });
         break;
     }
@@ -987,7 +1014,7 @@ function compileMarkdown(text) {
     })
 
     // regular alpha list
-    .replace(/<br>[A-Za-z]\.\ (.*?)(?:(?!<br>).)*/g, (c) => {
+    .replace(/<br>[A-Za-z](\)|\.)\ (.*?)(?:(?!<br>).)*/g, (c) => {
       const letter = c.match(/[A-Za-z]/g)[2];
       const alpha = alphas[letter.toLowerCase()]; // 2 because "b" and "r" become first letters. ex: a. asd = ['b', 'r', 'b', 'a', 's', 'd']
       const content = c.substring(7);
