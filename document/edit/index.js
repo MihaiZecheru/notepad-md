@@ -586,7 +586,7 @@ function compileMarkdown(text) {
         width = match[0].split("x")[0];
         height = match[0].split("x")[1];
       }
-      console.log(content, height, width);
+
       if (width && height) {
         return `<iframe id="${uuid}" src="${url.substring(1, url.length - 1)}" width="${width}%" height="${height}%" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>`;
       } else {
@@ -1625,6 +1625,61 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     }
   }
 
+  if (event.code === "Enter" && documentData.type === "markdown" && notepad.selectionStart === notepad.selectionEnd) {
+    const lines = notepad.value.split("\n");
+    const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+
+    let start_of_line = 0;
+    for (let i = 0; i < line - 1; i++) {
+      start_of_line += lines[i].length + 1;
+    }
+    
+    const end_of_line = start_of_line + lines[line - 1].length;
+
+    if (event.ctrlKey || event.shiftKey) {
+      event.preventDefault();
+      insertText("\n", 0);
+      return;
+    }
+
+    if (end_of_line !== notepad.selectionStart) return;
+
+    const line_content = notepad.value.substring(start_of_line, end_of_line);
+    const indent_count = line_content.match(/^\t*/)[0].length || line_content.match(/^\s*/)[0].length;
+    let indents = "";
+    if (indent_count) {
+      const indent_type = line_content.match(/^\t+/) ? "TAB" : "SPACE";
+      if (indent_type === "TAB") {
+        indents = "\t".repeat(indent_count);
+      } else {
+        indents = " ".repeat(indent_count);
+      }
+    }
+
+    if (line_content.trim().match(/- (.*?)/g)) {
+      event.preventDefault();
+      insertText(`\n${indents}- `);
+    } else if (line_content.trim().match(/\d+\. (.*?)/g)) {
+      event.preventDefault();
+      const number = line_content.match(/\d+/g)[0];
+      insertText(`\n${indents}${parseInt(number) + 1}. `);
+    } else if (line_content.trim().match(/[a-z]+(\)|\.) (.*?)/g)) {
+      event.preventDefault();
+      const type = line_content.match(/\)|\./g)[0];
+      const letter = line_content.match(/[a-z]+/g)[0];
+      let new_letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+      if (letter === "z") new_letter = "a";
+      insertText(`\n${indents}${new_letter}${type} `);
+    } else if (line_content.trim().match(/[A-Z]+(\)|\.) (.*?)/g)) {
+      event.preventDefault();
+      const type = line_content.match(/\)|\./g)[0];
+      const letter = line_content.match(/[A-Z]+/g)[0];
+      let new_letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+      if (letter === "Z") new_letter = "A";
+      insertText(`\n${indents}${new_letter}${type} `);
+    }
+  }
+
   if (event.ctrlKey) {
     switch (event.code) {
       // ctrl + shift + right_arrow = select word
@@ -1712,6 +1767,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       // copy line is there is no currently selected text
       case "KeyC":
         if (notepad.selectionStart === notepad.selectionEnd) {
+          event.preventDefault();
           const lines = notepad.value.split("\n");
           const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
 
