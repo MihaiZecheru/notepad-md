@@ -2,6 +2,7 @@
 
 import { getCookie, setCookie } from "../../modules/cookies.mjs";
 import { max_title_length } from "../../modules/max_lengths.mjs";
+import { showNewUserModal } from "../../modules/new-user-modal.mjs";
 import CHECKBOX_IDS from "../../modules/checkbox_ids.mjs";
 import getDate from "../../modules/date.mjs";
 
@@ -287,6 +288,12 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   title_ele.style.color = (title_ele.innerText === "Untitled Document") ? "tomato" : "var(--nmd-blue)";
   document.title = documentData.title;
   notepad.setSelectionRange(0, 0);
+
+  // check for new user
+  if (JSON.parse(getCookie("nmd-validation")).created_on === getDate() && !sessionStorage.getItem("new-user-modal-shown")) {
+    showNewUserModal();
+    sessionStorage.setItem("new-user-modal-shown", true);
+  }
 
   // add bold contextmenu event listeners
   addBoldEventListeners();
