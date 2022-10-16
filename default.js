@@ -51,8 +51,12 @@ if (loggedIn) {
   center_image_and_text_redirect = "/account/me/";
 }
 
-left_button.addEventListener("click", () => {
-  window.location.href = left_button_redirect;
+left_button.addEventListener("click", (e) => {
+  if (e.ctrlKey) {
+    window.open(left_button_redirect, "_blank");
+  } else {
+    window.location.href = left_button_redirect;
+  }
 });
 
 right_button.addEventListener("click", () => {
@@ -184,8 +188,12 @@ right_button.addEventListener("click", () => {
   }
 });
 
-document.querySelectorAll("#footer span:not(.material-symbols-outlined)")[1].addEventListener("click", () => {
-  window.location.href = center_image_and_text_redirect;
+document.querySelectorAll("#footer span:not(.material-symbols-outlined)")[1].addEventListener("click", (e) => {
+  if (e.ctrlKey) {
+    window.open(center_image_and_text_redirect, "_blank");
+  } else {
+    window.location.href = center_image_and_text_redirect;
+  }
 });
 
 document.getElementById("notepad-redirect").href = center_image_and_text_redirect;
