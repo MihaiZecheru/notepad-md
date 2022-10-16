@@ -197,8 +197,8 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   // if (documentData.type === "code") {
   //   html = html.substring(0, 39) + html.substring(40, html.length);
   // }
-  
-  doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}</div>${html || ""}`;
+
+  doc.innerHTML = `${documentData.type === "markdown" ? '<div id="footnotes-alert-placeholder"></div>' : ''}${html || ""}`;
   hljs.highlightAll();
 
   // update checkbox ids and add event listeners
@@ -215,7 +215,7 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     }
   })();
 
-  if (documentData.type === "markdown") {
+  if (documentData.type !== "markdown") {
     document.getElementById("footnotes-alert-placeholder")?.remove();
   }
 
