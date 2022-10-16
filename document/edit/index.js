@@ -1439,6 +1439,7 @@ function getStartAndEndPositions() {
 let location_before_last_insert = [ { start: 0, end: 0 } ];
 
 function insertText(text, cursor_movement = 0) {
+  setSaveStatus("not-saved");
   const { start, end } = getStartAndEndPositions();
   location_before_last_insert.unshift({ start, end });
   notepad.focus();
@@ -1490,6 +1491,45 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     } else {
       notepad.blur();
     }
+    return;
+  }
+
+  // move the line back 1-tab worth
+  if (event.code === "Tab" && event.shiftKey && notepad.selectionStart === notepad.selectionEnd) {
+    event.preventDefault();
+    const previous_cursor_location = notepad.selectionStart;
+    const lines = notepad.value.split("\n");
+    const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+
+    let start_of_line = 0;
+    for (let i = 0; i < line - 1; i++) {
+      start_of_line += lines[i].length + 1;
+    }
+    
+    const end_of_line = start_of_line + lines[line - 1].length;
+    let line_content = notepad.value.substring(start_of_line, end_of_line);
+    const indent_count = line_content.match(/^\t*/)[0].length || line_content.match(/^\s*/)[0].length;
+    let indents = "";
+    if (indent_count) {
+      const indent_type = line_content.match(/^\t+/) ? "TAB" : "SPACE";
+      if (indent_type === "TAB") {
+        indents = "\t".repeat(indent_count - 1);
+      } else {
+        indents = " ".repeat(indent_count - 1);
+      }
+    }
+
+    // remove leading tabs and spaces
+    line_content = line_content.replace(/^\t+/, "").replace(/^\s+/, "");
+
+    const value = notepad.value.substring(0, start_of_line) + indents + line_content + notepad.value.substring(end_of_line);
+    document.execCommand('selectAll', false);
+    var el = document.createElement('p');
+    el.innerText = value;
+    const previousScrollLocation = notepad.scrollTop;
+    document.execCommand('insertHTML', false, el.innerHTML);
+    notepad.scrollTop = previousScrollLocation;
+    notepad.selectionStart = notepad.selectionEnd = previous_cursor_location - 1;
     return;
   }
 
