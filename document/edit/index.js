@@ -2463,6 +2463,8 @@ document.querySelector("main div > span").addEventListener('click', () => {
     notepad.style.width = "98.75vw";
     notepad.style.height = "calc(95vh - 2.8em)";
     notepad.style.zIndex = "1000";
+    notepad.style.display = "block";
+    doc.style.display = "none";
 
     document.querySelector("main div > span").innerText = "fullscreen_exit";
     document.getElementById("footer").style.visibility= "hidden";
@@ -2475,6 +2477,8 @@ document.querySelector("main div > span").addEventListener('click', () => {
     notepad.style.width = "100%";
     notepad.style.height = "calc(100% - 5vh)";
     notepad.style.zIndex = "0";
+    notepad.style.display = "block";
+    doc.style.display = "block";
     
     document.querySelector("main div > span").innerText = "fullscreen";
     document.getElementById("footer").style.visibility= "visible";
@@ -2503,6 +2507,8 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.left = "0";
     doc.style.width = "100vw";
     doc.style.height = "95vh";
+    notepad.style.display = "none";
+    doc.style.display = "block";
 
     const fullscreen_box = document.querySelector(".dropleft > span");
     doc_fullscreen_previous_styles = JSON.parse(JSON.stringify(fullscreen_box.style));
@@ -2530,6 +2536,8 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.height = "calc(100% - 3.13vh)";
     doc.style.zIndex = "0";
     doc.style.paddingRight = "";
+    notepad.style.display = "block";
+    doc.style.display = "block";
     
     const fullscreen_box = document.querySelector(".dropleft > span");
     fullscreen_box.innerText = "fullscreen";
