@@ -16,319 +16,328 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 </head>
 <body>
-  <div>
-    <h1 id="introduction">Introduction</h1>
-    <hr id="hr">
-    <p>
-      Notepad MD is a simple, lightweight markdown editor where your documents, which can be written or uploaded, are safely stored using Google's Realtime Database.
-      While markdown is a universal text format, Notepad MD's markdown is slightly different than what you might be used to. An abundance of shortcuts and tools make it easy to write and edit your documents using the supported markdown listed below.
-      When you're done writing, you can export or print the document's markdown and compiled HTML to a variety of formats, including PDF, HTML, plain text.
-      The HTML can be copied to your clipboard so you can paste your document elsewhere, for example a Canvas assignment or an important email.
-      This text editor is designed to be used on a desktop, laptop, or tablet, meaning it's not recommended to use this editor on a mobile device.<br>
-      <br>
-      After creating your account <a href="/account/register/" rel="noopener noreferrer" target="_blank" tabindex="-1">here</a>, you will have full access to Notepad MD and all of it's features. To make an account, go to 
-      <a href="https://notes.mzecheru.com/account/me/" rel="noopener noreferrer" target="_blank" tabindex="-1">https://notes.mzecheru.com/account/me/</a> and click "New Document". You will then be redirected to the main page of the website where you will be spending most of your time:
-      <a href="https://notes.mzecheru.com/document/edit/" tabindex="-1">https://notes.mzecheru.com/document/edit</a>.<br>
-      <br>
-      The markdown you write in the right textbox will be compiled into HTML and displayed on the left side of the screen when the "Save" button is clicked or the Ctrl+S shortcut is used. 
-      All documents can be viewed in the <a href="https://notes.mzecheru.com/account/me/documents/" rel="noopener noreferrer" target="_blank" tabindex="-1">Documents</a> tab, where you can edit, view, delete, export, or share any of your documents to other users, 
-      although they'll only be able to view it without editing.
-    </p>
-  </div>
-  
-  <div>
-    <h1 id="markdown">Symbols & Markdown</h1>
-    <hr>
-    <div id="ave"s>
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Save | Ctrl+S">Save</span></button>
-      <span>Save - Ctrl+S</span>
-    </div>
-    <div id="italic">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Italics | Ctrl+I">format_italic</span></button>
-      <span>Italic - Ctrl+I - *</span><i>lorem ipsum</i><span>*</span>
-    </div>
-    <div id="bold">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Bold | Ctrl+B">format_bold</span></button>
-      <span>Bold (Pink) - Ctrl+B - **</span><b>lorem ipsum</b><span>**</span>
-    </div>
-    <div id="underline">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Underline | Ctrl+U">format_underlined</span></button>
-      <span>Underline - Ctrl+U - __</span><u>lorem ipsum</u><span>__</span>
-    </div>
-    <div id="strikethrough">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Strikethrough | Alt+S">strikethrough_s</span></button>
-      <span>Strikethrough - Alt+S - ~~</span><s>lorem ipsum</s><span>~~</span>
-    </div>
-    <div id="highlight">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Highlight | Ctrl+H">border_color</span></button>
-      <span>Highlight - Ctrl+H - `</span><mark>lorem ipsum</mark><span>`</span>
-    </div>
-    <div id="center">
-      <div style="display: flex; width: 100%;">
-        <div>
-          <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Center | Ctrl+{">format_align_center</span></button>
-          <span>Center - Ctrl+{ - {lorem ipsum}&nbsp;&nbsp;&nbsp;&nbsp;<u>from --> to</u>&nbsp;&nbsp;&nbsp;&nbsp;
-        </div>
-        <span style="position: relative; left: 25%;">lorem ipsum <u>(should be centered)</u></span>
-      </div>
+  <main>
+    <div>
+      <h1 id="introduction">Introduction</h1>
+      <hr>
+      <p>
+        Notepad MD is an efficient, lightweight markdown editor where your documents, which can be written or uploaded, are safely stored using Google's Realtime Database.
+        While markdown is a universal text format, Notepad MD's markdown is slightly different than what you might be used to. An abundance of shortcuts and tools make it easy to write and edit your documents using the supported markdown listed below.
+        When you're done writing, you can export or print the document's markdown and compiled HTML to a variety of formats, including PDF, HTML, and plain text.
+        The HTML and markdown can be copied to your clipboard, making it easy to move your document elsewhere, for example a Canvas assignment or an important email.<br><br>
+
+        If you're not all that interested in markdown, Notepad MD offers support for plain text and code making it easy to store your non-markdown files for later use.
+        All documents can be opened in <a href='https://notes.mzecheru.com/document/view/' rel='noopener noreferrer' target='_blank' tabindex='-1'>/document/view/</a>, making Notepad MD 
+        a great way to save important documents, even if they're not made by using the supported markdown.<br><br>
+
+        Notes:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- This text editor is designed to be used on a desktop, laptop, or tablet, meaning it's not recommended for use on a mobile device.<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- A feature for accessing documents via API will be developed sometime in the future.<br><br>
+
+        After creating your account <a href='https://notes.mzecheru.com/account/register/' rel='noopener noreferrer' target='_blank' tabindex='-1'>here</a>, you will have full access to Notepad MD and all of it's features. To make an account, go to 
+        <a href='https://notes.mzecheru.com/account/me/' rel='noopener noreferrer' target='_blank' tabindex='-1'>/account/me/</a> and click "New Document". You will then be redirected to the main page of the website 
+        where you will be spending most of your time: <a href='https://notes.mzecheru.com/document/edit' rel='noopener noreferrer' target='_blank' tabindex='-1'>/document/edit/</a>.<br><br>
+
+        The markdown you write in the right textbox will be compiled into HTML and displayed on the left side of the screen when the "Save" button is clicked or the Ctrl+S shortcut is used. 
+        All documents can be viewed in the <a href='https://notes.mzecheru.com/account/me/documents/' rel='noopener noreferrer' target='_blank' tabindex='-1'>Documents</a> tab, where you can edit, view, delete, export, or share any of your documents to other users.
+        When sharing a document to another user, note that they will only be able to view it while the document is set to <i>public</i> - if you want them to be able to edit the document as well, add them as an author, which can be done by viewing the document settings.<br><br>
+      </p>
     </div>
     <div>
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Hyperlink | Ctrl+K">link</span></button>
-      <span>Hyperlink - Ctrl+K - </span><a href="https://example.com/cool-link/" rel="noopener noreferrer" target="_blank" tabindex="-1">[lorem ipsum](https://example.com/cool-link/)</a>
-    </div>
-    <div id="image">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Image | Ctrl+M">image</span></button>
-      <span>Image - Ctrl+M - ![HeightxWidth as percentage or caption](https://example.com/link-to-image.png)</span>
-      <div>
-        <img src="/static/notepad.png" alt="lorem ipsum" id="image" style="width: 5%;">
-        <br>
-        <label class="document-content-label" for="image">HeightxWidth as percentage or caption</label>
-      </div><br>
-    </div>
-    <div id="video">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Video | Alt+V">video_file</span></button>
-      <span>Video - Alt+V - $[HeightxWidth as percentage or caption](https://example.com/link-to-video.mp4)</span>
-      <div>
-        <iframe width="15.9%" src="/static/helloworld.mp4" title="Content Embed: hello world by Louie Zong" frameborder="0" id="video" allowfullscreen sandbox></iframe>
-        <br>
-        <label class="document-content-label" for="img-example">HeightxWidth as percentage or caption</label>
-      </div><br>
-    </div>
-    <div id="content-embed">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Embed | Alt+E">wysiwyg</span></button>
-      <span>Content Embed - Alt+E - &[HeightxWidth as percentage or caption](https://example.com/link-to-content.html)</span>
-      <div>
-        <iframe src="https://spanish.mzecheru.com/translator/" alt="lorem ipsum" id="video" frameborder="0" width="100%" height="100%" style="position: relative; top: 0; left: 0; width: 850px; height: 470px;"></iframe>
-        <br>
-        <label class="document-content-label" for="video">HeightxWidth as percentage or caption</label>
-      </div><br>
-    </div>
-    <div id="quote">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Quote | Ctrl+Q">format_quote</span></button>
-      <span>Quote - Ctrl+Q - > lorem ipsum</span>
-      <div class="blockquote">lorem ipsum</div><br>
-    </div><br>
-    <div id="bullet-list">
-      <div style="display: flex;" width="20%">
-        <div style="display: flex;">
-          <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Bullet List | Alt+L">format_list_bulleted</span></button>
-          <span>Bullet List - Alt+L -&nbsp;</span>
-        </div>
-        <div>
-          Lorem Ipsum<br>
-          - lorem ipsum<br>
-          - lorem ipsum<br>
-          - lorem ipsum<br>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <div>
-          <span><u>from --> to</u></span>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <div>
-          <span>Lorem Ipsum</span>
-          <ul>
-            <li>lorem ipsum</li>
-            <li>lorem ipsum</li>
-            <li>lorem ipsum</li>
-          </ul>
+      <h1 id="markdown">Symbols & Markdown</h1>
+      <hr>
+      <div id="ave"s>
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Save | Ctrl+S">Save</span></button>
+        <span>Save - Ctrl+S</span>
+      </div>
+      <div id="italic">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Italics | Ctrl+I">format_italic</span></button>
+        <span>Italic - Ctrl+I - *</span><i>lorem ipsum</i><span>*</span>
+      </div>
+      <div id="bold">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Bold | Ctrl+B">format_bold</span></button>
+        <span>Bold (Pink) - Ctrl+B - **</span><b>lorem ipsum</b><span>**</span>
+      </div>
+      <div id="underline">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Underline | Ctrl+U">format_underlined</span></button>
+        <span>Underline - Ctrl+U - __</span><u>lorem ipsum</u><span>__</span>
+      </div>
+      <div id="strikethrough">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Strikethrough | Alt+S">strikethrough_s</span></button>
+        <span>Strikethrough - Alt+S - ~~</span><s>lorem ipsum</s><span>~~</span>
+      </div>
+      <div id="highlight">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Highlight | Ctrl+H">border_color</span></button>
+        <span>Highlight - Ctrl+H - `</span><mark>lorem ipsum</mark><span>`</span>
+      </div>
+      <div id="center">
+        <div style="display: flex; width: 100%;">
+          <div>
+            <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Center | Ctrl+{">format_align_center</span></button>
+            <span>Center - Ctrl+{ - {lorem ipsum}&nbsp;&nbsp;&nbsp;&nbsp;<u>from --> to</u>&nbsp;&nbsp;&nbsp;&nbsp;
+          </div>
+          <span style="position: relative; left: 25%;">lorem ipsum <u>(should be centered)</u></span>
         </div>
       </div>
-    </div>
-    <div id="number-list">
-      <div style="display: flex;" width="20%">
-        <div style="display: flex;">
-          <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Number List | Alt+Shift+L">format_list_numbered</span></button>
-          <span>Number List - Alt+Shift+L -&nbsp;</span>
-        </div>
+      <div>
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Hyperlink | Ctrl+K">link</span></button>
+        <span>Hyperlink - Ctrl+K - </span><a href="https://example.com/cool-link/" rel="noopener noreferrer" target="_blank" tabindex="-1">[lorem ipsum](https://example.com/cool-link/)</a>
+      </div>
+      <div id="image">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Image | Ctrl+M">image</span></button>
+        <span>Image - Ctrl+M - ![HeightxWidth as percentage or caption](https://example.com/link-to-image.png)</span>
         <div>
-          Lorem Ipsum<br>
-          1. lorem ipsum<br>
-          2. lorem ipsum<br>
-          3. lorem ipsum<br>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;
+          <img src="/static/notepad.png" alt="lorem ipsum" id="image" style="width: 5%;">
+          <br>
+          <label class="document-content-label" for="image">caption will show up here</label>
+        </div><br>
+      </div>
+      <div id="video">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Video | Alt+V">video_file</span></button>
+        <span>Video - Alt+V - $[HeightxWidth as percentage or caption](https://example.com/link-to-video.mp4)</span>
         <div>
-          <span><u>from --> to</u></span>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;
+          <iframe width="15.9%" src="/static/helloworld.mp4" title="Content Embed: hello world by Louie Zong" frameborder="0" id="video" allowfullscreen sandbox></iframe>
+          <br>
+          <label class="document-content-label" for="img-example">caption will show up here</label>
+        </div><br>
+      </div>
+      <div id="content-embed">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Embed | Alt+E">wysiwyg</span></button>
+        <span>Content Embed - Alt+E - &[HeightxWidth as percentage or caption](https://example.com/link-to-content.html)</span>
         <div>
-          <span>Lorem Ipsum</span>
-          <ol>
-            <li>lorem ipsum</li>
-            <li>lorem ipsum</li>
-            <li>lorem ipsum</li>
-          </ol>
+          <iframe src="https://spanish.mzecheru.com/translator/" alt="lorem ipsum" id="video" frameborder="0" width="100%" height="100%" style="position: relative; top: 0; left: 0; width: 850px; height: 470px;"></iframe>
+          <br>
+          <label class="document-content-label" for="video">caption will show up here</label>
+        </div><br>
+      </div>
+      <div id="quote">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Quote | Ctrl+Q">format_quote</span></button>
+        <span>Quote - Ctrl+Q - > lorem ipsum</span>
+        <div class="blockquote">lorem ipsum</div><br>
+      </div><br>
+      <div id="bullet-list">
+        <div style="display: flex;" width="20%">
+          <div style="display: flex;">
+            <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Bullet List | Alt+L">format_list_bulleted</span></button>
+            <span>Bullet List - Alt+L -&nbsp;</span>
+          </div>
+          <div>
+            Lorem Ipsum<br>
+            - lorem ipsum<br>
+            - lorem ipsum<br>
+            - lorem ipsum<br>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <div>
+            <span><u>from --> to</u></span>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <div>
+            <span>Lorem Ipsum</span>
+            <ul>
+              <li>lorem ipsum</li>
+              <li>lorem ipsum</li>
+              <li>lorem ipsum</li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-    <div id="checkbox">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Checkbox | Alt+C">check_box</span></button>
-      <span>Checkbox - Alt+C -<br></span>
-      <div style="display: flex">
-        <span>
-          &nbsp;&nbsp;- [] unchecked&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;<br>
-          &nbsp;&nbsp;- [x] checked&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;<br>
-        </span>
-        <div>
-          <div style="margin-bottom: 0!important;" class="form-check nmd-checkbox"><input type="checkbox" id="checkbox-unchecked" class="form-check-input"><label for="checkbox-unchecked" class="form-check-label document-content-label">unchecked</label></div>
-          <div class="form-check nmd-checkbox"><input type="checkbox" id="checkbox-unchecked" class="form-check-input" checked><label for="checkbox-unchecked" class="form-check-label document-content-label">checked</label></div>
+      <div id="number-list">
+        <div style="display: flex;" width="20%">
+          <div style="display: flex;">
+            <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Number List | Alt+Shift+L">format_list_numbered</span></button>
+            <span>Number List - Alt+Shift+L -&nbsp;</span>
+          </div>
+          <div>
+            Lorem Ipsum<br>
+            1. lorem ipsum<br>
+            2. lorem ipsum<br>
+            3. lorem ipsum<br>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <div>
+            <span><u>from --> to</u></span>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <div>
+            <span>Lorem Ipsum</span>
+            <ol>
+              <li>lorem ipsum</li>
+              <li>lorem ipsum</li>
+              <li>lorem ipsum</li>
+            </ol>
+          </div>
         </div>
-      </div><br>
-    </div>
-    <div id="table">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Table | Alt+T">table</span></button>
-      <span>Table - Alt+T -<br></span>
-      <div style="display: flex; align-items: center;">
-        <div>
+      </div>
+      <div id="checkbox">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Checkbox | Alt+C">check_box</span></button>
+        <span>Checkbox - Alt+C -<br></span>
+        <div style="display: flex">
           <span>
-            | Header 1 | Header 2 | Header 3 |<br>
-            | Cell 1 | Cell 2 | Cell 3 |<br>
-            | Cell 1 | Cell 2 | Cell 3 |<br>
-            | Cell 1 | Cell 2 | Cell 3 |<br>
+            &nbsp;&nbsp;- [] unchecked&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;<br>
+            &nbsp;&nbsp;- [x] checked&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->&nbsp;&nbsp;&nbsp;&nbsp;<br>
           </span>
-        </div>
-        &nbsp;&nbsp;&nbsp;&nbsp;<span><u>from --> to</u></span>&nbsp;&nbsp;&nbsp;&nbsp;
-        <div style="width: 50%;">
-          <table>
-            <thead>
-              <tr style="background-color: #dddddd;">
-                <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; border-right: 1px solid whitesmoke;"><center>Header 1</center></th>
-                <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; border-right: 1px solid whitesmoke;"><center>Header 2</center></th>
-                <th><center>Header 3</center></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Cell 1</td>
-                <td>Cell 2</td>
-                <td>Cell 3</td>
-              </tr>
-              <tr>
-                <td>Cell 1</td>
-                <td>Cell 2</td>
-                <td>Cell 3</td>
-              </tr>
-              <tr>
-                <td>Cell 1</td>
-                <td>Cell 2</td>
-                <td>Cell 3</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <div>
+            <div style="margin-bottom: 0!important;" class="form-check nmd-checkbox"><input type="checkbox" id="checkbox-unchecked" class="form-check-input"><label for="checkbox-unchecked" class="form-check-label document-content-label">unchecked</label></div>
+            <div class="form-check nmd-checkbox"><input type="checkbox" id="checkbox-unchecked" class="form-check-input" checked><label for="checkbox-unchecked" class="form-check-label document-content-label">checked</label></div>
+          </div>
+        </div><br>
+      </div>
+      <div id="table">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Table | Alt+T">table</span></button>
+        <span>Table - Alt+T -<br></span>
+        <div style="display: flex; align-items: center;">
+          <div>
+            <span>
+              | Header 1 | Header 2 | Header 3 |<br>
+              | Cell 1 | Cell 2 | Cell 3 |<br>
+              | Cell 1 | Cell 2 | Cell 3 |<br>
+              | Cell 1 | Cell 2 | Cell 3 |<br>
+            </span>
+          </div>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span><u>from --> to</u></span>&nbsp;&nbsp;&nbsp;&nbsp;
+          <div style="width: 50%;">
+            <table>
+              <thead>
+                <tr style="background-color: #dddddd;">
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; border-right: 1px solid whitesmoke;"><center>Header 1</center></th>
+                  <th style="border: 1px solid #dddddd; text-align: left; padding: 8px; border-right: 1px solid whitesmoke;"><center>Header 2</center></th>
+                  <th><center>Header 3</center></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cell 1</td>
+                  <td>Cell 2</td>
+                  <td>Cell 3</td>
+                </tr>
+                <tr>
+                  <td>Cell 1</td>
+                  <td>Cell 2</td>
+                  <td>Cell 3</td>
+                </tr>
+                <tr>
+                  <td>Cell 1</td>
+                  <td>Cell 2</td>
+                  <td>Cell 3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div><br>
+      </div>
+      <div id="horizontal-rule">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Horizontal Rule | Alt+R">Minimize</span></button>
+        <span>Horizontal Rule - Alt+R - The <a href='https://media.geeksforgeeks.org/wp-content/uploads/20220118003437/1.png' rel='noopener noreferrer' target='_blank' tabindex='-1'>line</a> typically seen under headings.</span>
+      </div><br>
+      <div id="superscript">
+        <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Superscript | Ctrl+.">superscript</span></button>
+        <span>Superscript - Ctrl+. - lorem^<sup>ipsum</sup>^</span>
       </div><br>
     </div>
-    <div id="horizontal-rule">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Horizontal Rule | Alt+R">Minimize</span></button>
-      <span>Horizontal Rule - Alt+R - The <a href="./#hr">line</a> under the headings.</span>
-    </div><br>
-    <div id="superscript">
-      <button class="document-button disable-highlighting" tabindex="-1"><span class="material-symbols-outlined" title="Superscript | Ctrl+.">superscript</span></button>
-      <span>Superscript - Ctrl+. - lorem^<sup>ipsum</sup>^</span>
-    </div><br>
-  </div>
-  <div>
-    <h1 id="exports">Export Options</h1>
-    <hr>
-    <p>
-      Exporting your document is easy. You can export your document by printing it or as a PDF, HTML, NMD, or Markdown file. HTML and Markdown exports can be either saved as a file or copied to your clipboard.
-      <br>Your document can be shared with others by sending them a link using the "Share Document" option. Those who have the link can view your document, but they cannot edit it unless you set them as an author from the settings menu.
-      <br>
-      <br><u>Print Document</u>: print the document or save it as a pdf.
-      <br><u>Make A Copy</u>: create a copy of the document for yourself.
-      <br><u>Copy HTML</u>: copy the HTML of the document to your clipboard using either linked or inline styles.
-      <br><u>Copy Markdown</u>: copy the Markdown of the document to your clipboard.
-      <br><u>Download .html</u>: export the document as an HTML file.
-      <br><u>Download .nmd</u>: export the document as an NMD file. NMD files are essentially the raw HTML from the document without any of the Notepad MD stylings.
-      <br><u>Download MD</u>: export the document as a Markdown file.
-    </p>
-  </div>
-  <div>
-    <h1 id="settings">Settings</h1>
-    <hr>
-    <p>
-      <u>Title</u>: The document's title. Give your document a memorable name.<br>
-      <u>Description</u>: The document's description. What's your document about? Write a short summary!<br>
-      <u>Visibility</u>: The document's visibility specifies who can see your document. Public: anyone with the link can view. Private: only you can view.<br>
-      <u>Type</u>: The document's type changes the writing mode. Markdown is default; the text will compile into HTML. Plain Text disables compiling; leaves the document as is. Code turns on syntax highlighting, disables autocorrect, and disables compiling.<br>
-      <u>Language</u>: The document's language determines syntax highlighting is the document Type is Code, otherwise it's an indicator and disables autocorrect if not set to English.<br>
-      <u>Theme</u>: The document's theme determines the color and background of the document when type is Code.<br>
-      <u>Font</u>: The document's font. Choose something pretty!<br>
-      <u>Font Size</u>: The document's font size in pixels, which can be between 5 and 50. The default is 16.<br>
-      <u>Tab Size</u>: The amount of spaces that the tab key will add, can be between 2 and 10. The default is 8.<br>
-      <u>Authors</u>: The collaborators / writers of the document. Who has permission to make changes to your document? To give a user edit permissions to your document, type their email below and press enter. To revoke their permission, press the X below.
-    </p>
-  </div>
-  <div>
-    <h1 id="shortcuts">Shortcuts</h1>
-    <span id="snackbar">Successfully Copied</span>
-    <hr>
-    <p>
-      Ctrl+C = Copy<br>
-      Ctrl+X = Cut<br>
-      Ctrl+V = Paste<br>
-      Ctrl+Z = Undo<br>
-      Ctrl+Y = Redo<br>
-      Ctrl+S = Save<br>
-      <br>
-      Alt+Shift+T = Change Title<br>
-      Ctrl+Shift+K = Delete Line<br>
-      Ctrl+Shift+F = Replace Text<br>
-      Ctrl+Shift+P = Document Summary<br>
-      Ctrl+Alt+S = Document Settings<br>
-      Ctrl+P = Print Document <br>
-      <br>
-      Escape = Exit Fullscreen <u>or</u> Unfocus Notepad <u>or</u> Hide Alert<br>
-      Alt+1 = Notepad Fullscreen<br>
-      Alt+2 = Document Fullscreen<br>
-      <br>
-      Ctrl+I = Italic<br>
-      Ctrl+B = Bold<br>
-      Ctrl+U = Underline<br>
-      Alt+S = Strikethrough<br>
-      Ctrl+H = Highlight<br>
-      Ctrl+{ = Center<br>
-      Ctrl+} = Right<br>
-      Ctrl+K = Link<br>
-      Ctrl+M = Image<br>
-      Alt+V = Video<br>
-      Alt+E = Embed<br>
-      Ctrl+Q = Quote<br>
-      Alt+L = Bullet List<br>
-      Alt+Shift+L = Number List<br>
-      Ctrl+Shift+6 = Footnote<br>
-      Alt+C = Checkbox<br>
-      Alt+T = Table<br>
-      Alt+R = Horizontal Rule<br>
-      Ctrl+. = Superscript<br>
-    </p>
-  </div>
+    <div>
+      <h1 id="exports">Export Options</h1>
+      <hr>
+      <p>
+        Exporting your document is easy. You can export your document by printing it or as a PDF, HTML, NMD, or Markdown file. HTML and Markdown exports can be either saved as a file or copied to your clipboard.
+        <br>Your document can be shared with others by sending them a link using the "Share Document" option. Those who have the link can view your document, but they cannot edit it unless you set them as an author from the settings menu.
+        <br>
+        <br><u>Print Document</u>: print the document or save it as a pdf.
+        <br><u>Make A Copy</u>: create a copy of the document for yourself.
+        <br><u>Copy HTML</u>: copy the HTML of the document to your clipboard using either linked or inline styles.
+        <br><u>Copy Markdown</u>: copy the Markdown of the document to your clipboard.
+        <br><u>Download .html</u>: export the document as an HTML file.
+        <br><u>Download .nmd</u>: export the document as an NMD file. NMD files are essentially the raw HTML from the document without any of the Notepad MD stylings.
+        <br><u>Download MD</u>: export the document as a Markdown file.
+      </p>
+    </div>
+    <div>
+      <h1 id="settings">Settings</h1>
+      <hr>
+      <p>
+        How to open: Use the Ctrl+Alt+S shortcut while having the document open or press the settings cog at the bottom of <a href='https://notes.mzecheru.com/document/edit/' rel='noopener noreferrer' target='_blank' tabindex='-1'>/document/edit/</a> or <a href='https://notes.mzecheru.com/document/view/' rel='noopener noreferrer' target='_blank' tabindex='-1'>/document/view/</a>.
+        <br>
+        <u>Title</u>: The document's title. Give your document a memorable name.<br>
+        <u>Description</u>: The document's description. What's your document about? Write a short summary!<br>
+        <u>Visibility</u>: The document's visibility specifies who can see your document. Public: anyone with the link can view. Private: only you can view.<br>
+        <u>Type</u>: The document's type changes the writing mode. Markdown is default; the text will compile into HTML. Plain Text disables compiling; leaves the document as is. Code turns on syntax highlighting, disables autocorrect, and disables compiling.<br>
+        <u>Language</u>: The document's language determines syntax highlighting is the document Type is Code, otherwise it's an indicator and disables autocorrect if not set to English.<br>
+        <u>Theme</u>: The document's theme determines the color and background of the document when type is Code.<br>
+        <u>Font</u>: The document's font. Choose something pretty!<br>
+        <u>Font Size</u>: The document's font size in pixels, which can be between 5 and 50. The default is 16.<br>
+        <u>Tab Size</u>: The amount of spaces that the tab key will add, can be between 2 and 10. The default is 8.<br>
+        <u>Authors</u>: The collaborators / writers of the document. Who has permission to make changes to your document? To give a user edit permissions to your document, type their email below and press enter. To revoke their permission, press the X below.
+      </p>
+    </div>
+    <div>
+      <h1 id="shortcuts">Shortcuts</h1>
+      <span id="snackbar">Successfully Copied</span>
+      <hr>
+      <p>
+        Ctrl+C = Copy<br>
+        Ctrl+X = Cut<br>
+        Ctrl+V = Paste<br>
+        Ctrl+Z = Undo<br>
+        Ctrl+Y = Redo<br>
+        Ctrl+S = Save<br>
+        <br>
+        Alt+Shift+T = Change Title<br>
+        Ctrl+Shift+K = Delete Line<br>
+        Ctrl+Shift+F = Replace Text<br>
+        Ctrl+Shift+P = Document Summary<br>
+        Ctrl+Alt+S = Document Settings<br>
+        Ctrl+P = Print Document <br>
+        <br>
+        Escape = Exit Fullscreen <u>or</u> Unfocus Notepad <u>or</u> Hide Alert<br>
+        Alt+1 = Notepad Fullscreen<br>
+        Alt+2 = Document Fullscreen<br>
+        <br>
+        Ctrl+I = Italic<br>
+        Ctrl+B = Bold<br>
+        Ctrl+U = Underline<br>
+        Alt+S = Strikethrough<br>
+        Ctrl+H = Highlight<br>
+        Ctrl+{ = Center<br>
+        Ctrl+} = Right<br>
+        Ctrl+K = Link<br>
+        Ctrl+M = Image<br>
+        Alt+V = Video<br>
+        Alt+E = Embed<br>
+        Ctrl+Q = Quote<br>
+        Alt+L = Bullet List<br>
+        Alt+Shift+L = Number List<br>
+        Ctrl+Shift+6 = Footnote<br>
+        Alt+C = Checkbox<br>
+        Alt+T = Table<br>
+        Alt+R = Horizontal Rule<br>
+        Ctrl+. = Superscript<br>
+      </p>
+    </div>
 
-  <br><br>  
+    <br><br>  
 
-  <script>
-    function showSnackBar() {
-      var sb = document.getElementById("snackbar");
-      sb.className = "show";
-      setTimeout(()=>{ sb.className = sb.className.replace("show", ""); }, 3000);
-    }
+    <script>
+      function showSnackBar() {
+        var sb = document.getElementById("snackbar");
+        sb.className = "show";
+        setTimeout(()=>{ sb.className = sb.className.replace("show", ""); }, 3000);
+      }
 
-    document.querySelectorAll("h1").forEach((h1) => {
-      h1.style.cursor = "pointer";
-      h1.addEventListener("click", () => {
-        navigator.clipboard.writeText(`https://notes.mzecheru.com/help/#${h1.id}`);
-        showSnackBar();
+      document.querySelectorAll("h1").forEach((h1) => {
+        h1.style.cursor = "pointer";
+        h1.addEventListener("click", () => {
+          navigator.clipboard.writeText(`https://notes.mzecheru.com/help/#${h1.id}`);
+          showSnackBar();
+        });
+      })
+      document.querySelectorAll("button.document-button.disable-highlighting").forEach((span) => {
+        span.addEventListener("click", () => {
+          navigator.clipboard.writeText(`https://notes.mzecheru.com/help/#${span.parentElement.id}`);
+          showSnackBar();
+        });
       });
-    })
-    document.querySelectorAll("button.document-button.disable-highlighting").forEach((span) => {
-      span.addEventListener("click", () => {
-        navigator.clipboard.writeText(`https://notes.mzecheru.com/help/#${span.parentElement.id}`);
-        showSnackBar();
-      });
-    });
-  </script>
-
+    </script>
+  </main>
   <div id="footer" class="align-items justify-content overflow-auto">
     <span style="position: absolute; left: 1rem;">© Mihai Zecheru 2022</span>
     <span style="margin-right: 1rem;">Notepad MD</span>
