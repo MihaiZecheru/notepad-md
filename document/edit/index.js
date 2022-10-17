@@ -2457,6 +2457,18 @@ doc.addEventListener('keydown', (e) => {
     e.preventDefault();
     new bootstrap.Modal(document.getElementById("search-modal")).show();
   }
+
+  if (e.ctrlKey && e.code === "KeyA") {
+    e.preventDefault();
+    // clear the current selection
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+
+    // select doc
+    const range = document.createRange();
+    range.selectNodeContents(doc);
+    selection.addRange(range);
+  }
 });
 
 /* notepad fullscreen - Alt+1 */
