@@ -1,3 +1,7 @@
+main {
+  padding: .5em!important;
+}
+
 .document-button {
   border: none;
   background: white;
@@ -86,4 +90,13 @@ tr:nth-child(even) td:not(td:last-child) {
 @keyframes fadeout {
   from {bottom: 30px; opacity: 1;}
   to {bottom: 0; opacity: 0;}
+}
+
+body {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+body::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
 }
