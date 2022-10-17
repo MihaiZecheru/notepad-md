@@ -69,7 +69,14 @@ async function addBoldEventListeners() {
           name: "Change Color",
           onClick: () => {
             // select current element
-            document.querySelector(`.circle-picker > span > div > span > div[style*='box-shadow: rgb(${BOLD_COLOR})]`).click();
+            const eles = document.querySelectorAll(".circle-picker > span");
+            eles.forEach(ele => {
+              // find ele
+              const child = ele.childNodes[0].childNodes[0].childNodes[0];
+              if (child.style.boxShadow.includes(`rgb(${BOLD_COLOR})`)) {
+                child.click();
+              }
+            });
             new bootstrap.Modal(document.getElementById("change-bold-text-color-modal")).show();
           }
         }]
