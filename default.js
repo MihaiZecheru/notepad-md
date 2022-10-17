@@ -51,6 +51,16 @@ if (loggedIn) {
   center_image_and_text_redirect = "/account/me/";
 }
 
+left_button.classList.add("disable-highlighting");
+right_button.classList.add("disable-highlighting");
+document.querySelectorAll("#footer span:not(.material-symbols-outlined)")[1].classList.add("disable-highlighting")
+try {
+  document.querySelector("#footer > a > img").classList.add("disable-highlighting");
+} catch (e) {
+  document.querySelector("#footer > div > a > img").classList.add("disable-highlighting");
+}
+document.querySelector("#footer > span").classList.add("disable-highlighting");
+
 left_button.addEventListener("click", (e) => {
   if (e.ctrlKey) {
     window.open(left_button_redirect, "_blank");
