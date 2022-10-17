@@ -89,3 +89,9 @@ body::-webkit-scrollbar {
 .help-button:hover {
   transform: scale(1.1);
 }
+
+#footnotes-alert-placeholder {
+  position: fixed!important;
+  top: 0%;
+  left: 25%;
+}
