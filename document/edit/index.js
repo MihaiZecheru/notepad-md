@@ -1522,9 +1522,9 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     let line_content = notepad.value.substring(start_of_line, end_of_line);
   
     // regular expressions
-    const letter_dot = new RegExp(/^[a-zA-Z]\.\s$/);
-    const number_dot = new RegExp(/^\d+\.\s$/);
-    const letter_paren = new RegExp(/^[a-zA-Z]\)\s$/);
+    const letter_dot = new RegExp(/^\t+[a-zA-Z]\.\s$/);
+    const number_dot = new RegExp(/^\t+\d+\.\s$/);
+    const letter_paren = new RegExp(/^\t+[a-zA-Z]\)\s$/);
 
     if (line_content === "- " || letter_dot.test(line_content) || number_dot.test(line_content) || letter_paren.test(line_content)) {
       event.preventDefault();
