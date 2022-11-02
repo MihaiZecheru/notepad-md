@@ -1508,7 +1508,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
-  if ((event.key === "Delete" || event.key === "Backspace") && sel === "") {
+  if ((event.key === "Delete" || event.key === "Backspace" || event.key === "Enter") && sel === "") {
     const previous_cursor_location = notepad.selectionStart;
     const lines = notepad.value.split("\n");
     const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
@@ -1533,6 +1533,10 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       notepad.selectionEnd = end_of_line;
       document.execCommand("delete");
       notepad.selectionStart = notepad.selectionEnd = previous_cursor_location - 2;
+
+      if (event.key === "Enter") {
+        insertText("\n");
+      }
       return;
     }
   }
