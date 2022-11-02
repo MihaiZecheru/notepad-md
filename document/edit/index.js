@@ -1699,7 +1699,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       case "KeyR":
         if (documentData.type === "markdown") {
           event.preventDefault();
-          insertText("---\n\n");
+          insertText("---\n");
         }
         break;
 
@@ -1810,7 +1810,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     if (event.ctrlKey) {
       // regular enter
       event.preventDefault();
-      insertText('\n\n');
+      insertText('\n');
       return;
     }
 
@@ -1830,7 +1830,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       const line_content = notepad.value.substring(start_of_line, end_of_line);
       document.execCommand('selectAll', false);
       var el = document.createElement('p');
-      el.innerText = notepad.value.substring(0, start_of_line - 1) + "\n\n" + line_content + notepad.value.substring(end_of_line);
+      el.innerText = notepad.value.substring(0, start_of_line - 1) + "\n" + line_content + notepad.value.substring(end_of_line);
       const previousScrollLocation = notepad.scrollTop;
       document.execCommand('insertHTML', false, el.innerHTML);
       notepad.scrollTop = previousScrollLocation;
