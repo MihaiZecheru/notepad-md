@@ -1508,6 +1508,35 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     return;
   }
 
+  if ((event.key === "Delete" || event.key === "Backspace") && sel === "") {
+    const previous_cursor_location = notepad.selectionStart;
+    const lines = notepad.value.split("\n");
+    const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
+
+    let start_of_line = 0;
+    for (let i = 0; i < line - 1; i++) {
+      start_of_line += lines[i].length + 1;
+    }
+    
+    const end_of_line = start_of_line + lines[line - 1].length;
+    let line_content = notepad.value.substring(start_of_line, end_of_line);
+  
+    // regular expressions
+    const letter_dot = new RegExp(/^[a-zA-Z]\.\s$/);
+    const number_dot = new RegExp(/^\d+\.\s$/);
+    const letter_paren = new RegExp(/^[a-zA-Z]\)\s$/);
+
+    if (line_content === "- " || letter_dot.test(line_content) || number_dot.test(line_content) || letter_paren.test(line_content)) {
+      event.preventDefault();
+      notepad.focus();
+      notepad.selectionStart = start_of_line;
+      notepad.selectionEnd = end_of_line;
+      document.execCommand("delete");
+      notepad.selectionStart = notepad.selectionEnd = previous_cursor_location - 2;
+      return;
+    }
+  }
+
   // move the line back 1-tab worth
   if (event.code === "Tab" && event.shiftKey && notepad.selectionStart === notepad.selectionEnd) {
     event.preventDefault();
