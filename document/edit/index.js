@@ -1666,7 +1666,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       case "KeyR":
         if (documentData.type === "markdown") {
           event.preventDefault();
-          insertText("---\n");
+          insertText("---\n\n");
         }
         break;
 
@@ -1774,6 +1774,13 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   }
 
   if (event.code === "Enter" && documentData.type === "markdown" && notepad.selectionStart === notepad.selectionEnd) {
+    if (event.ctrlKey) {
+      // regular enter
+      event.preventDefault();
+      insertText('\n\n');
+      return;
+    }
+
     const lines = notepad.value.split("\n");
     const line = notepad.value.substring(0, notepad.selectionStart).split("\n").length;
 
@@ -1784,9 +1791,21 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     
     const end_of_line = start_of_line + lines[line - 1].length;
 
-    if (event.ctrlKey || event.shiftKey) {
+    if (event.shiftKey) {
+      // add line break to the beginning of a line (move the line down)
       event.preventDefault();
-      insertText("\n", 0);
+      const line_content = notepad.value.substring(start_of_line, end_of_line);
+      document.execCommand('selectAll', false);
+      var el = document.createElement('p');
+      el.innerText = notepad.value.substring(0, start_of_line - 1) + "\n\n" + line_content + notepad.value.substring(end_of_line);
+      const previousScrollLocation = notepad.scrollTop;
+      document.execCommand('insertHTML', false, el.innerHTML);
+      notepad.scrollTop = previousScrollLocation;
+      console.log(start_of_line, start_of_line + line_content.length)
+      notepad.selectionStart = notepad.selectionEnd = start_of_line + line_content.length + 1;
+      setSaveStatus("not-saved");
+      const { start, end } = getStartAndEndPositions();
+      location_before_last_insert.unshift({ start, end });
       return;
     }
 
