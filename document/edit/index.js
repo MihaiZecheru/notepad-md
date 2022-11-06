@@ -2864,7 +2864,12 @@ function _print() {
   // if (documentData.type === "code") {
   //   printContents = printContents.substring(0, 39) + printContents.substring(40, printContents.length);
   // }
-  document.body.innerHTML = printContents;
+  document.body.innerHTML = printContents;;
+  document.body.style.fontWeight = "600";
+  document.body.style.fontFamily = documentData.font;
+  const _e_ = document.createElement("style");
+  _e_.innerHTML = BOLD_COLOR.startsWith('#') ? `b { color: ${BOLD_COLOR}; }` : `b { color: rgb(${BOLD_COLOR}); }` + `mark { color: yellow; }`;  
+  document.body.appendChild(_e_);
   window.print();
   window.location.reload();
 }
