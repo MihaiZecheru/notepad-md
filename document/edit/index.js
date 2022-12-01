@@ -1919,6 +1919,8 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           1 + notepad.value.indexOf("=", notepad.selectionEnd + 1) || 999999999,
           1 + notepad.value.indexOf("|", notepad.selectionEnd + 1) || 999999999,
           1 + notepad.value.indexOf("\"", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf(":", notepad.selectionEnd + 1) || 999999999,
+          1 + notepad.value.indexOf(";", notepad.selectionEnd + 1) || 999999999,
         ) - 1;
         if (event.shiftKey) {
           notepad.selectionEnd = endOfWord;
