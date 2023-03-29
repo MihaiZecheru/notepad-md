@@ -1653,6 +1653,9 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         // last cell, go to newline
         if (!event.shiftKey) {
           notepad.selectionStart = notepad.selectionEnd = end_of_line + 1;
+          // cursor would only go to the beginning of the line, but pressing tab again
+          // will move it to the next cell
+          notepad.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab" }));
           return;
         }
       }
@@ -1676,8 +1679,12 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
       } else {
         if (event.shiftKey) {
+          // last cell in line
           if (cell === 0) {
             notepad.selectionStart = notepad.selectionEnd = start_of_line - 1;
+            // cursor would only go to the beginning of the line, but pressing tab again
+            // will move it to the next cell
+            notepad.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", shiftKey: true }));
             return;
           }
 
@@ -1691,7 +1698,11 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           if (notepad.value[start_of_line + cell_start - cells[cell].length - 3] === " ") {
             notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 3;
           } else {
+            // first cell inline, but shift+tab goes backwards so we need to go to the end of the line cell
             notepad.selectionEnd = start_of_line + cell_start - cells[cell].length - 2;
+            // cursor would only go to the beginning of the line, but pressing tab again
+            // will move it to the next cell
+            notepad.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", shiftKey: true }));
           }
 
           // notepad.selectionStart = start_of_line + cell_start - cells[cell].length - cells[cell - 1].length - 1;
@@ -1713,6 +1724,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
       }
     } else {
+      // regular tab
       if (!event.shiftKey) {
         insertText("\t");
       }
