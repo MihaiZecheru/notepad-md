@@ -528,7 +528,7 @@ function compileMarkdown(text) {
   }
 
   if (documentData.type === "markdown") {
-    // angle brackets
+  // angle brackets
     let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;")
 
     // newline
@@ -1323,7 +1323,7 @@ function compileMarkdown(text) {
     pre.appendChild(code);
     return pre.outerHTML;
   } else if (documentData.type === "text") {
-    return text;
+    return text.replace(/\n/g, "<br>");
   }
 }
 
