@@ -1493,6 +1493,18 @@ async function check_for_changes() {
   }
 }
 
+// automatically update on change
+notepad.addEventListener("input", (e) => {
+  // automatically update display - but do not save
+  doc.innerHTML = compileMarkdown(notepad.value);
+  
+  // highlight code after change - line numbers will be removed
+  // from the screen until the doc is saved again
+  if (documentData.type === "code") {
+    hljs.highlightAll();
+  }
+});
+
 document.getElementById("notepad").addEventListener("keydown", (event) => {
   check_for_changes();
   const sel = window.getSelection().toString();
