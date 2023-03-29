@@ -305,6 +305,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   // add bold contextmenu event listeners
   addBoldEventListeners();
 }).then(() => {
+  // show run code button if in code mode & language is set to javascript
+  if (documentData.type === "code" && documentData.language === "js") {
+    document.getElementById("run-code-btn").classList.remove("visually-hidden");
+  }
+
   if (documentData.type === "markdown") {
     document.getElementById("italics").addEventListener("click", () => {
       const sel = window.getSelection().toString();
@@ -1492,6 +1497,27 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   check_for_changes();
   const sel = window.getSelection().toString();
 
+  // insert two slashes to form a comment
+  // add the comment to the beginning of the line
+  if (event.key === "/" && documentData.type === "code") {
+    event.preventDefault();
+    
+    // prev positions
+    let prev_start = notepad.selectionStart;
+    let prev_end = notepad.selectionEnd;
+    
+    // move cursor to beginning of line
+    notepad.selectionStart = notepad.selectionEnd = notepad.value.substring(0, notepad.selectionStart).lastIndexOf("\n") + 1;
+    
+    // add comment
+    insertText("// ", 0);
+
+    // return to original position
+    notepad.selectionStart = prev_start + 3;
+    notepad.selectionEnd = prev_end + 3;
+    return;
+  }
+
   // close alert if present, exit fullscreen if in fullscreen, or unfocus notepad otherwise
   if (event.key === "Escape") {
     event.preventDefault();
@@ -1802,7 +1828,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
             }
           }
         }
-        break; 
+        break;
     }
   }
 
@@ -2093,6 +2119,10 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
           } else if (notepad.value.includes(sel)) {
             insertText(`> ${sel}`, 0);
           }
+        }
+        else if (documentData.type === "code") {
+          event.preventDefault();
+          document.getElementById("run-code-btn").click();
         }
         break;
 
@@ -3361,4 +3391,48 @@ document.getElementById("replace-button").addEventListener('click', () => {
   notepad.value = notepad.value.replaceAll(search, replace);
   setSaveStatus("not-saved");
   document.getElementById("close-search-btn").click();
+});
+
+// Run the javascript program written in the editor (will also run with ctrl+q)
+document.getElementById("run-code-btn").addEventListener('click', () => {
+  // save before running the program
+  saveDocument();
+  
+  // run code and show output in modal
+  const modal = document.getElementById("run-code-output-modal");
+  try {
+    // add spinner animation to modal popup
+    modal.querySelector(".modal-title").querySelector(".spinner-border").classList.remove("visually-hidden");
+
+    // focus the close button for quick exit
+    new Promise((r) => {
+      setTimeout(() => {
+        modal.querySelector(".close-btn").focus(); r();
+      }, 500);
+    });
+
+    // open empty modal
+    new bootstrap.Modal(modal).show();
+
+    // run code and show output to modal
+    modal.querySelector(".modal-body").innerText = eval(notepad.value);
+  } catch (e) {
+    // show error to modal
+    if (modal.querySelector(".modal-body").innerHTML.length) {
+      // if previous output exists, add a line break and then show the error
+      modal.querySelector(".modal-body").innerHTML += `<br><hr><br><p>${e}</p>`;
+    } else {
+      modal.querySelector(".modal-body").innerHTML = `<p>${e}</p>`;
+    }
+  };
+
+  // remove spinner animation as code is done running
+  document.getElementById("run-code-output-modal").querySelector(".spinner-border").classList.add("visually-hidden");
+});
+
+document.getElementById("run-code-output-modal").addEventListener("hidden.bs.modal", () => {
+  document.getElementById("run-code-output-modal").querySelector(".spinner-border").classList.add("visually-hidden");
+  document.querySelector(".modal-backdrop.fade.show")?.remove();
+  document.getElementById("run-code-output-modal").querySelector(".modal-body").innerHTML = "";
+  notepad.focus();
 });

@@ -90,6 +90,14 @@
     <div class="form-group">
       <div class="align-items" style="justify-content: space-between;">
         <div class="align-items">
+
+          <!-- hidden unless document is in code mode with language set to javascript -->
+          <div id="run-code-btn" class="visually-hidden">
+            <svg id="run-code-btn-svg" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+              <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+            </svg>
+          </div>
+
           <label for="document" class="disable-highlighting" style="margin-right: .5em;"><document-title>Untitled Document</document-title></label>
         </div>
         <div class="dropleft btn-group">
@@ -122,6 +130,20 @@
       </div>
     </div>
   </main>
+  <div class="modal fade" tabindex="-1" id="run-code-output-modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title justify-content">Program Output <div class="spinner-border text-primary visually-hidden" role="status" style="margin-left: .75rem; width: 1.25em; height: 1.25em;"></div></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary close-btn" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="modal fade modal-dialog-scrollable" tabindex="-1" id="word-count-modal" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

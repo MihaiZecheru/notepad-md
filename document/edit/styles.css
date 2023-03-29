@@ -397,3 +397,17 @@ ol > li.list-parenthesis:before {
   content: counter(list, lower-alpha) ") ";
   counter-increment: list;
 }
+
+#run-code-btn-svg {
+  fill: #28a745;
+}
+
+#run-code-btn-svg:hover {
+  cursor: pointer;
+  transform: scale(1.125);
+}
+
+/* for click effect */
+#run-code-btn-svg:active {
+  transform: scale(1);
+}
