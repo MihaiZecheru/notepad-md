@@ -1724,10 +1724,50 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         }
       }
     } else {
-      // regular tab
-      if (!event.shiftKey) {
-        insertText("\t");
+      /* regular tab press */
+      
+      // already handled
+      if (event.shiftKey) return;
+
+      // check if the cursor is at a place in the note that looks like this:
+      /*
+        lorem ipsum dolor sit amet
+        - <cursor>
+      */
+     // if the user pressed tab right there, the tab should be added to the beginning of the line instead
+     // so that the output looks like this:
+     /*
+        lorem ipsum dolor sit amet
+            - <cursor>
+      */
+
+     const start = notepad.selectionStart;
+     const end = notepad.selectionEnd;
+     
+     // handle index error
+     try {
+       // only if nothing has been selected
+       if (start === end) {
+        notepad.selectionStart = notepad.selectionEnd = notepad.value.substring(0, start).lastIndexOf("\n") + 1;
+        // support single, double, & triple nesting
+        if (
+          (notepad.value[notepad.selectionStart] === "-")
+            ||
+          (notepad.value[notepad.selectionStart] === "\t" && notepad.value[notepad.selectionStart + 1] === "-")
+            ||
+          (notepad.value[notepad.selectionStart] === "\t" && notepad.value[notepad.selectionStart + 1] === "\t" && notepad.value[notepad.selectionStart + 2] === "-")
+        ) {
+          insertText("\t");
+          notepad.selectionStart = start + 1;
+          notepad.selectionEnd = end + 1;
+        } else {
+          // add tab in the original position  
+          notepad.selectionStart = start;
+          notepad.selectionEnd = end;
+          insertText("\t");
+        }
       }
+     } catch (e) {};
     }
   }
 
