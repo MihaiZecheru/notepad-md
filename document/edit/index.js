@@ -2545,7 +2545,7 @@ document.getElementById("download-notepad-as-txt-btn").addEventListener('click',
 document.addEventListener('keydown', (e) => {
   if (!e.altKey) return;
 
-  if (e.code === "Digit1") {
+  if (e.code === "Digit1" || (e.code === "Digit1" && e.shiftKey)) {
     e.preventDefault();
     if (NOTEPAD_DISABLED) return;
     if (doc.dataset.fullscreen === "true" ? true : false) {
@@ -2555,7 +2555,7 @@ document.addEventListener('keydown', (e) => {
     document.querySelector("main div > span").click();
   }
   
-  if (e.code === "Digit2") {
+  if (e.code === "Digit2" || (e.code === "Digit2" && e.shiftKey)) {
     e.preventDefault();
     if (notepad.dataset.fullscreen === "true" ? true : false) {
       // notepad is fullscreen, so we need to exit it first
