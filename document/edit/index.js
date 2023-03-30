@@ -1532,12 +1532,15 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   // pressing (, [, or { will automatically add the closing brackets
   if (event.key === "(" && !event.ctrlKey) {
+    event.preventDefault();
     insertText("()", -1);
     return;
   } else if (event.key === "[" && !event.ctrlKey) {
+    event.preventDefault();
     insertText("[]", -1);
     return;
   } else if (event.key === "{" && !event.ctrlKey) {
+    event.preventDefault();
     insertText("{}", -1);
     return;
   }
