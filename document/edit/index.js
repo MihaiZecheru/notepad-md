@@ -1511,7 +1511,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
 
   // insert two slashes to form a comment
   // add the comment to the beginning of the line
-  if (event.key === "/" ** event.ctrlKey && documentData.type === "code") {
+  if (event.key === "/" && event.ctrlKey && documentData.type === "code") {
     event.preventDefault();
     
     // prev positions
