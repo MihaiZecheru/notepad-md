@@ -1529,6 +1529,30 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     notepad.selectionEnd = prev_end + 3;
     return;
   }
+  
+  // pressing (, [, or { will automatically add the closing brackets
+  if (event.key === "(" && !event.ctrlKey) {
+    insertText("()", -1);
+    return;
+  } else if (event.key === "[" && !event.ctrlKey) {
+    insertText("[]", -1);
+    return;
+  } else if (event.key === "{" && !event.ctrlKey) {
+    insertText("{}", -1);
+    return;
+  }
+  
+  // pressing (, [, or { while the cursor is already at the given character will prevent the char from being written twice
+  if (!event.ctrlKey && notepad.selectionStart === notepad.selectionEnd && (
+    event.key === ")" && notepad.value[notepad.selectionStart] === ")"
+    ||
+    event.key === "]" && notepad.value[notepad.selectionStart] === "]"
+    ||
+    event.key === "}" && notepad.value[notepad.selectionStart] === "}"
+  )) {
+    notepad.dispatchEvent(new KeyboardEvent('keydown',{'keycode':39}));
+    return;
+  }
 
   // close alert if present, exit fullscreen if in fullscreen, or unfocus notepad otherwise
   if (event.key === "Escape") {
