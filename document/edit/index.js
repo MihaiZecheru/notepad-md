@@ -1553,6 +1553,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     ||
     event.key === "}" && notepad.value[notepad.selectionStart] === "}"
   )) {
+    event.preventDefault();
     notepad.dispatchEvent(new KeyboardEvent('keydown',{'keycode':39}));
     return;
   }
