@@ -1554,8 +1554,8 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     event.key === "}" && notepad.value[notepad.selectionStart] === "}"
   )) {
     event.preventDefault();
-    notepad.selectionStart++;
     notepad.selectionEnd++;
+    notepad.selectionStart++;
     return;
   }
 
