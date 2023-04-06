@@ -1547,11 +1547,11 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
   
   // pressing (, [, or { while the cursor is already at the given character will prevent the char from being written twice
   if (!event.ctrlKey && notepad.selectionStart === notepad.selectionEnd && (
-    event.key === ")" && notepad.value[notepad.selectionStart] === ")"
+    (event.key === ")" && notepad.value[notepad.selectionStart] === ")")
     ||
-    event.key === "]" && notepad.value[notepad.selectionStart] === "]"
+    (event.key === "]" && notepad.value[notepad.selectionStart] === "]")
     ||
-    event.key === "}" && notepad.value[notepad.selectionStart] === "}"
+    (event.key === "}" && notepad.value[notepad.selectionStart] === "}")
   )) {
     event.preventDefault();
     notepad.selectionEnd++;
