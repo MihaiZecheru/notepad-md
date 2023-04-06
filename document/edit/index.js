@@ -1602,7 +1602,9 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
       notepad.selectionStart = notepad.selectionEnd = previous_cursor_location - 2;
 
       if (event.key === "Enter") {
-        insertText("\n");
+        // Get amount of tabs on current line
+        const tabs = line_content.replace(/[^a]/g, "").length;
+        insertText("\t".repeat(tabs) + "\n");
       }
       return;
     }
