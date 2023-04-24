@@ -1926,6 +1926,14 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
         break;
     }
   }
+  
+  if (event.code === "Enter" && documentData.type === "code" && notepad.selectionStart === notepad.selectionEnd) {
+    // Put two enters instead of one
+    if (notepad.value[notepad.selectionStart] === "}") {
+      insertText("\n\n", -1);
+      event.preventDefault();
+    }
+  }
 
   if (event.code === "Enter" && documentData.type === "markdown" && notepad.selectionStart === notepad.selectionEnd) {
     if (event.ctrlKey) {
