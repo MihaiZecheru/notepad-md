@@ -1932,6 +1932,7 @@ document.getElementById("notepad").addEventListener("keydown", (event) => {
     if (notepad.value[notepad.selectionStart] === "}") {
       insertText("\n\n", -1);
       event.preventDefault();
+      return;
     }
   }
 
