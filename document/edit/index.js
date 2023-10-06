@@ -1368,6 +1368,7 @@ async function updateCheckbox(email, element_id, status) {
 
 async function saveDocument() {
   let text = notepad.value;
+  last_change = new Date().getTime();
   
   if (text === previousText) {
     setSaveStatus("saved");
@@ -1484,12 +1485,25 @@ document.addEventListener("keypress", (event) => {
   }
 });
 
+let last_change = new Date().getTime();
 async function check_for_changes() {
   if (previousText.trimEnd() !== notepad.value.trimEnd()) {
+    last_change = new Date().getTime();
     setSaveStatus("not-saved");
     previousText === notepad.value;
   }
 }
+
+new Promise((resolve, reject) => {
+  // Save if there haven't been any changes in 2.5 seconds
+  setInterval(async () => {
+    const timestamp = new Date().getTime();
+    if (timestamp - last_change >= 2000 && previousText.trimEnd() !== notepad.value.trimEnd()) {
+      await saveDocument();
+      last_change = timestamp;
+    }
+  }, 100);
+});
 
 // automatically update on change
 notepad.addEventListener("input", (e) => {
