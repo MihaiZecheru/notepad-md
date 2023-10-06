@@ -159,6 +159,11 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
     window.location.href = "/account/me/documents/?error=private_document";
   }
 
+  // show run code button if in code mode & language is set to javascript
+  if (documentData.type === "code" && documentData.language === "js") {
+    document.getElementById("run-code-btn").classList.remove("visually-hidden");
+  }
+
   if (documentData.type === "code") {
     document.getElementById(`theme-${documentData.theme}`).disabled = false;
     const lang = langs[documentData.language];
@@ -1448,6 +1453,56 @@ document.addEventListener('keydown', (e) => {
     new bootstrap.Modal(document.getElementById("word-count-modal")).show();
     return;
   }
+
+  if (e.ctrlKey && e.code === "KeyQ") {
+    e.preventDefault();
+    document.getElementById("run-code-btn").click();
+    return;
+  }
+});
+
+// Run the javascript program written in the editor (will also run with ctrl+q)
+document.getElementById("run-code-btn").addEventListener('click', () => {
+  // capture console.log output stream
+  const oldConsoleLog = console.log;
+  let consoleLogOutput = "";
+  console.log = (message) => {
+    consoleLogOutput += message + "\n";
+    oldConsoleLog.apply(console);
+  };
+  
+  // run code and show output in modal
+  const modal = document.getElementById("run-code-output-modal");
+  try {
+    // add spinner animation to modal popup
+    modal.querySelector(".modal-title").querySelector(".spinner-border").classList.remove("visually-hidden");
+
+    // focus the close button for quick exit
+    new Promise((r) => {
+      setTimeout(() => {
+        modal.querySelector(".close-btn").focus(); r();
+      }, 500);
+    });
+
+    // open empty modal
+    new bootstrap.Modal(modal).show();
+
+    // run code and show output to modal
+    eval(doc.innerText);
+    modal.querySelector(".modal-body").innerText = consoleLogOutput;
+    console.log = oldConsoleLog;
+  } catch (e) {
+    // show error to modal
+    if (modal.querySelector(".modal-body").innerHTML.length) {
+      // if previous output exists, add a line break and then show the error
+      modal.querySelector(".modal-body").innerHTML += `<br><hr><br><p>${e}</p>`;
+    } else {
+      modal.querySelector(".modal-body").innerHTML = `<p>${e}</p>`;
+    }
+  };
+
+  // remove spinner animation as code is done running
+  document.getElementById("run-code-output-modal").querySelector(".spinner-border").classList.add("visually-hidden");
 });
 
 doc.addEventListener('keydown', (e) => {
@@ -1874,8 +1929,4 @@ document.getElementById("settings-modal-document-type").addEventListener('change
 
 document.getElementById("settings-modal").addEventListener("shown.bs.modal", () => {
   document.getElementById("settings-modal-document-title").select();
-});
-
-document.getElementById("search-modal").addEventListener("hidden.bs.modal", () => {
-  document.querySelector(".modal-backdrop.fade.show").remove();
 });
