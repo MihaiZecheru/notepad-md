@@ -2796,6 +2796,7 @@ document.body.addEventListener('keydown', (e) => {
 
   // document settings
   if (e.ctrlKey && e.altKey && e.code === "KeyS" && documentData.owner.replace(/,/g, ".") === email.replace(/,/g, ".")) {
+    e.preventDefault();
     document.getElementById("settings").click();
     return;
   }
