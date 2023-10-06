@@ -204,17 +204,15 @@ fetch(`https://notepad-md-32479-default-rtdb.firebaseio.com/documents/${document
   }
 
   notepad.style.fontSize = documentData.fontSize + 'px';
+  doc.style.fontSize = notepad.style.fontSize;
   notepad.style.tabSize = documentData.indentSize;
-  notepad.style.fontFamily = fonts[documentData.font];
+  doc.style.tabsize = notepad.style.tabSize;
+  doc.style.fontFamily = notepad.style.fontFamily;
 
   // add font to document, has to be done through style tag to get all children of #document
   let style = document.createElement("style");
   style.innerHTML = `#document *, #document { font-family: "${fonts[documentData.font]}"!important; }`;
   document.head.appendChild(style);
-  
-  if (documentData.type !== "code") {
-    doc.style.fontSize = documentData.fontSize + 'px';
-  }
 
   notepad.value = previousText = _doc.content || "";
   previousHTML = compileMarkdown(_doc.content) || "";
@@ -2739,7 +2737,9 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     doc.style.paddingRight = `calc(${doc.offsetWidth - doc.clientWidth}px + 1.25vw + ${fullscreen_box.clientWidth}px)`;
 
     // delete alert if it exists
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    try {
+      document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    } catch (err) {};
     doc.dataset.fullscreen = true;
     notepad.blur();
     doc.tabIndex = 100;
@@ -2760,7 +2760,9 @@ document.querySelector(".dropleft > span").addEventListener('click', () => {
     fullscreen_box.style = doc_fullscreen_previous_styles;
     
     // delete alert if it exists
-    document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    try {
+      document.getElementById("footnotes-alert-placeholder").innerHTML = "";
+    } catch (err) {};
     doc.dataset.fullscreen = false;
     doc.blur();
     notepad.focus();
@@ -3501,6 +3503,14 @@ document.getElementById("replace-button").addEventListener('click', () => {
 document.getElementById("run-code-btn").addEventListener('click', () => {
   // save before running the program
   saveDocument();
+
+  // capture console.log output stream
+  const oldConsoleLog = console.log;
+  let consoleLogOutput = "";
+  console.log = (message) => {
+    consoleLogOutput += message + "\n";
+    oldConsoleLog.apply(console);
+  };
   
   // run code and show output in modal
   const modal = document.getElementById("run-code-output-modal");
@@ -3519,7 +3529,9 @@ document.getElementById("run-code-btn").addEventListener('click', () => {
     new bootstrap.Modal(modal).show();
 
     // run code and show output to modal
-    modal.querySelector(".modal-body").innerText = eval(notepad.value);
+    eval(notepad.value);
+    modal.querySelector(".modal-body").innerText = consoleLogOutput;
+    console.log = oldConsoleLog;
   } catch (e) {
     // show error to modal
     if (modal.querySelector(".modal-body").innerHTML.length) {
