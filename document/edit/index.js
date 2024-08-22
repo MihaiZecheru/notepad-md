@@ -126,6 +126,7 @@ const langs = {
   "cs": "csharp",
   "cpp": "cpp",
   "c": "c",
+  "java": "java",
   "en": "english",
   "sp": "spanish",
   "fr": "french"
